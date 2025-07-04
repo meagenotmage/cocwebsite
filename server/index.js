@@ -56,8 +56,42 @@ app.post('/api/announcements', async (req, res) => {
     }
 });
 
+// --- Mongoose Schema & Model for Events ---
+const eventSchema = new mongoose.Schema({
+    date: { type: String, required: true }, // Store date as "YYYY-MM-DD" string for easy matching
+    title: { type: String, required: true },
+    description: { type: String, required: true }
+});
+
+const Event = mongoose.model('Event', eventSchema);
+
+// --- New API Endpoint for Events ---
+
+// GET all events from the database
+app.get('/api/events', async (req, res) => {
+    try {
+        const events = await Event.find();
+        res.json(events);
+    } catch (err) {
+        res.status(500).json({ message: "Error fetching events", error: err });
+    }
+});
+
+// POST a new event (for you to add data with Postman)
+app.post('/api/events', async (req, res) => {
+    const { date, title, description } = req.body;
+    const newEvent = new Event({ date, title, description });
+    try {
+        const savedEvent = await newEvent.save();
+        res.status(201).json(savedEvent);
+    } catch (err) {
+        res.status(400).json({ message: "Error saving event", error: err });
+    }
+});
+
 
 // --- Start the Server ---
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
+
