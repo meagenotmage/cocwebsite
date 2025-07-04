@@ -21,7 +21,7 @@
             <a href="#" class="logo">
                 <img src="assets/coc.png" alt="College Logo"> 
             </a>
-            <nav>
+            <nav class="desktop-nav">
                 <ul>
                     <li><a href="#" class="active">Home</a></li>
                     <li><a href="#">Order</a></li>
@@ -30,8 +30,25 @@
                     <li><a href="#">About Us</a></li>
                 </ul>
             </nav>
+            <!-- ADDED: Hamburger Menu Button -->
+            <button class="hamburger" id="hamburger-btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
         </div>
     </header>
+
+    <!-- ADDED: Mobile Navigation Menu -->
+    <div class="mobile-nav" id="mobile-nav">
+        <button class="mobile-nav-close" id="mobile-nav-close-btn">×</button>
+        <ul>
+            <li><a href="#" class="active">Home</a></li>
+            <li><a href="#">Order</a></li>
+            <li><a href="#">Feedback</a></li>
+            <li><a href="#">Processing Logs</a></li>
+            <li><a href="#">About Us</a></li>
+        </ul>
+    </div>
+
 
     <!-- ======================= -->
     <!--       HERO BANNER       -->
@@ -206,19 +223,16 @@
                     <li><a href="#">About Us</a></li>
                 </ul>
             </div>
-            <!-- MODIFIED: Wrapped right side in a new div -->
             <div class="footer-right-column">
                 <div class="footer-social">
                     <h3>Social Media</h3>
                     <div class="social-icons">
-                        <!-- Replaced text with icons -->
-                        <a href="https://www.facebook.com/wvsucocsc" target="_blank"><i class="fa-brands fa-facebook" style="color:#9d0303; font-size: 32px; margin-right: 10px;"></i></a>
-                        <a href="https://www.facebook.com/wvsucoc" target="_blank"><i class="fa-brands fa-facebook" style="color:#9d0303; font-size: 32px; margin-right: 10px;"></i></a>
-                        <a href="https://www.instagram.com/wvsucocsc/" target="_blank"><i class="fa-brands fa-instagram" style="color:#9d0303; font-size: 32px;"></i></a>
+                        <a href="https://www.facebook.com/wvsucocsc" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="https://www.facebook.com/wvsucoc" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="https://www.instagram.com/wvsucocsc/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
 
                     </div>
                 </div>
-                 <!-- ADDED: New logos -->
                 <div class="footer-extra-logos">
                      <img src="assets/wvsu.png" alt="WVSU Seal">
                      <img src="assets/coc.png" alt="COC Seal">

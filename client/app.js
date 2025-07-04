@@ -42,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             announcementsContainer.innerHTML = ''; 
 
-            // ---MODIFIED: Condition changed to > 4 ---
             if (announcements.length > 4) {
                 announcementsContainer.classList.add('scrollable');
             } else {
@@ -167,6 +166,20 @@ document.addEventListener('DOMContentLoaded', () => {
             hideEventModal();
         }
     });
+
+    // --- NEW: Hamburger Menu Logic ---
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const mobileNav = document.getElementById('mobile-nav');
+    const mobileNavCloseBtn = document.getElementById('mobile-nav-close-btn');
+
+    hamburgerBtn.addEventListener('click', () => {
+        mobileNav.classList.add('open');
+    });
+
+    mobileNavCloseBtn.addEventListener('click', () => {
+        mobileNav.classList.remove('open');
+    });
+    
 
     // --- Initial Load ---
     fetchAndDisplayAnnouncements();
