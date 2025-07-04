@@ -3,23 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/coc.png" />
     <title>College of Communications</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="style.css">
-    <!-- You can add a link to a font library like Google Fonts here -->
 </head>
 <body>
 
     <!-- ======================= -->
     <!--          HEADER         -->
     <!-- ======================= -->
-    <header>
+     <header>
         <div class="container">
             <a href="#" class="logo">
-                <img src="https://i.imgur.com/G5gVAf7.png" alt="College Logo"> <!-- Placeholder Logo -->
+                <img src="assets/coc.png" alt="College Logo"> 
             </a>
             <nav>
                 <ul>
-                    <li><a href="#">Home</a></li>
+                    <li><a href="#" class="active">Home</a></li>
                     <li><a href="#">Order</a></li>
                     <li><a href="#">Feedback</a></li>
                     <li><a href="#">Processing Logs</a></li>
@@ -33,116 +37,154 @@
     <!--       HERO BANNER       -->
     <!-- ======================= -->
     <section class="hero">
+    <div class="container">
         <div class="hero-content">
+            <p class="hero-subheading">THE VOICE OF THE UNIVERSITY</p>
             <h1>College of Communications</h1>
-            <p>ang bagong, mas pinabonggang college!</p>
-            <a href="#" class="btn-apply">Apply Here</a>
+            <p>Ano ang description ka college</p>
+          <a href="https://www.facebook.com/wvsucoc" class="btn-apply">Apply Here</a>
         </div>
+    </div>
     </section>
 
     
-        <!-- ======================= -->
-        <!-- ANNOUNCEMENTS & CALENDAR -->
-         <!-- announcements -->  
-      <main class="container">
-        <section class="info-section">
-            <div class="announcements" id="announcements-container">
-                <!-- Announcements will be loaded here by JavaScript -->
+    <!-- ======================= -->
+    <!-- ANNOUNCEMENTS & CALENDAR -->
+    <!-- ======================= -->
+    <section class="info-section container">
+        <div class="announcements-wrapper">
+            <div class="announcements">
+                <h2 class="section-title">Announcements</h2>
+                <div id="announcements-container">
+                    <!-- JS will load announcements here -->
+                </div>
             </div>
+        </div>
 
-            <!-- Calendar -->
-              <div class="calendar">
+        <div id="event-modal" class="modal-backdrop hidden">
+            <div class="modal-content">
+                <button id="event-modal-close-btn" class="modal-close-btn">×</button>
+                <h2 id="event-modal-title">Event Title</h2>
+                <p id="event-modal-description">Event description goes here.</p>
+            </div>
+        </div>
+
+        <div class="calendar-wrapper">
+            <div class="calendar">
                 <div class="calendar-header">
-                    <span class="arrow"><</span>
-                    <h3>June 2025</h3>
-                    <span class="arrow">></span>
+                    <span class="arrow" id="prev-month-btn"><</span>
+                    <h3 id="month-year-header">June 2025</h3>
+                    <span class="arrow" id="next-month-btn">></span>
+                </div>
+                <div class="calendar-weekdays">
+                    <div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div><div>Su</div>
                 </div>
                 <div class="calendar-grid" id="calendar-grid">
-                    <div class="day-name">Mo</div><div class="day-name">Tu</div><div class="day-name">We</div><div class="day-name">Th</div><div class="day-name">Fr</div><div class="day-name">Sa</div><div class="day-name">Su</div>
-                    <div></div><div></div><div></div><div></div><div></div><div></div><div data-date="2025-06-01">1</div>
-                    <div data-date="2025-06-02">2</div><div data-date="2025-06-03">3</div><div data-date="2025-06-04">4</div><div data-date="2025-06-05">5</div><div data-date="2025-06-06">6</div><div data-date="2025-06-07">7</div><div data-date="2025-06-08">8</div>
-                    <div data-date="2025-06-09">9</div><div data-date="2025-06-10">10</div><div data-date="2025-06-11">11</div><div data-date="2025-06-12">12</div><div data-date="2025-06-13">13</div><div data-date="2025-06-14">14</div><div data-date="2025-06-15">15</div>
-                    <div data-date="2025-06-16">16</div><div data-date="2025-06-17">17</div><div data-date="2025-06-18">18</div><div data-date="2025-06-19">19</div><div data-date="2025-06-20">20</div><div data-date="2025-06-21">21</div><div data-date="2025-06-22">22</div>
-                    <div data-date="2025-06-23">23</div><div data-date="2025-06-24">24</div><div data-date="2025-06-25">25</div><div data-date="2025-06-26">26</div><div class="today" data-date="2025-06-27">27</div><div data-date="2025-06-28">28</div>
-                    <div data-date="2025-06-29">29</div><div data-date="2025-06-30">30</div>
+                    <!-- JS will generate calendar days here -->
                 </div>
-                 <div class="calendar-legend">
+                <div class="calendar-legend">
                     <div class="legend-item"><span class="color-box event-day"></span> EVENT</div>
                     <div class="legend-item"><span class="color-box today"></span> DATE TODAY</div>
                 </div>
+                <a href="assets/COCSC_Calendar.pdf" download class="calendar-download-link">
+                    COCSC Calendar of Activities 2025-2026
+                </a>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- ======================= -->
-        <!--  STUDENT ORGANIZATIONS  -->
-        <!-- ======================= -->
-        <section class="organizations">
-            <h2>Student Organizations</h2>
-            <div class="org-grid">
-                <!-- Card 1 -->
-                <div class="org-card">
-                    <div class="org-title">BROADCAST GUILD</div>
-                    <div class="org-content">
-                        <img src="https://i.imgur.com/g8i4VfR.png" alt="Broadcast Guild Logo">
-                        <div class="org-info">
-                            <!-- Info text here if needed -->
-                            <a href="#">Learn More</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 2 -->
-                <div class="org-card">
-                    <div class="org-title">THE MEDIATOR</div>
-                    <div class="org-content">
-                        <img src="https://i.imgur.com/g239xWl.png" alt="The Mediator Logo">
-                        <div class="org-info">
-                            <a href="#">Learn More</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 3 -->
-                <div class="org-card">
-                    <div class="org-title">YOUNG JOURNALIST'S SOCIETY</div>
-                    <div class="org-content">
-                        <img src="https://i.imgur.com/v8tTqUn.png" alt="YJS Logo">
-                         <div class="org-info">
-                            <a href="#">Learn More</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 4 -->
-                 <div class="org-card">
-                    <div class="org-title">STUDIOSITAS</div>
-                    <div class="org-content">
-                        <img src="https://i.imgur.com/t4fSNCB.png" alt="Studiositas Logo">
-                         <div class="org-info">
-                            <a href="#">Learn More</a>
-                        </div>
-                    </div>
-                </div>
-                 <!-- Card 5 -->
-                <div class="org-card">
-                    <div class="org-title">DEVELOPMENT COMMUNICATOR'S SOCIETY</div>
-                    <div class="org-content">
-                        <img src="https://i.imgur.com/uR4dY3i.png" alt="DCS Logo">
-                         <div class="org-info">
-                            <a href="#">Learn More</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 6 -->
-                 <div class="org-card">
-                    <div class="org-title">SINEMASKOM</div>
-                    <div class="org-content">
-                        <img src="https://i.imgur.com/w9N3gqf.png" alt="Sinemaskom Logo">
-                         <div class="org-info">
-                            <a href="#">Learn More</a>
-                        </div>
+    <!-- ======================= -->
+    <!--  STUDENT ORGANIZATIONS  -->
+    <!-- ======================= -->
+    <section class="organizations container">
+        <h2>Student Organizations</h2>
+        <div class="org-grid">
+            <!-- Card 1 -->
+            <div class="org-card">
+                <div class="org-title">BROADCAST GUILD</div>
+                <div class="org-content">
+                    <img src="assets/broadcasting.png" alt="Broadcast Guild Logo">
+                    <div class="org-info">
+                        <p>Beberapa Foto Ketika</p>
+                        <p>Wisida Tahfidz Murid -</p>
+                        <p>Murid SMP Negeri 1</p>
+                        <p>Cibadak</p>
+                        <a href="#">Learn More</a>
                     </div>
                 </div>
             </div>
-        </section>
-    </main>
+            <!-- Card 2 -->
+            <div class="org-card">
+                <div class="org-title">THE MEDIATOR</div>
+                <div class="org-content">
+                    <img src="assets/mediator.png" alt="The Mediator Logo">
+                    <div class="org-info">
+                        <p>Beberapa Foto Ketika</p>
+                        <p>Wisida Tahfidz Murid -</p>
+                        <p>Murid SMP Negeri 1</p>
+                        <p>Cibadak</p>
+                        <a href="#">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="org-card">
+                <div class="org-title">YOUNG JOURNALIST'S SOCIETY</div>
+                <div class="org-content">
+                    <img src="assets/journalist.png" alt="YJS Logo">
+                     <div class="org-info">
+                        <p>Beberapa Foto Ketika</p>
+                        <p>Wisida Tahfidz Murid -</p>
+                        <p>Murid SMP Negeri 1</p>
+                        <p>Cibadak</p>
+                        <a href="#">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 4 -->
+             <div class="org-card">
+                <div class="org-title">STUDIOSITAS</div>
+                <div class="org-content">
+                    <img src="assets/studiositas.png" alt="Studiositas Logo">
+                     <div class="org-info">
+                        <p>Beberapa Foto Ketika</p>
+                        <p>Wisida Tahfidz Murid -</p>
+                        <p>Murid SMP Negeri 1</p>
+                        <p>Cibadak</p>
+                        <a href="#">Learn More</a>
+                    </div>
+                </div>
+            </div>
+             <!-- Card 5 -->
+            <div class="org-card">
+                <div class="org-title">DEVELOPMENT COMMUNICATOR'S SOCIETY</div>
+                <div class="org-content">
+                    <img src="assets/devcom.png" alt="DCS Logo">
+                     <div class="org-info">
+                        <p>Beberapa Foto Ketika</p>
+                        <p>Wisida Tahfidz Murid -</p>
+                        <p>Murid SMP Negeri 1</p>
+                        <p>Cibadak</p>
+                        <a href="#">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 6 -->
+             <div class="org-card">
+                <div class="org-title">SINEMASKOM</div>
+                <div class="org-content">
+                    <img src="assets/sinemaskom.png" alt="Sinemaskom Logo">
+                     <div class="org-info">
+                        <p>Beberapa Foto Ketika</p>
+                        <p>Wisida Tahfidz Murid -</p>
+                        <p>Murid SMP Negeri 1</p>
+                        <p>Cibadak</p>
+                        <a href="#">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- ======================= -->
     <!--          FOOTER         -->
@@ -150,7 +192,7 @@
     <footer>
         <div class="container footer-content">
             <div class="footer-info">
-                <img src="https://i.imgur.com/G5gVAf7.png" alt="College Logo" class="footer-logo">
+                <img src="assets/COCSC.png" alt="College Logo" class="footer-logo">
                 <p>WVSU College of Communication, Luna St. La Paz<br>Iloilo City, Philippines 5000</p>
                 <p>coc.sec@wvsu.edu.ph</p>
                 <p>admission.coc@wvsu.edu.ph</p>
@@ -164,13 +206,22 @@
                     <li><a href="#">About Us</a></li>
                 </ul>
             </div>
-            <div class="footer-social">
-                <h3>Social Media</h3>
-                <div class="social-icons">
-                    <!-- You would use icon fonts or SVGs here -->
-                    <a href="#">T</a>
-                    <a href="#">f</a>
-                    <a href="#">Y</a>
+            <!-- MODIFIED: Wrapped right side in a new div -->
+            <div class="footer-right-column">
+                <div class="footer-social">
+                    <h3>Social Media</h3>
+                    <div class="social-icons">
+                        <!-- Replaced text with icons -->
+                        <a href="https://www.facebook.com/wvsucocsc" target="_blank"><i class="fa-brands fa-facebook" style="color:#9d0303; font-size: 32px; margin-right: 10px;"></i></a>
+                        <a href="https://www.facebook.com/wvsucoc" target="_blank"><i class="fa-brands fa-facebook" style="color:#9d0303; font-size: 32px; margin-right: 10px;"></i></a>
+                        <a href="https://www.instagram.com/wvsucocsc/" target="_blank"><i class="fa-brands fa-instagram" style="color:#9d0303; font-size: 32px;"></i></a>
+
+                    </div>
+                </div>
+                 <!-- ADDED: New logos -->
+                <div class="footer-extra-logos">
+                     <img src="assets/wvsu.png" alt="WVSU Seal">
+                     <img src="assets/coc.png" alt="COC Seal">
                 </div>
             </div>
         </div>
@@ -178,11 +229,10 @@
             <p>Copyright © COCSC 2025. All Rights Reserved.</p>
         </div>
     </footer>
- <!-- ======================= -->
+
+    <!-- ======================= -->
     <!--  MODALS & TOOLTIPS      -->
     <!-- ======================= -->
-
-    <!-- Announcement Modal (hidden by default) -->
     <div id="announcement-modal" class="modal-backdrop hidden">
         <div class="modal-content">
             <button class="modal-close-btn">×</button>
@@ -191,12 +241,10 @@
         </div>
     </div>
 
-    <!-- Calendar Event Tooltip (hidden by default) -->
     <div id="event-tooltip" class="tooltip hidden">
         <h4 id="tooltip-title"></h4>
         <p id="tooltip-description"></p>
     </div>
-
 
     <script src="app.js"></script>
 </body>
