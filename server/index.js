@@ -1,100 +1,59 @@
-// server/index.js
-require('dotenv').config(); // Loads environment variables from .env file
+// --- 1. SETUP ---
+require('dotenv').config(); // Loads variables from .env file
 const express = require('express');
-const cors = require('cors');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 const app = express();
-const port = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3001;
 
-// --- Middleware ---
-const corsOptions = { 
-        origin: process.env.CORS_ORIGIN
+// --- 2. MIDDLEWARE ---
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN 
 };
-app.use(cors(corsOptions))
-app.use(express.json()); // Middleware to parse JSON bodies from POST requests
+app.use(cors(corsOptions));
+app.use(express.json()); // Middleware to parse JSON bodies
 
-// --- MongoDB Connection ---
+// --- 3. DATABASE CONNECTION ---
 mongoose.connect(process.env.DATABASE_URL)
-    .then(() => console.log("MongoDB connected successfully!"))
-    .catch(err => console.error("MongoDB connection error:", err));
+  .then(() => console.log('Successfully connected to MongoDB!'))
+  .catch(err => console.error('Database connection error:', err));
 
-// --- Mongoose Schema & Model ---
-// This defines the structure of our documents in the "announcements" collection
-const announcementSchema = new mongoose.Schema({
-    title: { type: String, required: true },
-    content: { type: String, required: true },
-    date: { type: Date, default: Date.now }
+// Define your Mongoose schemas and models here (e.g., Announcement, Event)
+const Announcement = mongoose.model('Announcement', new mongoose.Schema({ title: String, content: String, date: Date }));
+const Event = mongoose.model('Event', new mongoose.Schema({ title: String, description: String, date: String }));
+
+
+// --- 4. API ROUTES (WITH CORRECTED PATHS) ---
+
+// Welcome route for the root URL
+app.get('/', (req, res) => {
+  res.send('COCSC API Server is running.');
 });
 
-const Announcement = mongoose.model('Announcement', announcementSchema);
-
-// --- API Endpoints ---
-
-// GET all announcements from the database
+// Announcements Route
 app.get('/api/announcements', async (req, res) => {
-    try {
-        const announcements = await Announcement.find().sort({ date: -1 }); // Get all, sorted by newest first
-        res.json(announcements);
-    } catch (err) {
-        res.status(500).json({ message: "Error fetching announcements", error: err });
-    }
+  try {
+    const announcements = await Announcement.find().sort({ date: -1 });
+    res.json(announcements);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch announcements.' });
+  }
 });
 
-// POST a new announcement to the database
-// (You can use Postman to test this endpoint and add data)
-app.post('/api/announcements', async (req, res) => {
-    const { title, content } = req.body;
-
-    const newAnnouncement = new Announcement({
-        title: title,
-        content: content
-    });
-
-    try {
-        const savedAnnouncement = await newAnnouncement.save();
-        res.status(201).json(savedAnnouncement);
-    } catch (err) {
-        res.status(400).json({ message: "Error saving announcement", error: err });
-    }
-});
-
-// --- Mongoose Schema & Model for Events ---
-const eventSchema = new mongoose.Schema({
-    date: { type: String, required: true }, // Store date as "YYYY-MM-DD" string for easy matching
-    title: { type: String, required: true },
-    description: { type: String, required: true }
-});
-
-const Event = mongoose.model('Event', eventSchema);
-
-// --- New API Endpoint for Events ---
-
-// GET all events from the database
+// Events Route
 app.get('/api/events', async (req, res) => {
-    try {
-        const events = await Event.find();
-        res.json(events);
-    } catch (err) {
-        res.status(500).json({ message: "Error fetching events", error: err });
-    }
+  try {
+    const events = await Event.find().sort({ date: 1 });
+    res.json(events);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch events.' });
+  }
 });
 
-// POST a new event (for you to add data with Postman)
-app.post('/api/events', async (req, res) => {
-    const { date, title, description } = req.body;
-    const newEvent = new Event({ date, title, description });
-    try {
-        const savedEvent = await newEvent.save();
-        res.status(201).json(savedEvent);
-    } catch (err) {
-        res.status(400).json({ message: "Error saving event", error: err });
-    }
+// Add any other routes (e.g., app.post) here with the /api prefix
+
+// --- 5. START SERVER ---
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
-
-
-// --- Start the Server ---
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
-
