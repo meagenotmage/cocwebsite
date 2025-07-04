@@ -5,14 +5,17 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3001;
 
 // --- Middleware ---
-app.use(cors());
+const corsOptions = { 
+        origin: process.env.CORS_ORIGIN
+};
+app.use(cors(corsOptions))
 app.use(express.json()); // Middleware to parse JSON bodies from POST requests
 
 // --- MongoDB Connection ---
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.DATABASE_URL)
     .then(() => console.log("MongoDB connected successfully!"))
     .catch(err => console.error("MongoDB connection error:", err));
 
