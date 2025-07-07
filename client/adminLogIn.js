@@ -1,31 +1,23 @@
 // Default admin credentials
 let adminEmail = "cocadmin@coc.web";
-let adminPassword = "pakiss123";
+let adminPassword = "password123";
 
 const loginForm = document.getElementById("login-form");
 
 loginForm.addEventListener("submit", function(event) {
-    event.preventDefault();
+    // Prevent the form from submitting the default way
+    event.preventDefault(); 
+    
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
+    // Check if the credentials are correct
     if (email === adminEmail && password === adminPassword) {
-        alert("Login successful!");
-        
-        // You can redirect to an admin dashboard here.
-        // For demonstration, we'll allow changing credentials via prompts.
-        const newEmail = prompt("Enter new admin email (leave blank to keep current):");
-        const newPassword = prompt("Enter new admin password (leave blank to keep current):");
-
-        if (newEmail) {
-            adminEmail = newEmail;
-            alert("Admin email updated successfully!");
-        }
-        if (newPassword) {
-            adminPassword = newPassword;
-            alert("Admin password updated successfully!");
-        }
+        // If successful, redirect to the admin dashboard
+        // THIS IS THE CORRECTED LINE:
+        window.location.href = 'admin.html'; 
     } else {
+        // If incorrect, show an error message
         alert("Invalid email or password.");
     }
 });
@@ -40,9 +32,4 @@ function togglePassword() {
         passwordField.type = "password";
         toggleIcon.textContent = "Hide";
     }
-}
-
-function goHome() {
-    // Replace with your actual home page URL
-    window.location.href = "https://example.com";
 }

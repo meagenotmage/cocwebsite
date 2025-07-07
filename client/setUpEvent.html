@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/COCSC.png" />
+    <title>Set-Up Event - Admin</title>
+    <link rel="stylesheet" href="setUpEvent.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- ======================= -->
+        <!--        SIDEBAR          -->
+        <!-- ======================= -->
+        <aside class="sidebar">
+            <h1 class="sidebar-title">Hi, Admin!</h1>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="admin.html"><i class="fa-solid fa-tachograph-digital"></i> Dashboard</a></li>
+                    <li><a href="adminFeedback.html"><i class="fa-solid fa-users"></i> Feedbacks</a></li>
+                    <li><a href="adminOrder.html"><i class="fa-solid fa-box-archive"></i> Orders</a></li>
+                    <li class="active"><a href="setUpEvent.html"><i class="fa-solid fa-calendar-plus"></i> Set-Up Event</a></li>
+                    <li><a href="createAnnouncement.html"><i class="fa-solid fa-bullhorn"></i> Announcements</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="adminLogIn.html"><i class="fa-solid fa-question-circle"></i> Log out</a>
+            </div>
+        </aside>
+        <!-- ======================= -->
+        <!--       MAIN CONTENT      -->
+        <!-- ======================= -->
+        <main class="main-content">
+            <!-- Event Creation Form -->
+            <div class="card">
+                <h2>Set-Up Event</h2>
+                <form id="event-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="event-name">Event name</label>
+                            <input type="text" id="event-name" placeholder="Event name">
+                        </div>
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <input type="text" id="location" placeholder="Input Location">
+                        </div>
+                        <div class="form-group">
+                            <label for="start-date">Start date from:</label>
+                            <input type="date" id="start-date">
+                        </div>
+                        <div class="form-group">
+                            <label for="finish-date">Finish date from:</label>
+                            <input type="date" id="finish-date">
+                        </div>
+                        <div class="form-group">
+                            <label for="start-time">Start time from:</label>
+                            <input type="time" id="start-time">
+                        </div>
+                        <div class="form-group">
+                            <label for="finish-time">Finish time from:</label>
+                            <input type="time" id="finish-time">
+                        </div>
+                        <div class="form-group form-group-full">
+                            <label for="event-description">Event Description</label>
+                            <textarea id="event-description" placeholder="Search..."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-clear">Clear</button>
+                        <button type="submit" class="btn btn-publish">Publish</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Events List Table -->
+            <div class="card">
+                <h2>EVENTS</h2>
+                <div class="table-container">
+                    <table class="events-table">
+                        <thead>
+                            <tr>
+                                <th>Event Name</th>
+                                <th>Dates</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th>Date Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="events-tbody">
+                            <!-- JS will populate this -->
+                            <tr>
+                                <td>WVSU Pag-Irilimaw 2025</td>
+                                <td>08.14.2025 - 08.14.2025</td>
+                                <td>08:00 AM - 05:00 PM</td>
+                                <td class="status-ongoing">Ongoing</td>
+                                <td>07/07/25</td>
+                                <td class="actions">
+                                    <i class="fa-solid fa-pencil"></i>
+                                    <i class="fa-solid fa-trash"></i>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>College Freshmen Orientation 2025</td>
+                                <td>08.16.2025 - 08.16.2025</td>
+                                <td>07:00 AM - 11:30 AM</td>
+                                <td class="status-upcoming">Upcoming</td>
+                                <td>07/07/25</td>
+                                <td class="actions">
+                                    <i class="fa-solid fa-pencil"></i>
+                                    <i class="fa-solid fa-trash"></i>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Opening Of Classes 2025</td>
+                                <td>08.12.2025 - 08.12.2025</td>
+                                <td>07:00 AM - 05:00 PM</td>
+                                <td class="status-ended">Ended</td>
+                                <td>07/07/25</td>
+                                <td class="actions">
+                                    <i class="fa-solid fa-pencil"></i>
+                                    <i class="fa-solid fa-trash"></i>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>University Days 2025</td>
+                                <td>01.14.2026 - 01.18.2026</td>
+                                <td>08:00 AM - 08:00 PM</td>
+                                <td class="status-upcoming">Upcoming</td>
+                                <td>07/07/25</td>
+                                <td class="actions">
+                                    <i class="fa-solid fa-pencil"></i>
+                                    <i class="fa-solid fa-trash"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="setUpEvent.js"></script>
+</body>
+</html>

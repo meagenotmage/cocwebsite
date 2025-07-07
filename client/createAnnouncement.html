@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/COCSC.png" />
+    <title>Announcements - Admin</title>
+    <link rel="stylesheet" href="createAnnouncement.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- ======================= -->
+        <!--        SIDEBAR          -->
+        <!-- ======================= -->
+        <aside class="sidebar">
+            <h1 class="sidebar-title">Hi, Admin!</h1>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="admin.html"><i class="fa-solid fa-tachograph-digital"></i> Dashboard</a></li>
+                    <li><a href="adminFeedback.html"><i class="fa-solid fa-users"></i> Feedbacks</a></li>
+                    <li><a href="adminOrder.html"><i class="fa-solid fa-box-archive"></i> Orders</a></li>
+                    <li><a href="setUpEvent.html"><i class="fa-solid fa-calendar-plus"></i> Set-Up Event</a></li>
+                    <li class="active"><a href="createAnnouncement.html"><i class="fa-solid fa-bullhorn"></i> Announcements</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="adminLogIn.html"><i class="fa-solid fa-question-circle"></i> Log out</a>
+            </div>
+        </aside>
+
+        <!-- ======================= -->
+        <!--       MAIN CONTENT      -->
+        <!-- ======================= -->
+        <main class="main-content">
+            <!-- Announcement Creation Form -->
+            <div class="card">
+                <h2>Create Announcement</h2>
+                <form id="announcement-form">
+                    <div class="form-group">
+                        <label for="announcement-name">Announcement Name</label>
+                        <input type="text" id="announcement-name" placeholder="Announcement Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="announcement-description">Announcement Description</label>
+                        <textarea id="announcement-description" placeholder="Description" required></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-clear">Clear</button>
+                        <button type="submit" class="btn btn-publish">Publish</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Announcements List Table -->
+            <div class="card">
+                <h2>ANNOUNCEMENTS</h2>
+                <div class="table-container">
+                    <table class="announcements-table">
+                        <thead>
+                            <tr>
+                                <th>Announcement Name</th>
+                                <th>Date Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="announcements-tbody">
+                            <!-- JS will populate this -->
+                            <tr>
+                                <td>WVSU Pag-Irilimaw 2025</td>
+                                <td>07/07/25</td>
+                                <td class="actions">
+                                    <i class="fa-solid fa-pencil"></i>
+                                    <i class="fa-solid fa-trash"></i>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>College Freshmen Orientation 2025</td>
+                                <td>07/07/25</td>
+                                <td class="actions">
+                                    <i class="fa-solid fa-pencil"></i>
+                                    <i class="fa-solid fa-trash"></i>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td>Opening Of Classes 2025</td>
+                                <td>07/07/25</td>
+                                <td class="actions">
+                                    <i class="fa-solid fa-pencil"></i>
+                                    <i class="fa-solid fa-trash"></i>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td>University Days 2026</td>
+                                <td>07/07/25</td>
+                                <td class="actions">
+                                    <i class="fa-solid fa-pencil"></i>
+                                    <i class="fa-solid fa-trash"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="createAnnouncement.js"></script>
+</body>
+</html>

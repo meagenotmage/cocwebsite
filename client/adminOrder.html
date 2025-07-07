@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/COCSC.png" />
+    <title>Orders - Admin</title>
+    <link rel="stylesheet" href="adminOrder.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- ======================= -->
+        <!--        SIDEBAR          -->
+        <!-- ======================= -->
+       <aside class="sidebar">
+            <h1 class="sidebar-title">Hi, Admin!</h1>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="admin.html"><i class="fa-solid fa-tachograph-digital"></i> Dashboard</a></li>
+                    <li><a href="adminFeedback.html"><i class="fa-solid fa-users"></i> Feedbacks</a></li>
+                    <li class="active"><a href="adminOrder.html"><i class="fa-solid fa-box-archive"></i> Orders</a></li>
+                    <li><a href="setUpEvent.html"><i class="fa-solid fa-calendar-plus"></i> Set-Up Event</a></li>
+                    <li><a href="createAnnouncement.html"><i class="fa-solid fa-bullhorn"></i> Announcements</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="adminLogIn.html"><i class="fa-solid fa-question-circle"></i> Log out</a>
+            </div>
+        </aside>
+
+        <!-- ======================= -->
+        <!--       MAIN CONTENT      -->
+        <!-- ======================= -->
+        <main class="main-content">
+            <div class="card">
+                <div class="search-container">
+                    <label for="search-name">Search Name</label>
+                    <div class="search-bar">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" id="search-name" placeholder="Search">
+                    </div>
+                </div>
+
+                <h2 class="list-title">Order Tracking List</h2>
+                <div class="table-container">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Program, Year & Section</th>
+                                <th>Payment Method</th>
+                                <th>Total Amount</th>
+                                <th>Order Number</th>
+                                <th class="editable">Payment Status</th>
+                                <th class="editable">Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-tbody">
+                            <!-- Order 1 -->
+                            <tr class="order-summary" data-name="Elmer Marie Sable">
+                                <td>Elmer Marie Sable</td>
+                                <td>BAB 4A</td>
+                                <td>GCASH</td>
+                                <td>P 1,100.00</td>
+                                <td>0001</td>
+                                <td class="status-paid">Paid</td>
+                                <td class="status-received">Received</td>
+                                <td class="actions">
+                                    <i class="fa-solid fa-chevron-down toggle-details"></i>
+                                    <i class="fa-solid fa-pencil"></i>
+                                    <i class="fa-solid fa-trash"></i>
+                                </td>
+                            </tr>
+                            <tr class="order-details">
+                                <td colspan="8">
+                                    <table class="details-table">
+                                        <thead>
+                                            <tr><th>Name</th><th>Product</th><th>Quantity</th><th>Price</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td>Elmer Marie Sable</td><td>COC Nameplate</td><td>1</td><td>P 600.00</td></tr>
+                                            <tr><td></td><td>COC Type B Uniform</td><td>1</td><td>P 500.00</td></tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            
+                            <!-- Order 2 -->
+                            <tr class="order-summary" data-name="Christine Elijah Porras">
+                                <td>Christine Elijah Porras</td>
+                                <td>BAB 3A</td>
+                                <td>CASH</td>
+                                <td>P 700.00</td>
+                                <td>0002</td>
+                                <td class="status-not-paid">Not Paid</td>
+                                <td class="status-not-received">Not Received</td>
+                                <td class="actions">
+                                    <i class="fa-solid fa-chevron-down toggle-details"></i>
+                                    <i class="fa-solid fa-pencil"></i>
+                                    <i class="fa-solid fa-trash"></i>
+                                </td>
+                            </tr>
+                            <tr class="order-details">
+                               <td colspan="8"><div class="no-details">No item details available.</div></td>
+                            </tr>
+
+                            <!-- Add more orders following the same pattern -->
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="adminOrder.js"></script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/COCSC.png" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="adminDashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- ======================= -->
+        <!--        SIDEBAR          -->
+        <!-- ======================= -->
+        <aside class="sidebar">
+            <h1 class="sidebar-title">Hi, Admin!</h1>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active"><a href="admin.html"><i class="fa-solid fa-tachograph-digital"></i> Dashboard</a></li>
+                    <li><a href="adminFeedback.html"><i class="fa-solid fa-users"></i> Feedbacks</a></li>
+                    <li><a href="adminOrder.html"><i class="fa-solid fa-box-archive"></i> Orders</a></li>
+                    <li><a href="setUpEvent.html"><i class="fa-solid fa-calendar-days"></i> Calendar</a></li>
+                    <li><a href="createAnnouncement.html"><i class="fa-solid fa-bullhorn"></i> Announcements</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="admin.html"><i class="fa-solid fa-question-circle"></i> Log out</a>
+            </div>
+        </aside>
+
+        <!-- ======================= -->
+        <!--       MAIN CONTENT      -->
+        <!-- ======================= -->
+        <main class="main-content">
+            <div class="card orders-card">
+                <h2>Orders</h2>
+                <p class="subtitle">Orders per Merch</p>
+                <div class="chart-container">
+                    <canvas id="ordersChart"></canvas>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #8B0000;"></span> ID Lanyard
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #B22222;"></span> COC Type B Uniform
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #CD5C5C;"></span> COC Type C Uniform
+                    </div>
+                     <div class="legend-item">
+                        <span class="legend-color" style="background-color: #E9967A;"></span> COC Nameplate
+                    </div>
+                </div>
+            </div>
+
+            <div class="card calendar-card">
+                <h2>Calendars</h2>
+                <div class="calendar-header">
+                    <button id="prev-month" class="calendar-nav"><</button>
+                    <h3 id="month-year">June 2025</h3>
+                    <button id="next-month" class="calendar-nav">></button>
+                </div>
+                <div class="calendar-grid">
+                    <div class="day-name">Mo</div>
+                    <div class="day-name">Tu</div>
+                    <div class="day-name">We</div>
+                    <div class="day-name">Th</div>
+                    <div class="day-name">Fr</div>
+                    <div class="day-name">Sa</div>
+                    <div class="day-name">Su</div>
+                </div>
+                <div class="calendar-grid" id="calendar-days">
+                    <!-- JS will populate this -->
+                </div>
+            </div>
+
+            <div class="card feedbacks-card">
+                <h2>Feedbacks</h2>
+                <div class="empty-state">
+                    <p>No Feedbacks Yet</p>
+                </div>
+            </div>
+
+            <div class="card announcements-card">
+                <h2>Announcements</h2>
+                <div class="announcement-list">
+                    <div class="announcement-item">
+                        <div class="item-header">
+                            <h3>Opening of Classes</h3>
+                            <span>July 27, 10:23 AM</span>
+                        </div>
+                        <p>Opening of classes will be on August 3</p>
+                    </div>
+                    <div class="announcement-item">
+                        <div class="item-header">
+                            <h3>Upcoming August Event</h3>
+                            <span>May 27, 10:23 AM</span>
+                        </div>
+                        <p>COC Parangal will be on June 4</p>
+                    </div>
+                    <div class="announcement-item">
+                         <div class="item-header">
+                            <h3>Claiming of Orders</h3>
+                            <span>Jan 17, 10:23 AM</span>
+                        </div>
+                        <p>Orders can be claim in the COCSC Officer during vacant hours</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="adminDashboard.js"></script>
+</body>
+</html>
