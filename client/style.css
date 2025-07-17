@@ -90,7 +90,7 @@ header nav.desktop-nav ul li a.active {
 /*       HERO BANNER       */
 /* ======================= */
 .hero {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://i.imgur.com/kY7a3xS.jpeg'); 
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('assets/hero.jpg'); 
     background-size: cover;
     background-position: center;
     min-height: 100vh; 

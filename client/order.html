@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/coc.png" />
+    <title>Order</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="order.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="assets/coc.png" alt="Logo">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="order.html" class="active">Order</a></li>
+                    <li><a href="feedback.html">Feedback</a></li>
+                    <li><a href="processingLogs.html">Processing Logs</a></li>
+                    <li><a href="aboutUs.html">About Us</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>ORDER</h1>
+            <p>College of Communications Merchandise! Wear your college with pride!</p>
+        </section>
+
+        <section class="merchandise">
+            <div class="container">
+                <div class="merchandise-header">
+                    <h2>College of Communications Merchandise</h2>
+                    <div class="cart-summary">
+                        <a href="#" id="cart-link">CART (<span id="cart-count">0</span>)</a>
+                    </div>
+                </div>
+                <div class="merchandise-grid">
+                    <div class="product-item" data-id="1" data-name="COC Type B Uniform" data-price="550" data-img-src="https://i.imgur.com/3qL6s9z.png">
+                        <img src="https://i.imgur.com/3qL6s9z.png" alt="COC Type B Uniform">
+                        <div class="product-info-text">
+                            <h3>COC Type B Uniform</h3>
+                            <p>₱ 550</p>
+                        </div>
+                    </div>
+                    <div class="product-item" data-id="2" data-name="COC Type C Uniform" data-price="550" data-img-src="https://i.imgur.com/OykO2aO.png">
+                        <img src="https://i.imgur.com/OykO2aO.png" alt="COC Type C Uniform">
+                        <div class="product-info-text">
+                            <h3>COC Type C Uniform</h3>
+                            <p>₱ 550</p>
+                        </div>
+                    </div>
+                    <div class="product-item" data-id="3" data-name="COC Nameplate" data-price="700" data-img-src="https://i.imgur.com/1RO9505.png">
+                        <img src="https://i.imgur.com/1RO9505.png" alt="COC Nameplate">
+                        <div class="product-info-text">
+                            <h3>COC Nameplate</h3>
+                            <p>₱ 700</p>
+                        </div>
+                    </div>
+                     <div class="product-item" data-id="4" data-name="COC Lanyard" data-price="120" data-img-src="https://i.imgur.com/1RO9505.png">
+                        <img src="https://i.imgur.com/1RO9505.png" alt="COC Lanyard">
+                        <div class="product-info-text">
+                            <h3>COC Lanyard</h3>
+                            <p>₱ 120</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="pagination">
+                    <button id="scroll-left-btn"><</button>
+                    <button id="scroll-right-btn">></button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+     <!-- ======================= -->
+    <!--          FOOTER         -->
+    <!-- ======================= -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-info">
+                <img src="assets/COCSC.png" alt="College Logo" class="footer-logo">
+                <p>WVSU College of Communication, Luna St. La Paz<br>Iloilo City, Philippines 5000</p>
+                <p>coc.sec@wvsu.edu.ph</p>
+                <p>admission.coc@wvsu.edu.ph</p>
+            </div>
+            <div class="footer-menu">
+                <h3>Menu</h3>
+                <ul>
+                    <li><a href="#">Orders</a></li>
+                    <li><a href="#">Feedback</a></li>
+                    <li><a href="#">Processing Logs</a></li>
+                    <li><a href="#">About Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-right-column">
+                <div class="footer-social">
+                    <h3>Social Media</h3>
+                    <div class="social-icons">
+                        <a href="https://www.facebook.com/wvsucocsc" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="https://www.facebook.com/wvsucoc" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="https://www.instagram.com/wvsucocsc/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+
+                    </div>
+                </div>
+                <div class="footer-extra-logos">
+                     <img src="assets/wvsu.png" alt="WVSU Seal">
+                     <a href="adminLogIn.html">
+                     <img src="assets/coc.png" alt="COC Seal">
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>Copyright © COCSC 2025. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">×</span>
+            <div class="modal-body">
+                <div class="modal-image">
+                    <img id="modal-img" src="" alt="Product Image">
+                </div>
+                <div class="modal-details">
+                    <h2 id="modal-name">Product Name</h2>
+                    <p id="modal-price">P 0</p>
+                    <div class="product-info">
+                        <h3>Product Info</h3>
+                        <p>Jacket mode of a loose fit makes the product a universal element of the upper layer. Two patch pockets and one hidden pocket. Branded lining with FABLE pattern. Shoulder pads of medium rigidity for shaping.</p>
+                    </div>
+                    <div id="modal-options">
+                        <div class="sizes">
+                            <button>S</button>
+                            <button>M</button>
+                            <button>L</button>
+                            <button>XL</button>
+                            <button>2XL</button>
+                        </div>
+                         <div class="name-template-input" style="display: none;">
+                            <label for="template-name">Template Name</label>
+                            <input type="text" id="template-name" placeholder="Enter Complete Name (LN, FN MI.)">
+                        </div>
+                    </div>
+                    <div class="quantity">
+                        <label for="quantity">Quantity:</label>
+                        <button class="quantity-btn minus">-</button>
+                        <input type="text" id="quantity" value="1" readonly>
+                        <button class="quantity-btn plus">+</button>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="add-to-cart-btn">Add to cart</button>
+                        <button class="checkout-btn">Checkout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="cart-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">×</span>
+            <h2>CART</h2>
+            <div id="cart-items-container">
+            </div>
+            <div class="cart-total">
+                <p>Total: <span id="cart-total-price">₱0.00</span></p>
+            </div>
+            <button class="checkout-btn">Checkout</button>
+        </div>
+    </div>
+
+    <script src="order.js"></script>
+</body>
+</html>
