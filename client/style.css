@@ -18,6 +18,25 @@ body {
     border-bottom: 5px solid var(--primary-red);
 }
 
+/* Modern focus styles for all interactive elements */
+*:focus {
+    outline: none;
+}
+
+a:focus,
+button:focus,
+input:focus,
+textarea:focus,
+select:focus {
+    outline: 2px solid #E53935;
+    outline-offset: 2px;
+}
+
+/* Remove default button styling */
+button {
+    -webkit-tap-highlight-color: transparent;
+}
+
 .container {
     max-width: 1100px;
     margin: 0 auto;
@@ -72,18 +91,38 @@ header nav.desktop-nav ul li a {
     text-decoration: none;
     font-weight: bold;
     font-size: 1rem;
-    padding-bottom: 5px;
-    border-bottom: 2px solid transparent;
-    transition: color 0.3s;
+    padding: 8px 16px;
+    border-radius: 6px;
+    position: relative;
+    transition: all 0.3s ease;
+    display: inline-block;
 }
 
 header nav.desktop-nav ul li a:hover {
-    color: #ddd;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+header nav.desktop-nav ul li a:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.3);
 }
 
 header nav.desktop-nav ul li a.active {
     color: #E53935;
-    border-bottom: 2px solid #E53935;
+    background: rgba(229, 57, 53, 0.15);
+}
+
+header nav.desktop-nav ul li a.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 2px;
+    background: #E53935;
 }
 
 /* ======================= */
