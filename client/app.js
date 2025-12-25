@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchAndDisplayAnnouncements() {
         try {
-            const response = await fetch(`${API_BASE_URL}/announcements`);
+            const response = await fetch(`${API_BASE_URL}/api/announcements`);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const announcements = await response.json();
 
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchEventsAndRender() {
         try {
-            const response = await fetch(`${API_BASE_URL}/events`);
+            const response = await fetch(`${API_BASE_URL}/api/events`);
             allEvents = await response.json();
             renderCalendar();
         } catch (error) {
