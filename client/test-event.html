@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Event Creation</title>
+</head>
+<body>
+    <h1>Test Event Creation</h1>
+    <button id="testBtn">Create Test Event</button>
+    <div id="result"></div>
+
+    <script src="config.js"></script>
+    <script>
+        document.getElementById('testBtn').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            console.log('API URL:', CONFIG.API_URL);
+            
+            const eventData = {
+                title: 'Test Event from Frontend',
+                description: 'Testing if form works',
+                date: '2025-12-28',
+                startDate: '2025-12-28',
+                endDate: '2025-12-28',
+                startTime: '10:00',
+                endTime: '18:00',
+                location: 'Test Location'
+            };
+            
+            console.log('Sending:', eventData);
+            
+            try {
+                const response = await fetch(`${CONFIG.API_URL}/api/events`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(eventData)
+                });
+                
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<p style="color:green">Success! Event created: ${data.event.title}</p>`;
+                } else {
+                    resultDiv.innerHTML = `<p style="color:red">Error: ${data.message}</p>`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `<p style="color:red">Error: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
