@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
     eventForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
+        console.log('Form submitted!');
+
         // 1. Get values from the form
         const eventName = document.getElementById('event-name').value.trim();
         const description = document.getElementById('event-description')?.value.trim() || '';
@@ -20,11 +22,35 @@ document.addEventListener('DOMContentLoaded', function() {
         const startTime = document.getElementById('start-time').value;
         const finishTime = document.getElementById('finish-time').value;
         
+        console.log('Form values:', {
+            eventName,
+            description,
+            location,
+            startDate,
+            finishDate,
+            startTime,
+            finishTime
+        });
+        
         // Basic validation
         if (!eventName || !startDate || !finishDate || !startTime || !finishTime) {
             alert('Please fill out all required fields.');
             return;
         }
+
+        const eventData = {
+            title: eventName,
+            description: description,
+            date: startDate, // Primary date for sorting
+            startDate: startDate,
+            endDate: finishDate,
+            startTime: startTime,
+            endTime: finishTime,
+            location: location
+        };
+
+        console.log('Sending to API:', API_BASE_URL + '/api/events');
+        console.log('Event data:', eventData);
 
         try {
             // 2. Send POST request to backend
@@ -33,23 +59,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    title: eventName,
-                    description: description,
-                    date: startDate, // Primary date for sorting
-                    startDate: startDate,
-                    endDate: finishDate,
-                    startTime: startTime,
-                    endTime: finishTime,
-                    location: location
-                })
+                body: JSON.stringify(eventData)
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to create event');
-            }
-
+            console.log('Response status:', response.status);
             const data = await response.json();
+            console.log('Response data:', data);
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to create event');
+            }
             
             // 3. Show success message
             alert('Event created successfully!');
@@ -62,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
         } catch (error) {
             console.error('Error creating event:', error);
-            alert('Failed to create event. Please try again.');
+            alert('Failed to create event: ' + error.message);
         }
     });
 
