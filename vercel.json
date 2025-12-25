@@ -1,0 +1,13 @@
+{
+  "buildCommand": "cd client && npm install",
+  "outputDirectory": "client",
+  "devCommand": "cd client && npx http-server -p 8080",
+  "installCommand": "npm install",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

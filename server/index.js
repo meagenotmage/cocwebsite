@@ -8,9 +8,25 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // --- 2. MIDDLEWARE ---
+// Configure CORS to allow multiple origins
+const allowedOrigins = process.env.CORS_ORIGIN 
+  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+  : ['http://localhost:8080'];
+
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN 
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
 };
+
 app.use(cors(corsOptions));
 app.use(express.json()); // Middleware to parse JSON bodies
 

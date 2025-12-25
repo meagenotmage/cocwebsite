@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    const API_BASE_URL = 'https://cocwebsite-7mj7.onrender.com';
+    // Use the API_URL from config.js
+    const API_BASE_URL = CONFIG.API_URL;
 
     // --- State Variables ---
     let currentDate = new Date();

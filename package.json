@@ -1,0 +1,17 @@
+{
+  "name": "cocwebsite",
+  "version": "1.0.0",
+  "description": "COC Website with Frontend and Backend",
+  "scripts": {
+    "install-all": "cd server && npm install && cd ../client && npm install",
+    "dev:server": "cd server && npm start",
+    "dev:client": "cd client && npx http-server -p 8080",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
