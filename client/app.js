@@ -103,7 +103,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 dayDiv.classList.add('today');
             }
 
-            const eventForDay = allEvents.find(e => e.date === dateStr);
+            // Check if any event falls on this day (check date, startDate, or endDate)
+            const eventForDay = allEvents.find(e => {
+                // Check if the date matches the main date field or startDate
+                if (e.date === dateStr || e.startDate === dateStr) return true;
+                
+                // Check if date falls within the event range
+                if (e.startDate && e.endDate) {
+                    const eventStart = new Date(e.startDate);
+                    const eventEnd = new Date(e.endDate);
+                    const currentDay = new Date(dateStr);
+                    return currentDay >= eventStart && currentDay <= eventEnd;
+                }
+                
+                return false;
+            });
+            
             if (eventForDay) {
                 dayDiv.classList.add('event-day');
                 dayDiv.addEventListener('click', () => showEventModal(eventForDay));

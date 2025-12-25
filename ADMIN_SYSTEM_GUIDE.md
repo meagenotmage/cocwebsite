@@ -40,6 +40,13 @@ Your COC Website now has a fully functional admin system that allows you to crea
 
 ## 📍 How to Access Admin Panel
 
+### 🔐 Login Credentials
+
+**Email:** cocadmin@coc.web  
+**Password:** password123
+
+> ⚠️ **Security Note:** Change these credentials in production! Currently stored in `client/adminLogIn.js`
+
 ### Option 1: Local Development
 
 1. Make sure your backend is running:
@@ -49,16 +56,23 @@ Your COC Website now has a fully functional admin system that allows you to crea
    ```
 
 2. Access admin pages:
+   - **Admin Login:** http://localhost:8080/adminLogIn.html
    - **Create Announcements:** http://localhost:8080/createAnnouncement.html
    - **Set Up Events:** http://localhost:8080/setUpEvent.html
-   - **Admin Login:** http://localhost:8080/adminLogIn.html
 
 ### Option 2: Production (Deployed)
 
-After deployment:
+**Live Admin Portal:**
+- **Admin Login:** https://college-of-communication.vercel.app/adminLogIn.html
 - **Create Announcements:** https://college-of-communication.vercel.app/createAnnouncement.html
 - **Set Up Events:** https://college-of-communication.vercel.app/setUpEvent.html
-- **Admin Login:** https://college-of-communication.vercel.app/adminLogIn.html
+
+**All Admin Pages Available:**
+- `adminLogIn.html` - Login page
+- `createAnnouncement.html` - Manage announcements
+- `setUpEvent.html` - Manage events
+- `adminOrder.html` - View orders
+- `adminFeedback.html` - View feedback
 
 ---
 
