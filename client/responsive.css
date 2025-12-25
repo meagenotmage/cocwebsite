@@ -1,0 +1,405 @@
+/* ======================= */
+/*   RESPONSIVE UTILITIES  */
+/* ======================= */
+
+/* Mobile-first approach - Base styles are mobile, then scale up */
+
+/* Utility Classes */
+.hide-mobile { display: none; }
+.show-mobile { display: block; }
+
+/* ======================= */
+/*    MOBILE NAVIGATION    */
+/* ======================= */
+
+/* Hamburger Menu Button */
+.hamburger {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 1000;
+}
+
+/* Mobile Navigation Overlay */
+.mobile-nav {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 70%;
+    max-width: 300px;
+    height: 100vh;
+    background: var(--dark-bg);
+    z-index: 999;
+    padding: 80px 30px 30px;
+    transition: right 0.3s ease;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-nav.active {
+    right: 0;
+}
+
+.mobile-nav-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mobile-nav ul li {
+    margin: 0 0 20px 0;
+}
+
+.mobile-nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: block;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: color 0.3s;
+}
+
+.mobile-nav ul li a:hover,
+.mobile-nav ul li a.active {
+    color: #E53935;
+}
+
+/* Mobile Overlay Background */
+.mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+}
+
+.mobile-overlay.active {
+    display: block;
+}
+
+/* ======================= */
+/*   RESPONSIVE BREAKPOINTS */
+/* ======================= */
+
+/* Mobile Devices (default - up to 768px) */
+@media (max-width: 768px) {
+    /* Show hamburger, hide desktop nav */
+    .hamburger {
+        display: block;
+    }
+    
+    header nav.desktop-nav {
+        display: none;
+    }
+    
+    /* Container adjustments */
+    .container {
+        padding: 0 15px;
+    }
+    
+    /* Hero section */
+    .hero {
+        min-height: 70vh;
+        padding-top: 80px;
+    }
+    
+    .hero h1 {
+        font-size: 2rem !important;
+    }
+    
+    .hero p {
+        font-size: 1rem !important;
+    }
+    
+    /* Logo size */
+    .logo img {
+        height: 45px;
+    }
+    
+    /* Content sections */
+    .content-section {
+        padding: 40px 0 !important;
+    }
+    
+    .content-section h2 {
+        font-size: 1.8rem !important;
+    }
+    
+    /* Announcements */
+    .announcements-section {
+        padding: 40px 0 !important;
+    }
+    
+    .announcements-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+    
+    .announcements-container {
+        max-height: 400px;
+    }
+    
+    .announcement-item {
+        padding: 15px !important;
+    }
+    
+    /* Calendar */
+    .calendar-container {
+        padding: 20px 15px !important;
+    }
+    
+    .calendar-header h3 {
+        font-size: 1.2rem !important;
+    }
+    
+    .calendar-grid {
+        gap: 5px !important;
+    }
+    
+    .calendar-day {
+        min-height: 60px !important;
+        font-size: 0.85rem !important;
+        padding: 5px !important;
+    }
+    
+    /* Forms */
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="date"],
+    input[type="time"],
+    textarea,
+    select {
+        font-size: 16px !important; /* Prevents zoom on iOS */
+    }
+    
+    /* Buttons */
+    button,
+    .btn {
+        padding: 12px 20px !important;
+        font-size: 1rem !important;
+    }
+    
+    /* Tables */
+    table {
+        font-size: 0.85rem;
+    }
+    
+    table th,
+    table td {
+        padding: 10px 5px !important;
+    }
+    
+    /* Order/Merchandise Grid */
+    .merchandise-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+        gap: 15px !important;
+    }
+    
+    .product-item {
+        padding: 10px !important;
+    }
+    
+    /* Modal adjustments */
+    .modal-content {
+        width: 90% !important;
+        max-width: 400px !important;
+        margin: 20px auto !important;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    /* Footer */
+    footer {
+        padding: 30px 0 !important;
+    }
+    
+    footer .footer-content {
+        flex-direction: column !important;
+        text-align: center !important;
+    }
+    
+    footer .footer-section {
+        margin-bottom: 25px;
+    }
+    
+    /* Admin sections */
+    .dashboard-stats {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .admin-section {
+        padding: 30px 15px !important;
+    }
+    
+    /* Hide/Show utilities */
+    .hide-mobile {
+        display: none !important;
+    }
+    
+    .show-mobile {
+        display: block !important;
+    }
+}
+
+/* Tablet Devices (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        max-width: 90%;
+    }
+    
+    .hero h1 {
+        font-size: 2.5rem !important;
+    }
+    
+    .announcements-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .merchandise-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+    }
+    
+    header nav.desktop-nav ul li {
+        margin-left: 20px;
+    }
+    
+    header nav.desktop-nav ul li a {
+        font-size: 0.95rem;
+    }
+}
+
+/* Desktop Devices (1025px and up) */
+@media (min-width: 1025px) {
+    .hamburger {
+        display: none !important;
+    }
+    
+    .mobile-nav {
+        display: none !important;
+    }
+    
+    header nav.desktop-nav {
+        display: flex !important;
+    }
+    
+    .hide-mobile {
+        display: block !important;
+    }
+    
+    .show-mobile {
+        display: none !important;
+    }
+}
+
+/* Large Desktop (1440px and up) */
+@media (min-width: 1440px) {
+    .container {
+        max-width: 1200px;
+    }
+}
+
+/* ======================= */
+/*    TOUCH IMPROVEMENTS   */
+/* ======================= */
+
+/* Larger touch targets for mobile */
+@media (max-width: 768px) {
+    button,
+    a,
+    input[type="submit"],
+    .btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Prevent text selection on buttons */
+    button,
+    .btn {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
+    }
+}
+
+/* ======================= */
+/*   ACCESSIBILITY FIXES   */
+/* ======================= */
+
+/* Focus states */
+button:focus,
+a:focus,
+input:focus,
+textarea:focus,
+select:focus {
+    outline: 2px solid #E53935;
+    outline-offset: 2px;
+}
+
+/* Skip to main content link */
+.skip-to-main {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #000;
+    color: white;
+    padding: 8px;
+    text-decoration: none;
+    z-index: 100;
+}
+
+.skip-to-main:focus {
+    top: 0;
+}
+
+/* ======================= */
+/*   PRINT STYLES          */
+/* ======================= */
+
+@media print {
+    header,
+    footer,
+    .hamburger,
+    .mobile-nav,
+    button {
+        display: none !important;
+    }
+    
+    .container {
+        max-width: 100%;
+    }
+    
+    * {
+        background: white !important;
+        color: black !important;
+    }
+}
