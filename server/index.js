@@ -144,9 +144,12 @@ app.put('/api/announcements/:id', async (req, res) => {
 // Create new event (POST)
 app.post('/api/events', async (req, res) => {
   try {
+    console.log('Received event creation request:', req.body);
+    
     const { title, description, date, startDate, endDate, startTime, endTime, location } = req.body;
     
     if (!title || !date) {
+      console.log('Validation failed: Missing title or date');
       return res.status(400).json({ message: 'Title and date are required.' });
     }
     
@@ -161,11 +164,14 @@ app.post('/api/events', async (req, res) => {
       location
     });
     
-    await event.save();
-    res.status(201).json({ message: 'Event created successfully!', event });
+    console.log('Attempting to save event:', event);
+    const savedEvent = await event.save();
+    console.log('Event saved successfully:', savedEvent);
+    
+    res.status(201).json({ message: 'Event created successfully!', event: savedEvent });
   } catch (err) {
     console.error('Error creating event:', err);
-    res.status(500).json({ message: 'Failed to create event.' });
+    res.status(500).json({ message: 'Failed to create event.', error: err.message });
   }
 });
 
