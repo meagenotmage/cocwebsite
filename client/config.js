@@ -5,8 +5,8 @@ const CONFIG = {
   // For local development
   API_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:3001'
-    // For production - UPDATE THIS with your actual Render backend URL
-    : 'https://your-backend-url.onrender.com',
+    // For production - YOUR Render backend URL
+    : 'https://cocwebsite-rocz.onrender.com',
   
   // API Endpoints
   ENDPOINTS: {
