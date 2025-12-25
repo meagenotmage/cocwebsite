@@ -36,8 +36,26 @@ mongoose.connect(process.env.DATABASE_URL)
   .catch(err => console.error('Database connection error:', err));
 
 // Define your Mongoose schemas and models here (e.g., Announcement, Event)
-const Announcement = mongoose.model('Announcement', new mongoose.Schema({ title: String, content: String, date: Date }));
-const Event = mongoose.model('Event', new mongoose.Schema({ title: String, description: String, date: String }));
+const announcementSchema = new mongoose.Schema({ 
+  title: { type: String, required: true }, 
+  content: { type: String, required: true }, 
+  date: { type: Date, default: Date.now } 
+});
+
+const eventSchema = new mongoose.Schema({ 
+  title: { type: String, required: true }, 
+  description: String,
+  date: { type: String, required: true },
+  startDate: String,
+  endDate: String,
+  startTime: String,
+  endTime: String,
+  location: String,
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Announcement = mongoose.model('Announcement', announcementSchema);
+const Event = mongoose.model('Event', eventSchema);
 
 
 // --- 4. API ROUTES (WITH CORRECTED PATHS) ---
@@ -64,6 +82,121 @@ app.get('/api/events', async (req, res) => {
     res.json(events);
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch events.' });
+  }
+});
+
+// --- ADMIN ROUTES ---
+
+// Create new announcement (POST)
+app.post('/api/announcements', async (req, res) => {
+  try {
+    const { title, content } = req.body;
+    
+    if (!title || !content) {
+      return res.status(400).json({ message: 'Title and content are required.' });
+    }
+    
+    const announcement = new Announcement({
+      title,
+      content,
+      date: new Date()
+    });
+    
+    await announcement.save();
+    res.status(201).json({ message: 'Announcement created successfully!', announcement });
+  } catch (err) {
+    console.error('Error creating announcement:', err);
+    res.status(500).json({ message: 'Failed to create announcement.' });
+  }
+});
+
+// Delete announcement (DELETE)
+app.delete('/api/announcements/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Announcement.findByIdAndDelete(id);
+    res.json({ message: 'Announcement deleted successfully!' });
+  } catch (err) {
+    console.error('Error deleting announcement:', err);
+    res.status(500).json({ message: 'Failed to delete announcement.' });
+  }
+});
+
+// Update announcement (PUT)
+app.put('/api/announcements/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, content } = req.body;
+    
+    const announcement = await Announcement.findByIdAndUpdate(
+      id,
+      { title, content },
+      { new: true }
+    );
+    
+    res.json({ message: 'Announcement updated successfully!', announcement });
+  } catch (err) {
+    console.error('Error updating announcement:', err);
+    res.status(500).json({ message: 'Failed to update announcement.' });
+  }
+});
+
+// Create new event (POST)
+app.post('/api/events', async (req, res) => {
+  try {
+    const { title, description, date, startDate, endDate, startTime, endTime, location } = req.body;
+    
+    if (!title || !date) {
+      return res.status(400).json({ message: 'Title and date are required.' });
+    }
+    
+    const event = new Event({
+      title,
+      description,
+      date,
+      startDate,
+      endDate,
+      startTime,
+      endTime,
+      location
+    });
+    
+    await event.save();
+    res.status(201).json({ message: 'Event created successfully!', event });
+  } catch (err) {
+    console.error('Error creating event:', err);
+    res.status(500).json({ message: 'Failed to create event.' });
+  }
+});
+
+// Delete event (DELETE)
+app.delete('/api/events/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Event.findByIdAndDelete(id);
+    res.json({ message: 'Event deleted successfully!' });
+  } catch (err) {
+    console.error('Error deleting event:', err);
+    res.status(500).json({ message: 'Failed to delete event.' });
+  }
+});
+
+// Update event (PUT)
+app.put('/api/events/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description, date, startDate, endDate, startTime, endTime, location } = req.body;
+    
+    const event = await Event.findByIdAndUpdate(
+      id,
+      { title, description, date, startDate, endDate, startTime, endTime, location },
+      { new: true }
+    );
+    
+    res.json({ message: 'Event updated successfully!', event });
+  } catch (err) {
+    console.error('Error updating event:', err);
+    res.status(500).json({ message: 'Failed to update event.' });
   }
 });
 

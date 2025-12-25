@@ -39,12 +39,12 @@
                 <h2>Create Announcement</h2>
                 <form id="announcement-form">
                     <div class="form-group">
-                        <label for="announcement-name">Announcement Name</label>
-                        <input type="text" id="announcement-name" placeholder="Announcement Name" required>
+                        <label for="announcement-name">Announcement Title</label>
+                        <input type="text" id="announcement-name" placeholder="Announcement Title" required>
                     </div>
                     <div class="form-group">
-                        <label for="announcement-description">Announcement Description</label>
-                        <textarea id="announcement-description" placeholder="Description" required></textarea>
+                        <label for="announcement-content">Announcement Content</label>
+                        <textarea id="announcement-content" placeholder="Content" required></textarea>
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn btn-clear">Clear</button>
@@ -60,24 +60,16 @@
                     <table class="announcements-table">
                         <thead>
                             <tr>
-                                <th>Announcement Name</th>
+                                <th>Title</th>
+                                <th>Content</th>
                                 <th>Date Created</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="announcements-tbody">
                             <!-- JS will populate this -->
-                            <tr>
-                                <td>WVSU Pag-Irilimaw 2025</td>
-                                <td>07/07/25</td>
-                                <td class="actions">
-                                    <i class="fa-solid fa-pencil"></i>
-                                    <i class="fa-solid fa-trash"></i>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>College Freshmen Orientation 2025</td>
-                                <td>07/07/25</td>
+                        </tbody>
+                    </table>
                                 <td class="actions">
                                     <i class="fa-solid fa-pencil"></i>
                                     <i class="fa-solid fa-trash"></i>
@@ -105,6 +97,7 @@
             </div>
         </main>
     </div>
+    <script src="config.js"></script>
     <script src="createAnnouncement.js"></script>
 </body>
 </html>
