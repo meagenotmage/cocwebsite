@@ -1,13 +1,27 @@
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded - setUpEvent.js loaded');
+    console.log('CONFIG available:', typeof CONFIG !== 'undefined');
+    console.log('CONFIG.API_URL:', CONFIG?.API_URL);
+    
     const API_BASE_URL = CONFIG.API_URL;
+    console.log('API_BASE_URL set to:', API_BASE_URL);
+    
     const eventForm = document.getElementById('event-form');
     const eventsTbody = document.getElementById('events-tbody');
     const clearButton = document.querySelector('.btn-clear');
+    
+    console.log('Form element found:', !!eventForm);
+    console.log('Events tbody found:', !!eventsTbody);
 
     // Load existing events on page load
     loadEvents();
 
     // Handle form submission to add or update events
+    if (!eventForm) {
+        console.error('ERROR: Event form not found!');
+        return;
+    }
+    
     eventForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
