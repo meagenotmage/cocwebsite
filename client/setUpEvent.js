@@ -179,13 +179,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-            // This is a simplified "edit": it just logs data.
-            // A full implementation would populate the form with the row's data.
-            const eventName = row.children[0].textContent;
-            console.log(`Editing event: ${eventName}`);
-            alert(`Editing functionality is for demonstration. You clicked edit for "${eventName}".`);
-        }
-    });
 
     // Helper function to format date from 'YYYY-MM-DD' to 'MM.DD.YYYY'
     function formatDate(dateString) {
