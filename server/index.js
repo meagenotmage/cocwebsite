@@ -64,7 +64,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json()); // Middleware to parse JSON bodies
+app.use(express.json({ limit: '50mb' })); // Increased limit for base64 images
+app.use(express.urlencoded({ limit: '50mb', extended: true })); // Also increase URL encoded limit
 // Serve uploaded files statically
 app.use('/uploads', express.static(uploadsDir));
 

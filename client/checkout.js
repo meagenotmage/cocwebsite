@@ -179,6 +179,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 sessionStorage.removeItem('checkoutData');
                 
+                // Clear the cart from localStorage after successful order
+                try {
+                    localStorage.removeItem('cocCart');
+                } catch (error) {
+                    console.error('Error clearing cart:', error);
+                }
+                
                 // Store order number for receipt
                 if (result.order && result.order.orderNumber) {
                     sessionStorage.setItem('orderNumber', result.order.orderNumber);

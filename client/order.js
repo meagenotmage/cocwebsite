@@ -21,11 +21,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const nameTemplateInputContainer = productModal.querySelector('.name-template-input');
     const nameTemplateInput = document.getElementById('template-name');
     const sizesContainer = productModal.querySelector('.sizes');
+    
+    // Load cart from localStorage
     let cart = [];
+    try {
+        const savedCart = localStorage.getItem('cocCart');
+        if (savedCart) {
+            cart = JSON.parse(savedCart);
+        }
+    } catch (error) {
+        console.error('Error loading cart:', error);
+        cart = [];
+    }
+    
     let selectedSize = '';
     const scrollLeftBtn = document.getElementById('scroll-left-btn');
     const scrollRightBtn = document.getElementById('scroll-right-btn');
     const merchandiseGrid = document.querySelector('.merchandise-grid');
+
+    // Initialize cart display on page load
+    updateCart();
+    updateCartDisplay();
 
     if (scrollLeftBtn && scrollRightBtn && merchandiseGrid) {
         const scrollAmount = 330;
@@ -214,6 +230,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateCart() {
         const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
         cartCountSpan.textContent = totalItems;
+        
+        // Save cart to localStorage
+        try {
+            localStorage.setItem('cocCart', JSON.stringify(cart));
+        } catch (error) {
+            console.error('Error saving cart:', error);
+        }
     }
 
     function removeItemFromCart(index) {
