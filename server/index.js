@@ -6,6 +6,11 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const mongoSanitize = require('express-mongo-sanitize');
+const validator = require('validator');
+const hpp = require('hpp');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -44,6 +49,42 @@ const upload = multer({
 });
 
 // --- 2. MIDDLEWARE ---
+// Security: Set security HTTP headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+}));
+
+// Security: Rate limiting to prevent brute force attacks
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/', limiter);
+
+// Stricter rate limiting for sensitive operations
+const strictLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10, // Only 10 requests per 15 minutes
+  message: 'Too many attempts, please try again later.',
+});
+
+// Security: Prevent MongoDB injection attacks
+app.use(mongoSanitize());
+
+// Security: Prevent HTTP Parameter Pollution
+app.use(hpp());
+
 // Configure CORS to allow multiple origins
 const allowedOrigins = process.env.CORS_ORIGIN 
   ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
@@ -146,18 +187,32 @@ app.get('/api/events', async (req, res) => {
 
 // --- ADMIN ROUTES ---
 
+// Input validation helper function
+function sanitizeString(str) {
+  if (!str) return '';
+  return validator.escape(str.toString().trim());
+}
+
 // Create new announcement (POST)
-app.post('/api/announcements', async (req, res) => {
+app.post('/api/announcements', strictLimiter, async (req, res) => {
   try {
     const { title, content } = req.body;
     
     if (!title || !content) {
       return res.status(400).json({ message: 'Title and content are required.' });
     }
+
+    // Validate input length
+    if (title.length > 200) {
+      return res.status(400).json({ message: 'Title is too long (max 200 characters).' });
+    }
+    if (content.length > 2000) {
+      return res.status(400).json({ message: 'Content is too long (max 2000 characters).' });
+    }
     
     const announcement = new Announcement({
-      title,
-      content,
+      title: sanitizeString(title),
+      content: sanitizeString(content),
       date: new Date()
     });
     
@@ -170,9 +225,15 @@ app.post('/api/announcements', async (req, res) => {
 });
 
 // Delete announcement (DELETE)
-app.delete('/api/announcements/:id', async (req, res) => {
+app.delete('/api/announcements/:id', strictLimiter, async (req, res) => {
   try {
     const { id } = req.params;
+    
+    // Validate MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid announcement ID.' });
+    }
+    
     const announcement = await Announcement.findByIdAndDelete(id);
     
     if (!announcement) {
@@ -188,14 +249,30 @@ app.delete('/api/announcements/:id', async (req, res) => {
 });
 
 // Update announcement (PUT)
-app.put('/api/announcements/:id', async (req, res) => {
+app.put('/api/announcements/:id', strictLimiter, async (req, res) => {
   try {
     const { id } = req.params;
     const { title, content } = req.body;
     
+    // Validate MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid announcement ID.' });
+    }
+
+    // Validate input length
+    if (title && title.length > 200) {
+      return res.status(400).json({ message: 'Title is too long (max 200 characters).' });
+    }
+    if (content && content.length > 2000) {
+      return res.status(400).json({ message: 'Content is too long (max 2000 characters).' });
+    }
+    
     const announcement = await Announcement.findByIdAndUpdate(
       id,
-      { title, content },
+      { 
+        title: title ? sanitizeString(title) : undefined,
+        content: content ? sanitizeString(content) : undefined
+      },
       { new: true }
     );
     
@@ -207,7 +284,7 @@ app.put('/api/announcements/:id', async (req, res) => {
 });
 
 // Create new event (POST)
-app.post('/api/events', async (req, res) => {
+app.post('/api/events', strictLimiter, async (req, res) => {
   try {
     console.log('Received event creation request:', req.body);
     
@@ -217,16 +294,27 @@ app.post('/api/events', async (req, res) => {
       console.log('Validation failed: Missing title or date');
       return res.status(400).json({ message: 'Title and date are required.' });
     }
+
+    // Validate input length
+    if (title.length > 200) {
+      return res.status(400).json({ message: 'Title is too long (max 200 characters).' });
+    }
+    if (description && description.length > 1000) {
+      return res.status(400).json({ message: 'Description is too long (max 1000 characters).' });
+    }
+    if (location && location.length > 200) {
+      return res.status(400).json({ message: 'Location is too long (max 200 characters).' });
+    }
     
     const event = new Event({
-      title,
-      description,
-      date,
-      startDate,
-      endDate,
-      startTime,
-      endTime,
-      location
+      title: sanitizeString(title),
+      description: description ? sanitizeString(description) : undefined,
+      date: sanitizeString(date),
+      startDate: startDate ? sanitizeString(startDate) : undefined,
+      endDate: endDate ? sanitizeString(endDate) : undefined,
+      startTime: startTime ? sanitizeString(startTime) : undefined,
+      endTime: endTime ? sanitizeString(endTime) : undefined,
+      location: location ? sanitizeString(location) : undefined
     });
     
     console.log('Attempting to save event:', event);
@@ -241,9 +329,15 @@ app.post('/api/events', async (req, res) => {
 });
 
 // Delete event (DELETE)
-app.delete('/api/events/:id', async (req, res) => {
+app.delete('/api/events/:id', strictLimiter, async (req, res) => {
   try {
     const { id } = req.params;
+    
+    // Validate MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid event ID.' });
+    }
+    
     await Event.findByIdAndDelete(id);
     res.json({ message: 'Event deleted successfully!' });
   } catch (err) {
@@ -253,14 +347,39 @@ app.delete('/api/events/:id', async (req, res) => {
 });
 
 // Update event (PUT)
-app.put('/api/events/:id', async (req, res) => {
+app.put('/api/events/:id', strictLimiter, async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, date, startDate, endDate, startTime, endTime, location } = req.body;
     
+    // Validate MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid event ID.' });
+    }
+
+    // Validate input length
+    if (title && title.length > 200) {
+      return res.status(400).json({ message: 'Title is too long (max 200 characters).' });
+    }
+    if (description && description.length > 1000) {
+      return res.status(400).json({ message: 'Description is too long (max 1000 characters).' });
+    }
+    if (location && location.length > 200) {
+      return res.status(400).json({ message: 'Location is too long (max 200 characters).' });
+    }
+    
     const event = await Event.findByIdAndUpdate(
       id,
-      { title, description, date, startDate, endDate, startTime, endTime, location },
+      { 
+        title: title ? sanitizeString(title) : undefined, 
+        description: description ? sanitizeString(description) : undefined, 
+        date: date ? sanitizeString(date) : undefined, 
+        startDate: startDate ? sanitizeString(startDate) : undefined, 
+        endDate: endDate ? sanitizeString(endDate) : undefined, 
+        startTime: startTime ? sanitizeString(startTime) : undefined, 
+        endTime: endTime ? sanitizeString(endTime) : undefined, 
+        location: location ? sanitizeString(location) : undefined 
+      },
       { new: true }
     );
     
@@ -293,15 +412,48 @@ app.post('/api/orders', async (req, res) => {
     if (!fullName || !phone || !email || !programYear || !paymentMethod || !items || !total) {
       return res.status(400).json({ message: 'All fields are required.' });
     }
+
+    // Validate email format
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ message: 'Invalid email format.' });
+    }
+
+    // Validate input length
+    if (fullName.length > 100) {
+      return res.status(400).json({ message: 'Name is too long (max 100 characters).' });
+    }
+    if (phone.length > 20) {
+      return res.status(400).json({ message: 'Phone number is too long (max 20 characters).' });
+    }
+    if (programYear.length > 50) {
+      return res.status(400).json({ message: 'Program/Year is too long (max 50 characters).' });
+    }
+
+    // Validate payment method
+    const validPaymentMethods = ['CASH', 'GCASH'];
+    if (!validPaymentMethods.includes(paymentMethod.toUpperCase())) {
+      return res.status(400).json({ message: 'Invalid payment method.' });
+    }
+
+    // Validate total is a positive number
+    if (isNaN(total) || total <= 0) {
+      return res.status(400).json({ message: 'Invalid order total.' });
+    }
     
     const order = new Order({
-      fullName,
-      phone,
-      email,
-      programYear,
-      paymentMethod,
-      items,
-      total,
+      fullName: sanitizeString(fullName),
+      phone: sanitizeString(phone),
+      email: validator.normalizeEmail(email),
+      programYear: sanitizeString(programYear),
+      paymentMethod: paymentMethod.toUpperCase(),
+      items: items.map(item => ({
+        name: sanitizeString(item.name),
+        size: item.size ? sanitizeString(item.size) : undefined,
+        quantity: parseInt(item.quantity),
+        price: parseFloat(item.price),
+        customName: item.customName ? sanitizeString(item.customName) : undefined
+      })),
+      total: parseFloat(total),
       status: status || 'pending'
     });
     
@@ -343,15 +495,25 @@ app.post('/api/orders/upload-receipt', upload.single('receipt'), async (req, res
 });
 
 // Update order status (for admin)
-app.put('/api/orders/:id', async (req, res) => {
+app.put('/api/orders/:id', strictLimiter, async (req, res) => {
   try {
     const { id } = req.params;
     const { status, receiptUrl } = req.body;
     
-    const updateData = { status };
-    if (receiptUrl) {
-      updateData.receiptUrl = receiptUrl;
+    // Validate MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid order ID.' });
     }
+
+    // Validate status
+    const validStatuses = ['pending', 'paid', 'pending_payment', 'cancelled'];
+    if (status && !validStatuses.includes(status)) {
+      return res.status(400).json({ message: 'Invalid order status.' });
+    }
+    
+    const updateData = {};
+    if (status) updateData.status = status;
+    if (receiptUrl) updateData.receiptUrl = sanitizeString(receiptUrl);
     
     const order = await Order.findByIdAndUpdate(
       id,
@@ -367,9 +529,15 @@ app.put('/api/orders/:id', async (req, res) => {
 });
 
 // Delete order (for admin)
-app.delete('/api/orders/:id', async (req, res) => {
+app.delete('/api/orders/:id', strictLimiter, async (req, res) => {
   try {
     const { id } = req.params;
+    
+    // Validate MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid order ID.' });
+    }
+    
     await Order.findByIdAndDelete(id);
     res.json({ message: 'Order deleted successfully!' });
   } catch (err) {
