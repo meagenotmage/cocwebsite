@@ -165,14 +165,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         method: 'DELETE'
                     });
                     
-                    if (!response.ok) throw new Error('Failed to delete announcement');
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Failed to delete announcement');
+                    }
                     
                     alert('Announcement deleted successfully!');
                     loadAnnouncements();
                     
                 } catch (error) {
                     console.error('Error deleting announcement:', error);
-                    alert('Failed to delete announcement. Please try again.');
+                    console.error('Error message:', error.message);
+                    alert('Failed to delete announcement: ' + error.message);
                 }
             }
         }

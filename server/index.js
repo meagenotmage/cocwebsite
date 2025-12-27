@@ -173,11 +173,17 @@ app.post('/api/announcements', async (req, res) => {
 app.delete('/api/announcements/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    await Announcement.findByIdAndDelete(id);
+    const announcement = await Announcement.findByIdAndDelete(id);
+    
+    if (!announcement) {
+      return res.status(404).json({ message: 'Announcement not found.' });
+    }
+    
     res.json({ message: 'Announcement deleted successfully!' });
   } catch (err) {
     console.error('Error deleting announcement:', err);
-    res.status(500).json({ message: 'Failed to delete announcement.' });
+    console.error('Error details:', err.message);
+    res.status(500).json({ message: 'Failed to delete announcement.', error: err.message });
   }
 });
 
