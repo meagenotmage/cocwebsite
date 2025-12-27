@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="assets/coc.png" />
-    <title>Checkout - College of Communications</title>
+    <title>GCash Payment - College of Communications</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="responsive.css">
-    <link rel="stylesheet" href="checkout.css">
+    <link rel="stylesheet" href="gcash-payment.css">
 </head>
 <body>
     <!-- ======================= -->
@@ -48,59 +48,55 @@
         </ul>
     </div>
 
-    <main class="checkout-main">
+    <main class="gcash-payment-main">
         <div class="container">
-            <div class="checkout-container">
-                <div class="checkout-left">
-                    <h2>Order details</h2>
-                    <div id="order-items-list"></div>
-                    <div class="order-summary">
-                        <p>No. of items: <span id="total-items">0</span></p>
-                        <p class="order-total">Total: <span id="order-total">€0</span></p>
-                    </div>
+            <div class="payment-container">
+                <div class="payment-header">
+                    <img src="assets/COCSC.png" alt="COC Logo" class="payment-logo">
+                    <h1>GCash Payment</h1>
+                    <p>Scan the QR code or send payment to the account below</p>
                 </div>
 
-                <div class="checkout-right">
-                    <h2>Recipient's details</h2>
-                    <form id="checkout-form">
-                        <div class="form-group">
-                            <label for="fullName">Full Name</label>
-                            <input type="text" id="fullName" name="fullName" placeholder="Enter firstname, middle initial and surname" required>
+                <div class="payment-content">
+                    <div class="payment-left">
+                        <div class="qr-section">
+                            <h3>Scan QR Code</h3>
+                            <div class="qr-code">
+                                <img src="assets/gcash-qr.png" alt="GCash QR Code" id="gcash-qr">
+                            </div>
+                        </div>
+                        
+                        <div class="account-details">
+                            <h3>Or send to:</h3>
+                            <div class="detail-item">
+                                <span class="label">Account Name:</span>
+                                <span class="value">COC Student Council</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">GCash Number:</span>
+                                <span class="value">09123456789</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="payment-right">
+                        <div class="order-summary-box">
+                            <h3>Order Summary</h3>
+                            <div id="payment-order-items"></div>
+                            <div class="summary-total">
+                                <p><strong>Total Amount:</strong></p>
+                                <p class="amount" id="payment-total">₱0.00</p>
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="phone">Phone</label>
-                            <input type="tel" id="phone" name="phone" placeholder="Enter phone number" required>
+                        <div class="payment-confirmation">
+                            <h3>Confirm Payment</h3>
+                            <p>After sending payment via GCash, click the button below to confirm.</p>
+                            <button type="button" class="confirm-payment-btn" id="confirm-payment-btn">
+                                I have sent the payment
+                            </button>
                         </div>
-
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" name="email" placeholder="Enter email" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="programYear">Program Year & Section</label>
-                            <input type="text" id="programYear" name="programYear" placeholder="Enter Program Year & Section" required>
-                        </div>
-
-                        <h3>Payment method</h3>
-                        <div class="payment-methods">
-                            <button type="button" class="payment-btn active" data-method="gcash">GCash</button>
-                            <button type="button" class="payment-btn" data-method="cash">Cash</button>
-                        </div>
-
-                        <div class="form-checkbox">
-                            <input type="checkbox" id="rememberMe" name="rememberMe">
-                            <label for="rememberMe">Remember Me</label>
-                        </div>
-
-                        <div class="form-checkbox">
-                            <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
-                            <label for="agreeTerms">I agree to the terms of the policy</label>
-                        </div>
-
-                        <button type="submit" class="place-order-btn">Place an order</button>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -148,12 +144,12 @@
             </div>
         </div>
         <div class="copyright">
-            <p>Copyright © COCSC 2025. All Rights Reserved.</p>
+            <p>Copyright © COCSC 2025. All rights Reserved.</p>
         </div>
     </footer>
 
     <script src="config.js"></script>
     <script src="mobile-nav.js"></script>
-    <script src="checkout.js"></script>
+    <script src="gcash-payment.js"></script>
 </body>
 </html>

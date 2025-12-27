@@ -1,0 +1,256 @@
+/* GCash Payment Page Styles */
+
+.gcash-payment-main {
+    padding-top: 100px;
+    padding-bottom: 60px;
+    min-height: calc(100vh - 200px);
+    background: #f5f5f5;
+}
+
+.payment-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.payment-header {
+    text-align: center;
+    margin-bottom: 40px;
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.payment-logo {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 15px;
+}
+
+.payment-header h1 {
+    font-size: 2rem;
+    color: #8B3A3A;
+    margin: 10px 0;
+}
+
+.payment-header p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.payment-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.payment-left,
+.payment-right {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* QR Section */
+.qr-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.qr-section h3 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+}
+
+.qr-code {
+    width: 250px;
+    height: 250px;
+    margin: 0 auto;
+    background: #f9f9f9;
+    border: 3px solid #8B3A3A;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+.qr-code img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* Account Details */
+.account-details {
+    border-top: 2px solid #eee;
+    padding-top: 20px;
+}
+
+.account-details h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-item .label {
+    color: #666;
+    font-weight: 600;
+}
+
+.detail-item .value {
+    color: #333;
+    font-weight: 700;
+}
+
+/* Order Summary Box */
+.order-summary-box {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #eee;
+}
+
+.order-summary-box h3 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+}
+
+.payment-order-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.payment-order-item:last-child {
+    border-bottom: none;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-info h4 {
+    color: #333;
+    margin: 0 0 5px 0;
+    font-size: 1rem;
+}
+
+.item-info p {
+    color: #666;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.item-price {
+    font-weight: 700;
+    color: #8B3A3A;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #8B3A3A;
+}
+
+.summary-total p {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.summary-total .amount {
+    color: #8B3A3A;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* Payment Confirmation */
+.payment-confirmation {
+    text-align: center;
+}
+
+.payment-confirmation h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.payment-confirmation p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.confirm-payment-btn {
+    width: 100%;
+    padding: 15px;
+    background: #00A36C;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.confirm-payment-btn:hover {
+    background: #008C5A;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 163, 108, 0.3);
+}
+
+.confirm-payment-btn:active {
+    background: #007548;
+    transform: translateY(0);
+}
+
+.confirm-payment-btn:disabled {
+    background: #ddd;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .gcash-payment-main {
+        padding-top: 80px;
+    }
+
+    .payment-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .payment-left,
+    .payment-right {
+        padding: 20px;
+    }
+
+    .payment-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .qr-code {
+        width: 200px;
+        height: 200px;
+    }
+
+    .summary-total .amount {
+        font-size: 1.3rem;
+    }
+}

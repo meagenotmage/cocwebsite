@@ -1,0 +1,409 @@
+/* Receipt Page Styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Oswald', sans-serif;
+    background: #f5f5f5;
+    padding: 20px;
+}
+
+.receipt-page {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.receipt-actions {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.action-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Oswald', sans-serif;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.print-btn {
+    background: #8B3A3A;
+    color: white;
+}
+
+.print-btn:hover {
+    background: #6D2E2E;
+    transform: translateY(-2px);
+}
+
+.download-btn {
+    background: #00A36C;
+    color: white;
+}
+
+.download-btn:hover {
+    background: #008C5A;
+    transform: translateY(-2px);
+}
+
+.back-btn {
+    background: #666;
+    color: white;
+}
+
+.back-btn:hover {
+    background: #555;
+    transform: translateY(-2px);
+}
+
+.receipt-container {
+    background: white;
+    padding: 40px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+/* Header */
+.receipt-header {
+    text-align: center;
+    border-bottom: 3px solid #8B3A3A;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+}
+
+.receipt-logo {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 10px;
+}
+
+.receipt-header h1 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.receipt-header h2 {
+    font-size: 1.2rem;
+    color: #8B3A3A;
+    font-weight: 400;
+}
+
+/* Receipt Info */
+.receipt-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 5px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.info-row .label {
+    font-weight: 600;
+    color: #666;
+}
+
+.info-row .value {
+    color: #333;
+    font-weight: 700;
+}
+
+.status-badge {
+    background: #00A36C;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+/* Customer Details */
+.customer-details {
+    margin-bottom: 30px;
+}
+
+.customer-details h3 {
+    font-size: 1.3rem;
+    color: #8B3A3A;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.customer-info {
+    padding-left: 20px;
+}
+
+.customer-info .info-row {
+    border-bottom: 1px solid #eee;
+}
+
+/* Order Items */
+.order-items {
+    margin-bottom: 30px;
+}
+
+.order-items h3 {
+    font-size: 1.3rem;
+    color: #8B3A3A;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.items-table thead {
+    background: #8B3A3A;
+    color: white;
+}
+
+.items-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 700;
+}
+
+.items-table tbody tr {
+    border-bottom: 1px solid #eee;
+}
+
+.items-table td {
+    padding: 12px;
+    color: #333;
+}
+
+.items-table tbody tr:hover {
+    background: #f9f9f9;
+}
+
+/* Receipt Total */
+.receipt-total {
+    border-top: 3px solid #8B3A3A;
+    border-bottom: 3px solid #8B3A3A;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.total-row .label {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.total-row .value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #8B3A3A;
+}
+
+/* Receipt Footer */
+.receipt-footer {
+    text-align: center;
+    margin-top: 40px;
+    border-top: 2px solid #eee;
+    padding-top: 30px;
+}
+
+.thank-you {
+    margin-bottom: 30px;
+}
+
+.footer-logo {
+    width: 60px;
+    height: 60px;
+    display: inline-block;
+    margin: 0 10px;
+}
+
+.footer-logo-small {
+    width: 40px;
+    height: 40px;
+    vertical-align: middle;
+    margin-left: 10px;
+}
+
+.thank-you h2 {
+    font-size: 2rem;
+    color: #8B3A3A;
+    margin: 15px 0;
+}
+
+.download-notice {
+    margin-top: 20px;
+}
+
+.download-receipt-btn {
+    padding: 15px 30px;
+    background: #8B3A3A;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Oswald', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.download-receipt-btn:hover {
+    background: #6D2E2E;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(139, 58, 58, 0.3);
+}
+
+.contact-info {
+    margin-bottom: 30px;
+}
+
+.contact-info p {
+    color: #666;
+    margin: 5px 0;
+}
+
+.contact-info strong {
+    color: #8B3A3A;
+}
+
+.footer-logos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.logo-item img {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 10px;
+}
+
+.logo-item p {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 3px 0;
+}
+
+.logo-item.social h4 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.social-links {
+    display: flex;
+    gap: 15px;
+    font-size: 1.5rem;
+}
+
+.social-links a {
+    color: #8B3A3A;
+    transition: color 0.3s ease;
+}
+
+.social-links a:hover {
+    color: #6D2E2E;
+}
+
+.logo-item.seals {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.copyright {
+    color: #999;
+    font-size: 0.9rem;
+}
+
+/* Print Styles */
+@media print {
+    body {
+        background: white;
+        padding: 0;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .receipt-container {
+        box-shadow: none;
+        padding: 20px;
+    }
+
+    .receipt-page {
+        max-width: 100%;
+    }
+
+    .download-notice {
+        display: none;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .receipt-container {
+        padding: 20px;
+    }
+
+    .receipt-actions {
+        flex-direction: column;
+    }
+
+    .action-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .receipt-info {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-logos {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .logo-item.seals {
+        justify-content: center;
+    }
+
+    .items-table {
+        font-size: 0.9rem;
+    }
+
+    .items-table th,
+    .items-table td {
+        padding: 8px;
+    }
+}

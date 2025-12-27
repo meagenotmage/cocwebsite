@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/coc.png" />
+    <title>Order Receipt - College of Communications</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="receipt.css">
+</head>
+<body>
+    <div class="receipt-page">
+        <div class="receipt-actions no-print">
+            <button onclick="window.print()" class="action-btn print-btn">
+                <i class="fa-solid fa-print"></i> Print Receipt
+            </button>
+            <button onclick="downloadReceipt()" class="action-btn download-btn">
+                <i class="fa-solid fa-download"></i> Download PDF
+            </button>
+            <a href="order.html" class="action-btn back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Back to Orders
+            </a>
+        </div>
+
+        <div class="receipt-container" id="receipt-content">
+            <div class="receipt-header">
+                <img src="assets/COCSC.png" alt="COC Logo" class="receipt-logo">
+                <h1>College of Communication Student Council 2025-2026</h1>
+                <h2>Official Receipt of Purchase</h2>
+            </div>
+
+            <div class="receipt-info">
+                <div class="info-row">
+                    <span class="label">Receipt No:</span>
+                    <span class="value" id="receipt-number">2025-001</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Date Issued:</span>
+                    <span class="value" id="receipt-date">07-01-2025</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Payment Method:</span>
+                    <span class="value" id="payment-method">Online Payment</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Payment Status:</span>
+                    <span class="value status-badge" id="payment-status">Paid</span>
+                </div>
+            </div>
+
+            <div class="customer-details">
+                <h3>Customer Details</h3>
+                <div class="customer-info">
+                    <div class="info-row">
+                        <span class="label">Customer Name:</span>
+                        <span class="value" id="customer-name">Meagelee Rose Generosa</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Order No:</span>
+                        <span class="value" id="order-number">0001</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Program, Year & Section:</span>
+                        <span class="value" id="program-year">BSCS 3A AI</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-items">
+                <h3>Item Description</h3>
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Item Description</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody id="receipt-items">
+                        <!-- Items will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="receipt-total">
+                <div class="total-row">
+                    <span class="label">TOTAL</span>
+                    <span class="value" id="receipt-total">₱ 3,550.00</span>
+                </div>
+            </div>
+
+            <div class="receipt-footer">
+                <div class="thank-you">
+                    <img src="assets/COCSC.png" alt="Logo" class="footer-logo">
+                    <h2>THANK YOU! <img src="assets/coc.png" alt="Logo" class="footer-logo-small"></h2>
+                    <div class="download-notice">
+                        <button onclick="window.print()" class="download-receipt-btn">
+                            <i class="fa-solid fa-download"></i> Download Receipt
+                        </button>
+                    </div>
+                </div>
+
+                <div class="contact-info">
+                    <p>Have any concerns? Send us an email:</p>
+                    <p><strong>coc.sec@wvsu.edu.ph</strong></p>
+                </div>
+
+                <div class="footer-logos">
+                    <div class="logo-item">
+                        <img src="assets/COCSC.png" alt="COC Logo">
+                        <p>WVSU College of Communication, Luna St. La Paz</p>
+                        <p>Iloilo City, Philippines 5000</p>
+                        <p>coc.sec@wvsu.edu.ph</p>
+                        <p>admission.coc@wvsu.edu.ph</p>
+                    </div>
+                    <div class="logo-item social">
+                        <h4>Social Media</h4>
+                        <div class="social-links">
+                            <a href="https://www.facebook.com/wvsucocsc" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+                            <a href="https://www.facebook.com/wvsucoc" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+                            <a href="https://www.instagram.com/wvsucocsc/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                        </div>
+                    </div>
+                    <div class="logo-item seals">
+                        <img src="assets/wvsu.png" alt="WVSU Seal">
+                        <img src="assets/coc.png" alt="COC Seal">
+                    </div>
+                </div>
+
+                <div class="copyright">
+                    <p>Copyright © COCSC 2025. All rights Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="receipt.js"></script>
+</body>
+</html>

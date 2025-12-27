@@ -20,6 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Set default payment method
+    selectedPaymentMethod = 'gcash';
+
     // Load order items
     function displayOrderItems() {
         if (orderData.length === 0) {
@@ -143,9 +146,10 @@ document.addEventListener('DOMContentLoaded', () => {
             phone: document.getElementById('phone').value,
             email: document.getElementById('email').value,
             programYear: document.getElementById('programYear').value,
-            paymentMethod: selectedPaymentMethod === 'online' ? 'ONLINE' : 'GCASH',
+            paymentMethod: selectedPaymentMethod.toUpperCase(),
             items: orderData,
-            total: orderData.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+            total: orderData.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+            status: selectedPaymentMethod === 'gcash' ? 'pending_payment' : 'pending'
         };
 
         // Save or clear user data based on Remember Me checkbox
@@ -167,9 +171,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
 
             if (response.ok) {
-                alert('Order placed successfully! Your order has been sent to the admin.');
                 sessionStorage.removeItem('checkoutData');
-                window.location.href = 'order.html';
+                
+                // Redirect to GCash payment or receipt based on payment method
+                if (selectedPaymentMethod === 'gcash') {
+                    // Store order ID and data for GCash payment
+                    sessionStorage.setItem('pendingOrderId', result.order._id);
+                    sessionStorage.setItem('orderData', JSON.stringify(result.order));
+                    window.location.href = 'gcash-payment.html';
+                } else {
+                    // For cash, go directly to receipt
+                    sessionStorage.setItem('orderData', JSON.stringify(result.order));
+                    window.location.href = 'receipt.html';
+                }
             } else {
                 alert('Error placing order: ' + (result.message || 'Please try again'));
             }
