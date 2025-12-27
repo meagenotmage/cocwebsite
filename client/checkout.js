@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
             programYear: document.getElementById('programYear').value,
             paymentMethod: selectedPaymentMethod === 'online' ? 'ONLINE' : 'GCASH',
             items: orderData,
-            totalAmount: orderData.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+            total: orderData.reduce((sum, item) => sum + (item.price * item.quantity), 0)
         };
 
         // Save or clear user data based on Remember Me checkbox
