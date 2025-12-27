@@ -54,8 +54,26 @@ const eventSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+const orderSchema = new mongoose.Schema({
+  fullName: { type: String, required: true },
+  phone: { type: String, required: true },
+  email: { type: String, required: true },
+  programYear: { type: String, required: true },
+  paymentMethod: { type: String, required: true },
+  items: [{
+    name: { type: String, required: true },
+    size: String,
+    quantity: { type: Number, required: true },
+    price: { type: Number, required: true }
+  }],
+  total: { type: Number, required: true },
+  status: { type: String, default: 'pending' },
+  createdAt: { type: Date, default: Date.now }
+});
+
 const Announcement = mongoose.model('Announcement', announcementSchema);
 const Event = mongoose.model('Event', eventSchema);
+const Order = mongoose.model('Order', orderSchema);
 
 
 // --- 4. API ROUTES (WITH CORRECTED PATHS) ---
@@ -207,6 +225,77 @@ app.put('/api/events/:id', async (req, res) => {
 });
 
 // Add any other routes (e.g., app.post) here with the /api prefix
+
+// Orders Routes
+// Get all orders (for admin)
+app.get('/api/orders', async (req, res) => {
+  try {
+    const orders = await Order.find().sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (err) {
+    console.error('Error fetching orders:', err);
+    res.status(500).json({ message: 'Failed to fetch orders.' });
+  }
+});
+
+// Create new order (POST)
+app.post('/api/orders', async (req, res) => {
+  try {
+    const { fullName, phone, email, programYear, paymentMethod, items, total } = req.body;
+    
+    if (!fullName || !phone || !email || !programYear || !paymentMethod || !items || !total) {
+      return res.status(400).json({ message: 'All fields are required.' });
+    }
+    
+    const order = new Order({
+      fullName,
+      phone,
+      email,
+      programYear,
+      paymentMethod,
+      items,
+      total,
+      status: 'pending'
+    });
+    
+    await order.save();
+    res.status(201).json({ message: 'Order placed successfully!', order });
+  } catch (err) {
+    console.error('Error creating order:', err);
+    res.status(500).json({ message: 'Failed to place order.', error: err.message });
+  }
+});
+
+// Update order status (for admin)
+app.put('/api/orders/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    
+    const order = await Order.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+    
+    res.json({ message: 'Order updated successfully!', order });
+  } catch (err) {
+    console.error('Error updating order:', err);
+    res.status(500).json({ message: 'Failed to update order.' });
+  }
+});
+
+// Delete order (for admin)
+app.delete('/api/orders/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Order.findByIdAndDelete(id);
+    res.json({ message: 'Order deleted successfully!' });
+  } catch (err) {
+    console.error('Error deleting order:', err);
+    res.status(500).json({ message: 'Failed to delete order.' });
+  }
+});
 
 // Health check endpoint for keep-alive
 app.get('/api/health', (req, res) => {
