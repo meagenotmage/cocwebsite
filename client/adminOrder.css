@@ -246,12 +246,14 @@ td[class^="status-"] { font-weight: bold; cursor: pointer;}
 
 .receipt-modal-content {
     background: white;
-    padding: 30px;
+    padding: 20px;
     border-radius: 12px;
-    max-width: 90%;
-    max-height: 90%;
+    max-width: 95vw;
+    max-height: 95vh;
     position: relative;
-    overflow: auto;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .receipt-modal-content h3 {
@@ -275,20 +277,24 @@ td[class^="status-"] { font-weight: bold; cursor: pointer;}
 }
 
 .receipt-image-container {
-    max-height: 70vh;
+    max-height: calc(95vh - 80px);
     overflow: auto;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    padding: 10px;
 }
 
 .receipt-image {
     max-width: 100%;
+    max-height: calc(95vh - 100px);
+    width: auto;
     height: auto;
     display: block;
     margin: 0 auto;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    object-fit: contain;
 }
 
 /* Pending Status */

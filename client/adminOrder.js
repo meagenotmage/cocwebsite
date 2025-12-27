@@ -274,16 +274,29 @@ document.addEventListener('DOMContentLoaded', function () {
                     <span class="close-modal">&times;</span>
                     <h3>GCash Payment Receipt</h3>
                     <div class="receipt-image-container">
-                        <img src="" alt="Payment Receipt" class="receipt-image">
+                        <div style="text-align: center; padding: 20px;">Loading image...</div>
                     </div>
                 </div>
             `;
             
             document.body.appendChild(modal);
             
-            // Set image source after modal is in DOM
-            const img = modal.querySelector('.receipt-image');
-            // Handle both base64 and URL formats
+            // Load image after modal is in DOM
+            const container = modal.querySelector('.receipt-image-container');
+            const img = document.createElement('img');
+            img.className = 'receipt-image';
+            img.alt = 'Payment Receipt';
+            
+            img.onload = function() {
+                container.innerHTML = '';
+                container.appendChild(img);
+            };
+            
+            img.onerror = function() {
+                container.innerHTML = '<p style="text-align: center; padding: 20px; color: #f44336;">Failed to load receipt image. The image may be corrupted or unavailable.</p>';
+            };
+            
+            // Set image source - handle both base64 and URL formats
             if (receiptUrl.startsWith('data:image')) {
                 img.src = receiptUrl;
             } else if (receiptUrl.startsWith('/uploads')) {
@@ -291,13 +304,6 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 img.src = receiptUrl;
             }
-            
-            img.onerror = function() {
-                img.alt = 'Failed to load receipt image';
-                img.style.display = 'none';
-                const container = modal.querySelector('.receipt-image-container');
-                container.innerHTML = '<p style="text-align: center; padding: 20px;">Failed to load receipt image</p>';
-            };
             
             // Close modal handlers
             modal.addEventListener('click', (e) => {
