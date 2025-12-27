@@ -63,13 +63,23 @@ document.addEventListener('DOMContentLoaded', function() {
             location: location
         };
 
+        const editId = eventForm.dataset.editId;
+        const isEditing = !!editId;
+
         console.log('Sending to API:', API_BASE_URL + '/api/events');
         console.log('Event data:', eventData);
+        console.log('Is editing:', isEditing);
 
         try {
-            // 2. Send POST request to backend
-            const response = await fetch(`${API_BASE_URL}/api/events`, {
-                method: 'POST',
+            // 2. Send POST or PUT request to backend
+            const url = isEditing 
+                ? `${API_BASE_URL}/api/events/${editId}`
+                : `${API_BASE_URL}/api/events`;
+            
+            const method = isEditing ? 'PUT' : 'POST';
+            
+            const response = await fetch(url, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -81,21 +91,23 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Response data:', data);
 
             if (!response.ok) {
-                throw new Error(data.message || 'Failed to create event');
+                throw new Error(data.message || `Failed to ${isEditing ? 'update' : 'create'} event`);
             }
             
             // 3. Show success message
-            alert('Event created successfully!');
+            alert(`Event ${isEditing ? 'updated' : 'created'} successfully!`);
             
             // 4. Reload events list
             loadEvents();
             
-            // 5. Clear the form
+            // 5. Clear the form and reset button
             eventForm.reset();
+            delete eventForm.dataset.editId;
+            document.querySelector('.btn-publish').textContent = 'Publish';
             
         } catch (error) {
-            console.error('Error creating event:', error);
-            alert('Failed to create event: ' + error.message);
+            console.error(`Error ${isEditing ? 'updating' : 'creating'} event:`, error);
+            alert(`Failed to ${isEditing ? 'update' : 'create'} event: ` + error.message);
         }
     });
 
@@ -135,6 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td class="status-upcoming">Upcoming</td>
                     <td>${dateCreated}</td>
                     <td class="actions">
+                        <i class="fa-solid fa-pencil" title="Edit"></i>
                         <i class="fa-solid fa-trash" title="Delete"></i>
                     </td>
                 `;
@@ -150,11 +163,53 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle 'Clear' button functionality
     clearButton.addEventListener('click', function() {
         eventForm.reset();
+        delete eventForm.dataset.editId;
+        document.querySelector('.btn-publish').textContent = 'Publish';
     });
 
     // Handle 'Delete' action using event delegation
     eventsTbody.addEventListener('click', async function(e) {
         const target = e.target;
+
+        // Edit action
+        if (target.classList.contains('fa-pencil')) {
+            const row = target.closest('tr');
+            const eventId = row.dataset.id;
+            
+            // Fetch full event data
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/events`);
+                if (!response.ok) throw new Error('Failed to fetch events');
+                
+                const events = await response.json();
+                const event = events.find(e => e._id === eventId);
+                
+                if (!event) throw new Error('Event not found');
+                
+                // Populate form with event data
+                document.getElementById('event-name').value = event.title || '';
+                document.getElementById('event-description').value = event.description || '';
+                document.getElementById('location').value = event.location || '';
+                document.getElementById('start-date').value = event.startDate || event.date || '';
+                document.getElementById('finish-date').value = event.endDate || event.date || '';
+                document.getElementById('start-time').value = event.startTime || '';
+                document.getElementById('finish-time').value = event.endTime || '';
+                
+                // Store the ID for updating
+                eventForm.dataset.editId = eventId;
+                
+                // Change button text
+                const publishBtn = document.querySelector('.btn-publish');
+                publishBtn.textContent = 'Update';
+                
+                // Scroll to form
+                eventForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+            } catch (error) {
+                console.error('Error loading event for edit:', error);
+                alert('Failed to load event. Please try again.');
+            }
+        }
 
         // Delete action
         if (target.classList.contains('fa-trash')) {

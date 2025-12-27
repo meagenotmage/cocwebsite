@@ -23,10 +23,19 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        const editId = announcementForm.dataset.editId;
+        const isEditing = !!editId;
+
         try {
-            // 2. Send POST request to backend
-            const response = await fetch(`${API_BASE_URL}/api/announcements`, {
-                method: 'POST',
+            // 2. Send POST or PUT request to backend
+            const url = isEditing 
+                ? `${API_BASE_URL}/api/announcements/${editId}`
+                : `${API_BASE_URL}/api/announcements`;
+            
+            const method = isEditing ? 'PUT' : 'POST';
+            
+            const response = await fetch(url, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -34,23 +43,25 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to create announcement');
+                throw new Error(`Failed to ${isEditing ? 'update' : 'create'} announcement`);
             }
 
             const data = await response.json();
             
             // 3. Show success message
-            alert('Announcement created successfully!');
+            alert(`Announcement ${isEditing ? 'updated' : 'created'} successfully!`);
             
             // 4. Reload announcements list
             loadAnnouncements();
             
-            // 5. Clear the form
+            // 5. Clear the form and reset button
             announcementForm.reset();
+            delete announcementForm.dataset.editId;
+            document.querySelector('.btn-publish').textContent = 'Publish';
             
         } catch (error) {
-            console.error('Error creating announcement:', error);
-            alert('Failed to create announcement. Please try again.');
+            console.error(`Error ${isEditing ? 'updating' : 'creating'} announcement:`, error);
+            alert(`Failed to ${isEditing ? 'update' : 'create'} announcement. Please try again.`);
         }
     });
 
@@ -80,6 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td>${announcement.content.substring(0, 50)}${announcement.content.length > 50 ? '...' : ''}</td>
                     <td>${dateCreated}</td>
                     <td class="actions">
+                        <i class="fa-solid fa-pencil" title="Edit"></i>
                         <i class="fa-solid fa-trash" title="Delete"></i>
                     </td>
                 `;
@@ -95,11 +107,52 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle 'Clear' button functionality
     clearButton.addEventListener('click', function() {
         announcementForm.reset();
+        delete announcementForm.dataset.editId;
+        document.querySelector('.btn-publish').textContent = 'Publish';
     });
 
     // Handle 'Delete' action using event delegation
     announcementsTbody.addEventListener('click', async function(e) {
         const target = e.target;
+
+        // Edit action
+        if (target.classList.contains('fa-pencil')) {
+            const row = target.closest('tr');
+            const announcementId = row.dataset.id;
+            
+            // Find the announcement data
+            const title = row.children[0].textContent;
+            const content = row.children[1].textContent;
+            
+            // Fetch full content
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/announcements`);
+                if (!response.ok) throw new Error('Failed to fetch announcements');
+                
+                const announcements = await response.json();
+                const announcement = announcements.find(a => a._id === announcementId);
+                
+                if (!announcement) throw new Error('Announcement not found');
+                
+                // Populate form with announcement data
+                document.getElementById('announcement-name').value = announcement.title;
+                document.getElementById('announcement-content').value = announcement.content;
+                
+                // Store the ID for updating
+                announcementForm.dataset.editId = announcementId;
+                
+                // Change button text
+                const publishBtn = document.querySelector('.btn-publish');
+                publishBtn.textContent = 'Update';
+                
+                // Scroll to form
+                announcementForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+            } catch (error) {
+                console.error('Error loading announcement for edit:', error);
+                alert('Failed to load announcement. Please try again.');
+            }
+        }
 
         // Delete action
         if (target.classList.contains('fa-trash')) {
