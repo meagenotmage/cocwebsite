@@ -590,32 +590,94 @@ footer {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .modal-content {
-    background-color: white;
-    padding: 30px;
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    padding: 40px;
+    border-radius: 20px;
     width: 90%;
-    max-width: 500px;
+    max-width: 600px;
     position: relative;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-content h2 {
+    color: var(--primary-red);
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.8em;
+    padding-right: 40px;
+    line-height: 1.3;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.modal-content h2::before {
+    content: '📢';
+    font-size: 1.2em;
+}
+
+.modal-content p {
+    color: #333;
+    line-height: 1.7;
+    font-size: 1.05em;
+    margin: 0;
 }
 
 .modal-close-btn {
     position: absolute;
-    top: 10px;
+    top: 15px;
     right: 15px;
-    font-size: 2em;
+    font-size: 1.8em;
     border: none;
-    background: none;
+    background: rgba(139, 58, 58, 0.1);
     cursor: pointer;
-    color: #888;
+    color: var(--primary-red);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-weight: 300;
+}
+
+.modal-close-btn:hover {
+    background: var(--primary-red);
+    color: white;
+    transform: rotate(90deg);
 }
 
 .hidden {
