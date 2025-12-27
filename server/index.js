@@ -299,7 +299,17 @@ app.post('/api/orders', async (req, res) => {
     });
     
     await order.save();
-    res.status(201).json({ message: 'Order placed successfully!', order });
+    
+    // Calculate order number based on creation order
+    const allOrders = await Order.find().sort({ createdAt: 1 });
+    const orderIndex = allOrders.findIndex(o => o._id.toString() === order._id.toString());
+    const orderNumber = String(orderIndex + 1).padStart(4, '0');
+    
+    // Add order number to response
+    const orderWithNumber = order.toObject();
+    orderWithNumber.orderNumber = orderNumber;
+    
+    res.status(201).json({ message: 'Order placed successfully!', order: orderWithNumber });
   } catch (err) {
     console.error('Error creating order:', err);
     res.status(500).json({ message: 'Failed to place order.', error: err.message });

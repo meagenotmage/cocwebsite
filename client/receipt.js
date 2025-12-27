@@ -48,8 +48,8 @@ function populateReceipt(order) {
     document.getElementById('customer-name').textContent = order.fullName || 'N/A';
     document.getElementById('program-year').textContent = order.programYear || 'N/A';
     
-    // Order number (use index or generate from ID)
-    const orderNumber = order.orderNumber || '0001';
+    // Order number - fetch from session or use from order object
+    const orderNumber = order.orderNumber || sessionStorage.getItem('orderNumber') || '0001';
     document.getElementById('order-number').textContent = orderNumber;
 
     // Order items

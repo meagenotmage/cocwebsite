@@ -78,15 +78,18 @@ document.addEventListener('DOMContentLoaded', function () {
             let itemsHTML = '';
             if (order.items && order.items.length > 0) {
                 itemsHTML = order.items.map(item => {
-                    // Check if it's a nameplate and show the customization name
+                    // For nameplate, show the custom name in the Name column
+                    let customerName = order.fullName;
                     let productName = item.name;
+                    
                     if (item.name && item.name.toLowerCase().includes('nameplate') && item.customName) {
-                        productName = `${item.name} (Name: ${item.customName})`;
+                        customerName = item.customName;
+                        productName = item.name;
                     }
                     
                     return `
                         <tr>
-                            <td>${order.fullName}</td>
+                            <td>${customerName}</td>
                             <td>${productName}${item.size ? ' - ' + item.size : ''}</td>
                             <td>${item.quantity}</td>
                             <td>P ${item.price.toFixed(2)}</td>

@@ -179,6 +179,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 sessionStorage.removeItem('checkoutData');
                 
+                // Store order number for receipt
+                if (result.order && result.order.orderNumber) {
+                    sessionStorage.setItem('orderNumber', result.order.orderNumber);
+                }
+                
                 // Redirect to GCash payment or receipt based on payment method
                 if (selectedPaymentMethod === 'gcash') {
                     // Store order ID and data for GCash payment
