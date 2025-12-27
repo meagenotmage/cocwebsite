@@ -81,14 +81,25 @@ function populateReceipt(order) {
 
 function downloadReceipt() {
     const element = document.getElementById('receipt-content');
-    const opt = {
-        margin: 0.5,
-        filename: `receipt-${Date.now()}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
-
-    // Use html2pdf library to generate PDF
-    html2pdf().set(opt).from(element).save();
+    
+    // Use html2canvas to capture the receipt as an image
+    html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+    }).then(canvas => {
+        // Convert canvas to blob and download
+        canvas.toBlob(function(blob) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = `receipt-${Date.now()}.png`;
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+        });
+    }).catch(error => {
+        console.error('Error generating receipt image:', error);
+        alert('Failed to download receipt. Please try again.');
+    });
 }

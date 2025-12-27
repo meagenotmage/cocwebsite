@@ -18,7 +18,7 @@
                 <i class="fa-solid fa-print"></i> Print Receipt
             </button>
             <button onclick="downloadReceipt()" class="action-btn download-btn">
-                <i class="fa-solid fa-download"></i> Download PDF
+                <i class="fa-solid fa-download"></i> Download as Image
             </button>
             <a href="order.html" class="action-btn back-btn">
                 <i class="fa-solid fa-arrow-left"></i> Back to Orders
@@ -104,8 +104,8 @@
                     <img src="assets/COCSC.png" alt="Logo" class="footer-logo">
                     <h2>THANK YOU! <img src="assets/coc.png" alt="Logo" class="footer-logo-small"></h2>
                     <div class="download-notice">
-                        <button onclick="window.print()" class="download-receipt-btn">
-                            <i class="fa-solid fa-download"></i> Download Receipt
+                        <button onclick="downloadReceipt()" class="download-receipt-btn">
+                            <i class="fa-solid fa-download"></i> Download as Image
                         </button>
                     </div>
                 </div>
@@ -144,7 +144,7 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="receipt.js"></script>
 </body>
 </html>
