@@ -26,8 +26,14 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        // Sort orders by creation date (oldest first) to maintain consistent numbering
+        const sortedOrders = [...orders].sort((a, b) => 
+            new Date(a.createdAt) - new Date(b.createdAt)
+        );
+
         ordersTbody.innerHTML = '';
-        orders.forEach((order, index) => {
+        sortedOrders.forEach((order, index) => {
+            // Sequential order number based on creation order
             const orderNumber = String(index + 1).padStart(4, '0');
             const paymentStatusClass = order.status === 'paid' ? 'status-paid' : 'status-not-paid';
             const receivedStatusClass = order.status === 'received' ? 'status-received' : 'status-not-received';
@@ -67,14 +73,22 @@ document.addEventListener('DOMContentLoaded', function () {
             
             let itemsHTML = '';
             if (order.items && order.items.length > 0) {
-                itemsHTML = order.items.map(item => `
-                    <tr>
-                        <td>${order.fullName}</td>
-                        <td>${item.name}${item.size ? ' - ' + item.size : ''}</td>
-                        <td>${item.quantity}</td>
-                        <td>P ${item.price.toFixed(2)}</td>
-                    </tr>
-                `).join('');
+                itemsHTML = order.items.map(item => {
+                    // Check if it's a nameplate and show the customization name
+                    let productName = item.name;
+                    if (item.name && item.name.toLowerCase().includes('nameplate') && item.customName) {
+                        productName = `${item.name} (Name: ${item.customName})`;
+                    }
+                    
+                    return `
+                        <tr>
+                            <td>${order.fullName}</td>
+                            <td>${productName}${item.size ? ' - ' + item.size : ''}</td>
+                            <td>${item.quantity}</td>
+                            <td>P ${item.price.toFixed(2)}</td>
+                        </tr>
+                    `;
+                }).join('');
             } else {
                 itemsHTML = '<tr><td colspan="4">No item details available.</td></tr>';
             }

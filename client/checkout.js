@@ -147,7 +147,13 @@ document.addEventListener('DOMContentLoaded', () => {
             email: document.getElementById('email').value,
             programYear: document.getElementById('programYear').value,
             paymentMethod: selectedPaymentMethod.toUpperCase(),
-            items: orderData,
+            items: orderData.map(item => ({
+                name: item.name,
+                size: item.name.toLowerCase().includes('nameplate') ? undefined : item.detail,
+                customName: item.name.toLowerCase().includes('nameplate') ? item.detail : undefined,
+                quantity: item.quantity,
+                price: item.price
+            })),
             total: orderData.reduce((sum, item) => sum + (item.price * item.quantity), 0),
             status: selectedPaymentMethod === 'gcash' ? 'pending_payment' : 'pending'
         };
