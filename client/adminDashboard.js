@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let currentDate = new Date();
     let eventDays = []; // Will be populated from events API
+    let allEvents = []; // Store all events
 
     // Fetch events from database
     async function loadEvents() {
@@ -99,10 +100,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const response = await fetch(`${API_BASE_URL}/api/events`);
             if (!response.ok) throw new Error('Failed to fetch events');
             
-            const events = await response.json();
+            allEvents = await response.json();
             
             // Extract event days for current month
-            updateEventDays(events);
+            updateEventDays();
             renderCalendar();
             
         } catch (error) {
@@ -111,12 +112,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function updateEventDays(events) {
+    function updateEventDays() {
         eventDays = [];
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
         
-        events.forEach(event => {
+        allEvents.forEach(event => {
             // Check if event falls in current month
             const eventDate = new Date(event.startDate || event.date);
             if (eventDate.getFullYear() === year && eventDate.getMonth() === month) {
@@ -142,24 +143,44 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Previous month's days
         for (let i = startingDay; i > 0; i--) {
-        fetch(`${API_BASE_URL}/api/events`)
-            .then(res => res.json())
-            .then(events => {
-                updateEventDays(events);
-                renderCalendar();
-            })
-            .catch(() => renderCalendar());
+            const day = document.createElement('div');
+            day.className = 'date-cell other-month';
+            day.textContent = lastDateOfPrevMonth - i + 1;
+            calendarDays.appendChild(day);
+        }
+
+        // Current month's days
+        for (let i = 1; i <= lastDateOfMonth; i++) {
+            const day = document.createElement('div');
+            day.className = 'date-cell';
+            day.textContent = i;
+            if (eventDays.includes(i)) {
+                day.classList.add('event-day');
+            }
+            calendarDays.appendChild(day);
+        }
+
+        // Next month's days
+        const totalCells = startingDay + lastDateOfMonth;
+        const remainingCells = (totalCells % 7 === 0) ? 0 : 7 - (totalCells % 7);
+        for (let i = 1; i <= remainingCells; i++) {
+            const day = document.createElement('div');
+            day.className = 'date-cell other-month';
+            day.textContent = i;
+            calendarDays.appendChild(day);
+        }
+    }
+
+    prevMonthBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        updateEventDays();
+        renderCalendar();
     });
 
     nextMonthBtn.addEventListener('click', () => {
         currentDate.setMonth(currentDate.getMonth() + 1);
-        fetch(`${API_BASE_URL}/api/events`)
-            .then(res => res.json())
-            .then(events => {
-                updateEventDays(events);
-                renderCalendar();
-            })
-            .catch(() => renderCalendar());
+        updateEventDays();
+        renderCalendar();
     });
     
     // Load events and render calendar
@@ -213,35 +234,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Load announcements
-    loadAnnouncementsassName = 'date-cell';
-            day.textContent = i;
-            if (eventDays.includes(i)) {
-                day.classList.add('event-day');
-            }
-            calendarDays.appendChild(day);
-        }
-
-        // Next month's days
-        const totalCells = startingDay + lastDateOfMonth;
-        const remainingCells = (totalCells % 7 === 0) ? 0 : 7 - (totalCells % 7);
-        for (let i = 1; i <= remainingCells; i++) {
-             const day = document.createElement('div');
-            day.className = 'date-cell other-month';
-            day.textContent = i;
-            calendarDays.appendChild(day);
-        }
-    }
-
-    prevMonthBtn.addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() - 1);
-        renderCalendar();
-    });
-
-    nextMonthBtn.addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() + 1);
-        renderCalendar();
-    });
-    
-    // Initial render
-    renderCalendar();
+    loadAnnouncements();
 });

@@ -68,6 +68,15 @@ function populateReceipt(order) {
 
     // Total
     document.getElementById('receipt-total').textContent = `₱ ${order.total.toFixed(2)}`;
+
+    // GCash receipt image
+    if (order.paymentMethod === 'GCASH' && order.receiptUrl) {
+        const paymentProofSection = document.getElementById('payment-proof-section');
+        const gcashReceiptImg = document.getElementById('gcash-receipt');
+        
+        gcashReceiptImg.src = order.receiptUrl;
+        paymentProofSection.style.display = 'block';
+    }
 }
 
 function downloadReceipt() {
