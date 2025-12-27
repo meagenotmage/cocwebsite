@@ -81,23 +81,10 @@ document.addEventListener('DOMContentLoaded', () => {
             confirmBtn.textContent = 'Processing...';
 
             try {
-                // Upload receipt image first
-                const formData = new FormData();
-                formData.append('receipt', receiptFile);
-                formData.append('orderId', pendingOrderId);
+                // Convert receipt to base64 for permanent storage
+                const base64Image = await convertToBase64(receiptFile);
 
-                const uploadResponse = await fetch(`${CONFIG.API_URL}/api/orders/upload-receipt`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (!uploadResponse.ok) {
-                    throw new Error('Failed to upload receipt');
-                }
-
-                const uploadResult = await uploadResponse.json();
-
-                // Update order status to "paid" with receipt URL
+                // Update order status to "paid" with receipt base64
                 const response = await fetch(`${CONFIG.API_URL}/api/orders/${pendingOrderId}`, {
                     method: 'PUT',
                     headers: {
@@ -105,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     body: JSON.stringify({ 
                         status: 'paid',
-                        receiptUrl: uploadResult.receiptUrl
+                        receiptUrl: base64Image
                     })
                 });
 
@@ -153,5 +140,15 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
 
         totalElement.textContent = `₱${order.total.toFixed(2)}`;
+    }
+
+    // Convert image file to base64 string
+    function convertToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
     }
 });

@@ -26,15 +26,19 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // Sort orders by creation date (oldest first) to maintain consistent numbering
+        // Sort orders by creation date (newest first) for easier viewing
         const sortedOrders = [...orders].sort((a, b) => 
-            new Date(a.createdAt) - new Date(b.createdAt)
+            new Date(b.createdAt) - new Date(a.createdAt)
         );
 
         ordersTbody.innerHTML = '';
         sortedOrders.forEach((order, index) => {
-            // Sequential order number based on creation order
-            const orderNumber = String(index + 1).padStart(4, '0');
+            // Sequential order number based on creation order (oldest = 0001)
+            const allOrdersSorted = [...orders].sort((a, b) => 
+                new Date(a.createdAt) - new Date(b.createdAt)
+            );
+            const orderIndex = allOrdersSorted.findIndex(o => o._id === order._id);
+            const orderNumber = String(orderIndex + 1).padStart(4, '0');
             const paymentStatusClass = order.status === 'paid' ? 'status-paid' : 'status-not-paid';
             const receivedStatusClass = order.status === 'received' ? 'status-received' : 'status-not-received';
             
@@ -212,6 +216,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const target = e.target.classList.contains('view-receipt') ? e.target : e.target.closest('.view-receipt');
             const receiptUrl = target.dataset.receipt;
             
+            // Determine if it's a base64 image or URL
+            const imageSrc = receiptUrl.startsWith('data:') ? receiptUrl : `${CONFIG.API_URL}${receiptUrl}`;
+            
             // Create modal to view receipt
             const modal = document.createElement('div');
             modal.className = 'receipt-modal';
@@ -219,7 +226,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="receipt-modal-content">
                     <span class="close-modal">&times;</span>
                     <h3>GCash Payment Receipt</h3>
-                    <img src="${CONFIG.API_URL}${receiptUrl}" alt="Payment Receipt" class="receipt-image">
+                    <img src="${imageSrc}" alt="Payment Receipt" class="receipt-image">
                 </div>
             `;
             
