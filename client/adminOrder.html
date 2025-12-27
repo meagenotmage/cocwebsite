@@ -36,10 +36,26 @@
         <main class="main-content">
             <div class="card">
                 <div class="search-container">
-                    <label for="search-name">Search Name</label>
-                    <div class="search-bar">
-                        <i class="fa-solid fa-search"></i>
-                        <input type="text" id="search-name" placeholder="Search">
+                    <div class="search-group">
+                        <label for="search-name">Search</label>
+                        <div class="search-bar">
+                            <i class="fa-solid fa-search"></i>
+                            <input type="text" id="search-name" placeholder="Search name, payment, section...">
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-payment">Payment Method</label>
+                        <select id="filter-payment" class="filter-select">
+                            <option value="">All Payment Methods</option>
+                            <option value="Cash">Cash</option>
+                            <option value="GCASH">GCash</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-section">Section</label>
+                        <select id="filter-section" class="filter-select">
+                            <option value="">All Sections</option>
+                        </select>
                     </div>
                 </div>
 

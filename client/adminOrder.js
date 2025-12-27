@@ -1,14 +1,18 @@
 document.addEventListener('DOMContentLoaded', function () {
     const ordersTbody = document.getElementById('orders-tbody');
     const searchInput = document.getElementById('search-name');
+    const filterPayment = document.getElementById('filter-payment');
+    const filterSection = document.getElementById('filter-section');
+    let allOrders = [];
 
     // Load orders from API
     async function loadOrders() {
         try {
             const response = await fetch(`${CONFIG.API_URL}/api/orders`);
             if (response.ok) {
-                const orders = await response.json();
-                displayOrders(orders);
+                allOrders = await response.json();
+                populateSectionFilter(allOrders);
+                displayOrders(allOrders);
             } else {
                 console.error('Failed to load orders');
                 ordersTbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">Failed to load orders</td></tr>';
@@ -17,6 +21,18 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error loading orders:', error);
             ordersTbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">Error loading orders. Please check if the server is running.</td></tr>';
         }
+    }
+
+    // Populate section filter with unique sections from orders
+    function populateSectionFilter(orders) {
+        const sections = [...new Set(orders.map(order => order.programYear))].sort();
+        filterSection.innerHTML = '<option value="">All Sections</option>';
+        sections.forEach(section => {
+            const option = document.createElement('option');
+            option.value = section;
+            option.textContent = section;
+            filterSection.appendChild(option);
+        });
     }
 
     // Display orders in the table
@@ -55,6 +71,8 @@ document.addEventListener('DOMContentLoaded', function () {
             summaryRow.className = 'order-summary';
             summaryRow.dataset.name = order.fullName;
             summaryRow.dataset.orderId = order._id;
+            summaryRow.dataset.payment = order.paymentMethod;
+            summaryRow.dataset.section = order.programYear;
             summaryRow.innerHTML = `
                 <td>${order.fullName}</td>
                 <td>${order.programYear}</td>
@@ -152,16 +170,28 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // 2. SEARCH FILTER LOGIC
-    searchInput.addEventListener('keyup', function () {
-        const query = searchInput.value.toLowerCase();
+    // 2. FILTER LOGIC - Search and Filters
+    function applyFilters() {
+        const searchQuery = searchInput.value.toLowerCase();
+        const paymentFilter = filterPayment.value;
+        const sectionFilter = filterSection.value;
         const rows = ordersTbody.querySelectorAll('.order-summary');
 
         rows.forEach(row => {
             const name = row.dataset.name.toLowerCase();
+            const payment = row.dataset.payment;
+            const section = row.dataset.section;
             const detailsRow = row.nextElementSibling;
             
-            if (name.includes(query)) {
+            // Check if row matches all filters
+            const matchesSearch = !searchQuery || 
+                name.includes(searchQuery) || 
+                payment.toLowerCase().includes(searchQuery) || 
+                section.toLowerCase().includes(searchQuery);
+            const matchesPayment = !paymentFilter || payment === paymentFilter;
+            const matchesSection = !sectionFilter || section === sectionFilter;
+            
+            if (matchesSearch && matchesPayment && matchesSection) {
                 row.style.display = '';
                 // Keep details visible if they were already open
                 if (detailsRow.classList.contains('is-open')) {
@@ -172,7 +202,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 detailsRow.style.display = 'none'; // Also hide details
             }
         });
-    });
+    }
+
+    // Add event listeners for all filters
+    searchInput.addEventListener('keyup', applyFilters);
+    filterPayment.addEventListener('change', applyFilters);
+    filterSection.addEventListener('change', applyFilters);
 
     // 3. INLINE STATUS EDITING LOGIC
     ordersTbody.addEventListener('click', function(e) {
@@ -219,8 +254,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const target = e.target.classList.contains('view-receipt') ? e.target : e.target.closest('.view-receipt');
             const receiptUrl = target.dataset.receipt;
             
-            // Determine if it's a base64 image or URL
-            const imageSrc = receiptUrl.startsWith('data:') ? receiptUrl : `${CONFIG.API_URL}${receiptUrl}`;
+            if (!receiptUrl) {
+                alert('No receipt available');
+                return;
+            }
             
             // Create modal to view receipt
             const modal = document.createElement('div');
@@ -229,11 +266,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="receipt-modal-content">
                     <span class="close-modal">&times;</span>
                     <h3>GCash Payment Receipt</h3>
-                    <img src="${imageSrc}" alt="Payment Receipt" class="receipt-image">
+                    <div class="receipt-image-container">
+                        <img src="" alt="Payment Receipt" class="receipt-image">
+                    </div>
                 </div>
             `;
             
             document.body.appendChild(modal);
+            
+            // Set image source after modal is in DOM
+            const img = modal.querySelector('.receipt-image');
+            // Handle both base64 and URL formats
+            if (receiptUrl.startsWith('data:image')) {
+                img.src = receiptUrl;
+            } else if (receiptUrl.startsWith('/uploads')) {
+                img.src = `${CONFIG.API_URL}${receiptUrl}`;
+            } else {
+                img.src = receiptUrl;
+            }
+            
+            img.onerror = function() {
+                img.alt = 'Failed to load receipt image';
+                img.style.display = 'none';
+                const container = modal.querySelector('.receipt-image-container');
+                container.innerHTML = '<p style="text-align: center; padding: 20px;">Failed to load receipt image</p>';
+            };
             
             // Close modal handlers
             modal.addEventListener('click', (e) => {
