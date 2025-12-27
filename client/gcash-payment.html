@@ -90,11 +90,30 @@
                         </div>
 
                         <div class="payment-confirmation">
-                            <h3>Confirm Payment</h3>
-                            <p>After sending payment via GCash, click the button below to confirm.</p>
-                            <button type="button" class="confirm-payment-btn" id="confirm-payment-btn">
-                                I have sent the payment
-                            </button>
+                            <h3>Upload Payment Proof</h3>
+                            <p>Please upload a screenshot of your GCash payment receipt for verification.</p>
+                            
+                            <div class="upload-section">
+                                <input type="file" id="receipt-upload" accept="image/*" style="display: none;">
+                                <button type="button" class="upload-btn" id="upload-btn">
+                                    <i class="fa-solid fa-upload"></i> Choose Receipt Image
+                                </button>
+                                <div class="upload-preview" id="upload-preview" style="display: none;">
+                                    <img id="preview-image" src="" alt="Receipt preview">
+                                    <button type="button" class="remove-image-btn" id="remove-image-btn">
+                                        <i class="fa-solid fa-times"></i> Remove
+                                    </button>
+                                </div>
+                                <p class="upload-status" id="upload-status"></p>
+                            </div>
+
+                            <div class="confirmation-section">
+                                <h3>Confirm Payment</h3>
+                                <p>After uploading your receipt, click the button below to confirm payment.</p>
+                                <button type="button" class="confirm-payment-btn" id="confirm-payment-btn" disabled>
+                                    I have sent the payment
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

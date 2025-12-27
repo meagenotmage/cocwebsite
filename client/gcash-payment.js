@@ -11,21 +11,102 @@ document.addEventListener('DOMContentLoaded', () => {
     // Display order items
     displayOrderItems(orderData);
 
-    // Confirm payment button
+    // Receipt upload handling
+    let receiptFile = null;
+    const receiptUpload = document.getElementById('receipt-upload');
+    const uploadBtn = document.getElementById('upload-btn');
+    const uploadPreview = document.getElementById('upload-preview');
+    const previewImage = document.getElementById('preview-image');
+    const removeImageBtn = document.getElementById('remove-image-btn');
+    const uploadStatus = document.getElementById('upload-status');
     const confirmBtn = document.getElementById('confirm-payment-btn');
+
+    uploadBtn.addEventListener('click', () => {
+        receiptUpload.click();
+    });
+
+    receiptUpload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                uploadStatus.textContent = 'Please upload an image file (JPG, PNG, etc.)';
+                uploadStatus.style.color = '#E53935';
+                return;
+            }
+
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                uploadStatus.textContent = 'File size must be less than 5MB';
+                uploadStatus.style.color = '#E53935';
+                return;
+            }
+
+            receiptFile = file;
+            
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+                uploadPreview.style.display = 'block';
+                uploadBtn.style.display = 'none';
+                uploadStatus.textContent = 'Receipt uploaded successfully!';
+                uploadStatus.style.color = '#00A36C';
+                
+                // Enable confirm button
+                confirmBtn.disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    removeImageBtn.addEventListener('click', () => {
+        receiptFile = null;
+        receiptUpload.value = '';
+        uploadPreview.style.display = 'none';
+        uploadBtn.style.display = 'block';
+        uploadStatus.textContent = '';
+        confirmBtn.disabled = true;
+    });
+
+    // Confirm payment button
     confirmBtn.addEventListener('click', async () => {
-        if (confirm('Have you completed the GCash payment?')) {
+        if (!receiptFile) {
+            alert('Please upload your GCash payment receipt first.');
+            return;
+        }
+
+        if (confirm('Have you uploaded the correct payment receipt?')) {
             confirmBtn.disabled = true;
             confirmBtn.textContent = 'Processing...';
 
             try {
-                // Update order status to "paid"
+                // Upload receipt image first
+                const formData = new FormData();
+                formData.append('receipt', receiptFile);
+                formData.append('orderId', pendingOrderId);
+
+                const uploadResponse = await fetch(`${CONFIG.API_URL}/api/orders/upload-receipt`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!uploadResponse.ok) {
+                    throw new Error('Failed to upload receipt');
+                }
+
+                const uploadResult = await uploadResponse.json();
+
+                // Update order status to "paid" with receipt URL
                 const response = await fetch(`${CONFIG.API_URL}/api/orders/${pendingOrderId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ status: 'paid' })
+                    body: JSON.stringify({ 
+                        status: 'paid',
+                        receiptUrl: uploadResult.receiptUrl
+                    })
                 });
 
                 if (response.ok) {
