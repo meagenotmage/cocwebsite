@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/coc.png" />
+    <title>Checkout - College of Communications</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="responsive.css">
+    <link rel="stylesheet" href="checkout.css">
+</head>
+<body>
+    <!-- ======================= -->
+    <!--          HEADER         -->
+    <!-- ======================= -->
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="assets/coc.png" alt="College Logo"> 
+            </a>
+            <nav class="desktop-nav">
+                <ul>
+                    <li><a href="index.html">HOME</a></li>
+                    <li><a href="order.html">ORDER</a></li>
+                    <li><a href="aboutUs.html">ABOUT US</a></li>
+                </ul>
+            </nav>
+            <button class="hamburger" id="hamburger-btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="mobile-nav" id="mobile-nav">
+        <ul>
+            <li><a href="index.html">HOME</a></li>
+            <li class="mobile-dropdown">
+                <a href="#" class="mobile-dropdown-toggle">SERVICES <i class="fa-solid fa-chevron-down"></i></a>
+                <ul class="mobile-dropdown-menu">
+                    <li><a href="order.html">ORDER</a></li>
+                </ul>
+            </li>
+            <li><a href="aboutUs.html">ABOUT US</a></li>
+        </ul>
+    </div>
+
+    <main class="checkout-main">
+        <div class="container">
+            <div class="checkout-container">
+                <div class="checkout-left">
+                    <h2>Order details</h2>
+                    <div id="order-items-list"></div>
+                    <div class="order-summary">
+                        <p>No. of items: <span id="total-items">0</span></p>
+                        <p class="order-total">Total: <span id="order-total">€0</span></p>
+                    </div>
+                </div>
+
+                <div class="checkout-right">
+                    <h2>Recipient's details</h2>
+                    <form id="checkout-form">
+                        <div class="form-group">
+                            <label for="fullName">Full Name</label>
+                            <input type="text" id="fullName" name="fullName" placeholder="Enter firstname, middle initial and surname" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="tel" id="phone" name="phone" placeholder="Enter phone number" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="Enter email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="programYear">Program Year & Section</label>
+                            <input type="text" id="programYear" name="programYear" placeholder="Enter Program Year & Section" required>
+                        </div>
+
+                        <h3>Payment method</h3>
+                        <div class="payment-methods">
+                            <button type="button" class="payment-btn active" data-method="online">Online Payment</button>
+                            <button type="button" class="payment-btn" data-method="cash">Cash</button>
+                        </div>
+
+                        <div class="form-checkbox">
+                            <input type="checkbox" id="rememberMe" name="rememberMe">
+                            <label for="rememberMe">Remember Me</label>
+                        </div>
+
+                        <div class="form-checkbox">
+                            <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                            <label for="agreeTerms">I agree to the terms of the policy</label>
+                        </div>
+
+                        <button type="submit" class="place-order-btn">Place an order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ======================= -->
+    <!--          FOOTER         -->
+    <!-- ======================= -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-main">
+                <a href="adminLogIn.html" style="display: inline-block;">
+                    <img src="assets/COCSC.png" alt="College Logo" class="footer-logo">
+                </a>
+                <p>WVSU College of Communication, Luna St. La Paz</p>
+                <p>Iloilo City, Philippines 5000</p>
+                <p>coc.sec@wvsu.edu.ph</p>
+                <p>admission.coc@wvsu.edu.ph</p>
+            </div>
+            
+            <div class="footer-menu">
+                <h3>Menu</h3>
+                <ul>
+                    <li><a href="order.html">Orders</a></li>
+                    <li><a href="feedback.html">Feedback</a></li>
+                    <li><a href="processingLogs.html">Processing Logs</a></li>
+                    <li><a href="aboutUs.html">About Us</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-social">
+                <h3>Social Media</h3>
+                <div class="social-icons">
+                    <a href="https://www.facebook.com/wvsucocsc" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="https://www.facebook.com/wvsucoc" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="https://www.instagram.com/wvsucocsc/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-logos">
+                <img src="assets/wvsu.png" alt="WVSU Seal">
+                <a href="adminLogIn.html">
+                    <img src="assets/coc.png" alt="COC Seal">
+                </a>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>Copyright © COCSC 2025. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="mobile-nav.js"></script>
+    <script src="checkout.js"></script>
+</body>
+</html>

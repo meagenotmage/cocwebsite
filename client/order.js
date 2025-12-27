@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const productModal = document.getElementById('product-modal');
     const cartModal = document.getElementById('cart-modal');
+    const confirmationModal = document.getElementById('confirmation-modal');
     const closeButtons = document.querySelectorAll('.close-button');
     const productItems = document.querySelectorAll('.product-item');
     const cartLink = document.getElementById('cart-link');
@@ -8,7 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const cartItemsContainer = document.getElementById('cart-items-container');
     const cartTotalPriceSpan = document.getElementById('cart-total-price');
     const addToCartBtn = productModal.querySelector('.add-to-cart-btn');
-    const checkoutBtns = document.querySelectorAll('.checkout-btn');
+    const productModalCheckoutBtn = productModal.querySelector('.checkout-btn');
+    const cartModalCheckoutBtn = cartModal.querySelector('.checkout-btn');
+    const confirmationOkBtn = document.getElementById('confirmation-ok-btn');
+    const confirmationTitle = document.getElementById('confirmation-title');
+    const confirmationMessage = document.getElementById('confirmation-message');
     const sizeButtons = productModal.querySelectorAll('.sizes button');
     const quantityInput = document.getElementById('quantity');
     const minusBtn = productModal.querySelector('.quantity-btn.minus');
@@ -17,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const nameTemplateInput = document.getElementById('template-name');
     const sizesContainer = productModal.querySelector('.sizes');
     let cart = [];
-    let selectedSize = 'M';
+    let selectedSize = '';
     const scrollLeftBtn = document.getElementById('scroll-left-btn');
     const scrollRightBtn = document.getElementById('scroll-right-btn');
     const merchandiseGrid = document.querySelector('.merchandise-grid');
@@ -74,10 +79,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    confirmationOkBtn.addEventListener('click', () => {
+        confirmationModal.style.display = 'none';
+    });
+
     window.addEventListener('click', (event) => {
         if (event.target == productModal || event.target == cartModal) {
             productModal.style.display = 'none';
             cartModal.style.display = 'none';
+        }
+        if (event.target == confirmationModal) {
+            confirmationModal.style.display = 'none';
         }
     });
 
@@ -103,10 +115,13 @@ document.addEventListener('DOMContentLoaded', () => {
         let customDetail = selectedSize;
         if (e.target.dataset.name === 'COC Nameplate') {
             if(nameTemplateInput.value.trim() === '') {
-                alert('Please enter a name for the nameplate.');
+                showConfirmation('Error', '<p>Please enter a name for the nameplate.</p>', false);
                 return;
             }
             customDetail = nameTemplateInput.value.trim();
+        } else if (!selectedSize) {
+            showConfirmation('Error', '<p>Please select a size.</p>', false);
+            return;
         }
 
         const item = {
@@ -127,7 +142,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         updateCart();
         productModal.style.display = 'none';
-        alert(`${item.quantity} x ${item.name} added to cart!`);
+        
+        const detailLabel = item.name === 'COC Nameplate' ? 'Name' : 'Size';
+        showConfirmation(
+            'Added to Cart!',
+            `<p><strong>${item.quantity} x ${item.name}</strong></p>
+             <p>${detailLabel}: ${item.detail}</p>
+             <p>Price: ₱${(item.price * item.quantity).toFixed(2)}</p>`
+        );
     });
 
     cartLink.addEventListener('click', (e) => {
@@ -136,14 +158,46 @@ document.addEventListener('DOMContentLoaded', () => {
         cartModal.style.display = 'flex';
     });
 
-    checkoutBtns.forEach(button => {
-        button.addEventListener('click', () => {
-            if (cart.length === 0) {
-                alert("Your cart is empty. Please add items before checking out.");
+    // Direct checkout from product modal
+    productModalCheckoutBtn.addEventListener('click', () => {
+        let customDetail = selectedSize;
+        const productName = addToCartBtn.dataset.name;
+        
+        if (productName === 'COC Nameplate') {
+            if(nameTemplateInput.value.trim() === '') {
+                showConfirmation('Error', '<p>Please enter a name for the nameplate.</p>', false);
                 return;
             }
-            alert("Redirecting to checkout page...");
-        });
+            customDetail = nameTemplateInput.value.trim();
+        } else if (!selectedSize) {
+            showConfirmation('Error', '<p>Please select a size.</p>', false);
+            return;
+        }
+
+        const item = {
+            id: addToCartBtn.dataset.id,
+            name: productName,
+            price: parseFloat(addToCartBtn.dataset.price),
+            quantity: parseInt(quantityInput.value),
+            detail: customDetail,
+            img: addToCartBtn.dataset.img
+        };
+
+        // Store in session and redirect to checkout
+        sessionStorage.setItem('checkoutData', JSON.stringify([item]));
+        window.location.href = 'checkout.html';
+    });
+
+    // Checkout from cart
+    cartModalCheckoutBtn.addEventListener('click', () => {
+        if (cart.length === 0) {
+            showConfirmation('Cart Empty', '<p>Please add items to your cart before checking out.</p>', false);
+            return;
+        }
+        
+        // Store cart in session and redirect to checkout
+        sessionStorage.setItem('checkoutData', JSON.stringify(cart));
+        window.location.href = 'checkout.html';
     });
 
     function setActiveSize(size) {
@@ -206,5 +260,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         cartTotalPriceSpan.textContent = `₱${totalPrice.toFixed(2)}`;
         addDeleteEventListeners();
+    }
+
+    function showConfirmation(title, message, isSuccess = true) {
+        confirmationTitle.textContent = title;
+        confirmationMessage.innerHTML = message;
+        
+        const icon = confirmationModal.querySelector('.confirmation-icon i');
+        if (isSuccess) {
+            icon.className = 'fa-solid fa-check-circle';
+            icon.style.color = '#28a745';
+        } else {
+            icon.className = 'fa-solid fa-exclamation-circle';
+            icon.style.color = '#E53935';
+        }
+        
+        confirmationModal.style.display = 'flex';
     }
 });
