@@ -193,13 +193,16 @@ document.addEventListener('DOMContentLoaded', function () {
             
             if (matchesSearch && matchesPayment && matchesSection) {
                 row.style.display = '';
-                // Keep details visible if they were already open
-                if (detailsRow.classList.contains('is-open')) {
+                // Remove inline display style from details row - let CSS class handle visibility
+                if (detailsRow && detailsRow.classList.contains('order-details')) {
                     detailsRow.style.display = '';
                 }
             } else {
                 row.style.display = 'none';
-                detailsRow.style.display = 'none'; // Also hide details
+                // Hide details row when summary is hidden
+                if (detailsRow && detailsRow.classList.contains('order-details')) {
+                    detailsRow.style.display = 'none';
+                }
             }
         });
     }
