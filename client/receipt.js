@@ -30,9 +30,15 @@ function populateReceipt(order) {
 
     // Payment status
     const paymentStatusElement = document.getElementById('payment-status');
-    if (order.status === 'paid' || order.paymentMethod === 'GCASH') {
+    if (order.status === 'paid') {
         paymentStatusElement.textContent = 'Paid';
         paymentStatusElement.style.background = '#00A36C';
+    } else if (order.status === 'pending_payment' || (order.paymentMethod === 'GCASH' && order.receiptUrl)) {
+        paymentStatusElement.textContent = 'Pending for Verification';
+        paymentStatusElement.style.background = '#FFA500';
+    } else if (order.paymentMethod === 'CASH') {
+        paymentStatusElement.textContent = 'Pending';
+        paymentStatusElement.style.background = '#FFA500';
     } else {
         paymentStatusElement.textContent = 'Pending';
         paymentStatusElement.style.background = '#FFA500';
