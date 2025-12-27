@@ -32,6 +32,14 @@ document.addEventListener('DOMContentLoaded', function () {
             const paymentStatusClass = order.status === 'paid' ? 'status-paid' : 'status-not-paid';
             const receivedStatusClass = order.status === 'received' ? 'status-received' : 'status-not-received';
             
+            // Determine payment status display
+            let paymentStatusText = 'Not Paid';
+            if (order.status === 'paid') {
+                paymentStatusText = 'Paid ✓';
+            } else if (order.status === 'pending_payment' && order.receiptUrl) {
+                paymentStatusText = 'Pending Verification';
+            }
+            
             // Create summary row
             const summaryRow = document.createElement('tr');
             summaryRow.className = 'order-summary';
@@ -43,10 +51,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 <td>${order.paymentMethod}</td>
                 <td>P ${order.total.toFixed(2)}</td>
                 <td>${orderNumber}</td>
-                <td class="${paymentStatusClass}">${order.status === 'paid' ? 'Paid' : 'Not Paid'}</td>
+                <td class="${order.status === 'pending_payment' && order.receiptUrl ? 'status-pending' : paymentStatusClass}">${paymentStatusText}</td>
                 <td class="${receivedStatusClass}">${order.status === 'received' ? 'Received' : 'Not Received'}</td>
                 <td class="actions">
                     <i class="fa-solid fa-chevron-down toggle-details"></i>
+                    ${order.receiptUrl ? '<i class="fa-solid fa-image view-receipt" title="View Receipt" data-receipt="' + order.receiptUrl + '"></i>' : ''}
                     <i class="fa-solid fa-pencil"></i>
                     <i class="fa-solid fa-trash delete-order" data-order-id="${order._id}"></i>
                 </td>
@@ -70,8 +79,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 itemsHTML = '<tr><td colspan="4">No item details available.</td></tr>';
             }
 
+            // Add receipt verification section if receipt exists
+            let receiptSection = '';
+            if (order.receiptUrl && order.status === 'pending_payment') {
+                receiptSection = `
+                    <div class="receipt-verification">
+                        <h4>GCash Receipt Verification</h4>
+                        <div class="receipt-actions">
+                            <button class="verify-btn" data-order-id="${order._id}">
+                                <i class="fa-solid fa-check"></i> Verify & Approve Payment
+                            </button>
+                            <button class="reject-btn" data-order-id="${order._id}">
+                                <i class="fa-solid fa-times"></i> Reject Payment
+                            </button>
+                        </div>
+                        <p class="verification-note">Please verify the GCash receipt before approving payment.</p>
+                    </div>
+                `;
+            }
+            
             detailsRow.innerHTML = `
                 <td colspan="8">
+                    ${receiptSection}
                     <table class="details-table">
                         <thead>
                             <tr><th>Name</th><th>Product</th><th>Quantity</th><th>Price</th></tr>
@@ -163,7 +192,68 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // 4. DELETE ACTION
+    // 4. VIEW RECEIPT
+    ordersTbody.addEventListener('click', function(e) {
+        if (e.target.classList.contains('view-receipt') || e.target.closest('.view-receipt')) {
+            const target = e.target.classList.contains('view-receipt') ? e.target : e.target.closest('.view-receipt');
+            const receiptUrl = target.dataset.receipt;
+            
+            // Create modal to view receipt
+            const modal = document.createElement('div');
+            modal.className = 'receipt-modal';
+            modal.innerHTML = `
+                <div class="receipt-modal-content">
+                    <span class="close-modal">&times;</span>
+                    <h3>GCash Payment Receipt</h3>
+                    <img src="${CONFIG.API_URL}${receiptUrl}" alt="Payment Receipt" class="receipt-image">
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Close modal handlers
+            modal.addEventListener('click', (e) => {
+                if (e.target.classList.contains('receipt-modal') || e.target.classList.contains('close-modal')) {
+                    modal.remove();
+                }
+            });
+        }
+    });
+
+    // 5. VERIFY/REJECT PAYMENT
+    ordersTbody.addEventListener('click', async function(e) {
+        const target = e.target.closest('.verify-btn') || e.target.closest('.reject-btn');
+        if (!target) return;
+
+        const orderId = target.dataset.orderId;
+        const isVerify = target.classList.contains('verify-btn');
+        
+        const action = isVerify ? 'verify and approve' : 'reject';
+        if (confirm(`Are you sure you want to ${action} this payment?`)) {
+            try {
+                const newStatus = isVerify ? 'paid' : 'pending';
+                const response = await fetch(`${CONFIG.API_URL}/api/orders/${orderId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                if (response.ok) {
+                    alert(`Payment ${isVerify ? 'approved' : 'rejected'} successfully!`);
+                    loadOrders(); // Reload orders to reflect changes
+                } else {
+                    alert(`Failed to ${action} payment`);
+                }
+            } catch (error) {
+                console.error('Error updating payment status:', error);
+                alert(`Error ${action}ing payment`);
+            }
+        }
+    });
+
+    // 6. DELETE ACTION
     ordersTbody.addEventListener('click', async function(e) {
         if (e.target.classList.contains('fa-trash') || e.target.classList.contains('delete-order')) {
             const summaryRow = e.target.closest('tr');

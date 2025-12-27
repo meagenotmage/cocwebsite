@@ -123,3 +123,133 @@ td[class^="status-"] { font-weight: bold; cursor: pointer;}
 }
 .details-table thead { background-color: #f0f0f0; }
 .details-table td:first-child { padding-left: 25px; } /* Indent */
+
+/* Receipt Verification Section */
+.receipt-verification {
+    background: #FFF9E6;
+    border: 2px solid #FFA726;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.receipt-verification h4 {
+    color: #F57C00;
+    margin: 0 0 15px 0;
+    font-size: 1.1rem;
+}
+
+.receipt-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.verify-btn, .reject-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.verify-btn {
+    background: #4CAF50;
+    color: white;
+}
+
+.verify-btn:hover {
+    background: #45a049;
+    transform: translateY(-2px);
+}
+
+.reject-btn {
+    background: #f44336;
+    color: white;
+}
+
+.reject-btn:hover {
+    background: #da190b;
+    transform: translateY(-2px);
+}
+
+.verification-note {
+    color: #666;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+/* View Receipt Icon */
+.view-receipt {
+    color: #2196F3 !important;
+    cursor: pointer;
+}
+
+.view-receipt:hover {
+    color: #1976D2 !important;
+}
+
+/* Receipt Modal */
+.receipt-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.receipt-modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 90%;
+    max-height: 90%;
+    position: relative;
+    overflow: auto;
+}
+
+.receipt-modal-content h3 {
+    margin: 0 0 20px 0;
+    color: #333;
+    text-align: center;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.3s;
+}
+
+.close-modal:hover {
+    color: #333;
+}
+
+.receipt-image {
+    max-width: 100%;
+    max-height: 70vh;
+    display: block;
+    margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Pending Status */
+.status-pending {
+    background-color: #FFF3CD;
+    color: #856404;
+    font-weight: 600;
+}
