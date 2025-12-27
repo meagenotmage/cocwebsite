@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <td class="${receivedStatusClass}">${order.status === 'received' ? 'Received' : 'Not Received'}</td>
                 <td class="actions">
                     <i class="fa-solid fa-chevron-down toggle-details"></i>
-                    ${order.receiptUrl ? '<i class="fa-solid fa-image view-receipt" title="View Receipt" data-receipt="' + order.receiptUrl + '"></i>' : ''}
+                    ${order.receiptUrl ? '<i class="fa-solid fa-image view-receipt" title="View Receipt" data-order-id="' + order._id + '"></i>' : ''}
                     <i class="fa-solid fa-pencil"></i>
                     <i class="fa-solid fa-trash delete-order" data-order-id="${order._id}"></i>
                 </td>
@@ -255,12 +255,16 @@ document.addEventListener('DOMContentLoaded', function () {
     ordersTbody.addEventListener('click', function(e) {
         if (e.target.classList.contains('view-receipt') || e.target.closest('.view-receipt')) {
             const target = e.target.classList.contains('view-receipt') ? e.target : e.target.closest('.view-receipt');
-            const receiptUrl = target.dataset.receipt;
+            const orderId = target.dataset.orderId;
             
-            if (!receiptUrl) {
+            // Find the order in the allOrders array
+            const order = allOrders.find(o => o._id === orderId);
+            if (!order || !order.receiptUrl) {
                 alert('No receipt available');
                 return;
             }
+            
+            const receiptUrl = order.receiptUrl;
             
             // Create modal to view receipt
             const modal = document.createElement('div');
