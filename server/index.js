@@ -208,7 +208,33 @@ app.put('/api/events/:id', async (req, res) => {
 
 // Add any other routes (e.g., app.post) here with the /api prefix
 
+// Health check endpoint for keep-alive
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
 // --- 5. START SERVER ---
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  
+  // Self-ping to keep Render service active (every 14 minutes)
+  if (process.env.NODE_ENV === 'production' && process.env.RENDER_SERVICE_URL) {
+    const selfPingInterval = 14 * 60 * 1000; // 14 minutes
+    setInterval(() => {
+      const protocol = process.env.RENDER_SERVICE_URL.startsWith('https') ? require('https') : require('http');
+      const url = `${process.env.RENDER_SERVICE_URL}/api/health`;
+      
+      protocol.get(url, (res) => {
+        console.log(`[${new Date().toISOString()}] Self-ping: ${res.statusCode}`);
+      }).on('error', (err) => {
+        console.error(`[${new Date().toISOString()}] Self-ping failed:`, err.message);
+      });
+    }, selfPingInterval);
+    
+    console.log('Keep-alive mechanism enabled');
+  }
 });
