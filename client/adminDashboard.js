@@ -83,107 +83,86 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // ======================= //
-    //    CALENDAR WIDGET      //
+    //      EVENTS LIST        //
     // ======================= //
-    const monthYearHeader = document.getElementById('month-year');
-    const calendarDays = document.getElementById('calendar-days');
-    const prevMonthBtn = document.getElementById('prev-month');
-    const nextMonthBtn = document.getElementById('next-month');
-
-    let currentDate = new Date();
-    let eventDays = []; // Will be populated from events API
-    let allEvents = []; // Store all events
-
-    // Fetch events from database
     async function loadEvents() {
         try {
             const response = await fetch(`${API_BASE_URL}/api/events`);
             if (!response.ok) throw new Error('Failed to fetch events');
             
-            allEvents = await response.json();
+            const events = await response.json();
+            const eventsList = document.querySelector('.events-list');
             
-            // Extract event days for current month
-            updateEventDays();
-            renderCalendar();
+            if (!events || events.length === 0) {
+                eventsList.innerHTML = '<div class="empty-state"><p>No Events Yet</p></div>';
+                return;
+            }
+            
+            // Sort events by start date (upcoming first)
+            const sortedEvents = events.sort((a, b) => {
+                const dateA = new Date(a.startDate || a.date);
+                const dateB = new Date(b.startDate || b.date);
+                return dateA - dateB;
+            });
+            
+            eventsList.innerHTML = sortedEvents.map(event => {
+                const startDate = new Date(event.startDate || event.date);
+                const endDate = event.endDate ? new Date(event.endDate) : null;
+                
+                const formattedStartDate = startDate.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+                
+                const formattedStartTime = event.startTime || 'TBA';
+                const formattedEndTime = event.endTime || '';
+                const timeRange = formattedEndTime ? `${formattedStartTime} - ${formattedEndTime}` : formattedStartTime;
+                
+                const dateRange = endDate && endDate.getTime() !== startDate.getTime() 
+                    ? `${formattedStartDate} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+                    : formattedStartDate;
+                
+                return `
+                    <div class="event-item">
+                        <div class="event-date">
+                            <div class="date-badge">
+                                <span class="day">${startDate.getDate()}</span>
+                                <span class="month">${startDate.toLocaleDateString('en-US', { month: 'short' })}</span>
+                            </div>
+                        </div>
+                        <div class="event-details">
+                            <h3>${event.name}</h3>
+                            <div class="event-info">
+                                <div class="info-item">
+                                    <i class="fa-solid fa-calendar"></i>
+                                    <span>${dateRange}</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fa-solid fa-clock"></i>
+                                    <span>${timeRange}</span>
+                                </div>
+                                ${event.location ? `
+                                <div class="info-item">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span>${event.location}</span>
+                                </div>
+                                ` : ''}
+                            </div>
+                            ${event.description ? `<p class="event-description">${event.description}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
             
         } catch (error) {
             console.error('Error loading events:', error);
-            renderCalendar(); // Render anyway without events
+            const eventsList = document.querySelector('.events-list');
+            eventsList.innerHTML = '<div class="empty-state"><p>Failed to load events</p></div>';
         }
     }
-
-    function updateEventDays() {
-        eventDays = [];
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
-        
-        allEvents.forEach(event => {
-            // Check if event falls in current month
-            const eventDate = new Date(event.startDate || event.date);
-            if (eventDate.getFullYear() === year && eventDate.getMonth() === month) {
-                eventDays.push(eventDate.getDate());
-            }
-        });
-    }
-
-    function renderCalendar() {
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
-
-        monthYearHeader.textContent = `${currentDate.toLocaleString('default', { month: 'long' })} ${year}`;
-
-        calendarDays.innerHTML = '';
-
-        const firstDayOfMonth = new Date(year, month, 1).getDay();
-        const lastDateOfMonth = new Date(year, month + 1, 0).getDate();
-        const lastDateOfPrevMonth = new Date(year, month, 0).getDate();
-
-        // Adjust for Monday-first week (getDay() returns 0 for Sun)
-        const startingDay = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
-
-        // Previous month's days
-        for (let i = startingDay; i > 0; i--) {
-            const day = document.createElement('div');
-            day.className = 'date-cell other-month';
-            day.textContent = lastDateOfPrevMonth - i + 1;
-            calendarDays.appendChild(day);
-        }
-
-        // Current month's days
-        for (let i = 1; i <= lastDateOfMonth; i++) {
-            const day = document.createElement('div');
-            day.className = 'date-cell';
-            day.textContent = i;
-            if (eventDays.includes(i)) {
-                day.classList.add('event-day');
-            }
-            calendarDays.appendChild(day);
-        }
-
-        // Next month's days
-        const totalCells = startingDay + lastDateOfMonth;
-        const remainingCells = (totalCells % 7 === 0) ? 0 : 7 - (totalCells % 7);
-        for (let i = 1; i <= remainingCells; i++) {
-            const day = document.createElement('div');
-            day.className = 'date-cell other-month';
-            day.textContent = i;
-            calendarDays.appendChild(day);
-        }
-    }
-
-    prevMonthBtn.addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() - 1);
-        updateEventDays();
-        renderCalendar();
-    });
-
-    nextMonthBtn.addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() + 1);
-        updateEventDays();
-        renderCalendar();
-    });
     
-    // Load events and render calendar
+    // Load events
     loadEvents();
 
     // ======================= //
