@@ -183,20 +183,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- NEW: Hamburger Menu Logic ---
-    const hamburgerBtn = document.getElementById('hamburger-btn');
-    const mobileNav = document.getElementById('mobile-nav');
-    const mobileNavCloseBtn = document.getElementById('mobile-nav-close-btn');
-
-    hamburgerBtn.addEventListener('click', () => {
-        mobileNav.classList.add('open');
-    });
-
-    mobileNavCloseBtn.addEventListener('click', () => {
-        mobileNav.classList.remove('open');
-    });
-    
-
     // --- Initial Load ---
     fetchAndDisplayAnnouncements();
     fetchEventsAndRender();
