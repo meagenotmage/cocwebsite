@@ -121,83 +121,150 @@
         display: none;
     }
     
+    header {
+        position: fixed;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+    }
+    
     /* Container adjustments */
     .container {
-        padding: 0 15px;
+        padding: 0 20px;
     }
     
     /* Hero section */
     .hero {
-        min-height: 70vh;
-        padding-top: 80px;
+        min-height: 100vh;
+        padding: 140px 20px 80px;
+        background-attachment: scroll;
     }
     
-    .hero h1 {
-        font-size: 2rem !important;
+    .hero-content h1 {
+        font-size: 2.5rem !important;
+        white-space: normal !important;
     }
     
-    .hero p {
+    .hero-tagline {
+        font-size: 0.75rem !important;
+        letter-spacing: 2px;
+    }
+    
+    .hero-description {
         font-size: 1rem !important;
+        max-width: 100%;
+    }
+    
+    .btn-apply-now,
+    .btn-read-more {
+        padding: 12px 28px;
+        font-size: 0.875rem;
     }
     
     /* Logo size */
     .logo img {
-        height: 45px;
+        height: 50px;
     }
     
-    /* Content sections */
-    .content-section {
-        padding: 40px 0 !important;
+    /* Info section */
+    .info-section {
+        margin: 40px auto 60px;
+        flex-direction: column;
+        gap: 24px;
     }
     
-    .content-section h2 {
-        font-size: 1.8rem !important;
+    .announcements, .calendar {
+        padding: 24px;
     }
     
-    /* Announcements */
-    .announcements-section {
-        padding: 40px 0 !important;
-    }
-    
-    .announcements-grid {
-        grid-template-columns: 1fr !important;
-        gap: 15px !important;
-    }
-    
-    .announcements-container {
-        max-height: 400px;
+    .announcements .section-title {
+        font-size: 1.5rem;
     }
     
     .announcement-item {
-        padding: 15px !important;
+        flex-direction: column;
+        padding: 16px;
+    }
+    
+    .announcement-item .date {
+        margin-left: 0;
+        margin-top: 8px;
     }
     
     /* Calendar */
-    .calendar-container {
-        padding: 20px 15px !important;
-    }
-    
     .calendar-header h3 {
-        font-size: 1.2rem !important;
+        font-size: 1.25rem !important;
     }
     
-    .calendar-grid {
-        gap: 5px !important;
+    /* Organizations */
+    .organizations {
+        margin: 60px auto;
     }
     
-    .calendar-day {
-        min-height: 60px !important;
-        font-size: 0.85rem !important;
-        padding: 5px !important;
+    .organizations h2 {
+        font-size: 2rem;
+        margin-bottom: 40px;
     }
     
-    /* Forms */
-    .form-group {
-        margin-bottom: 15px;
+    .org-grid {
+        grid-template-columns: 1fr !important;
+        gap: 24px;
     }
     
-    input[type="text"],
-    input[type="email"],
+    .org-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 24px;
+    }
+    
+    .org-content img {
+        max-width: 100px;
+        max-height: 100px;
+    }
+    
+    /* Footer */
+    footer {
+        padding: 40px 0 0;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 32px;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .footer-main,
+    .footer-menu,
+    .footer-social {
+        text-align: center;
+    }
+    
+    .footer-logos {
+        justify-content: center;
+        gap: 20px;
+    }
+    
+    .footer-logos img,
+    .footer-logo {
+        height: 60px;
+    }
+    
+    .social-icons {
+        justify-content: center;
+    }
+    
+    /* Modal */
+    .modal-content {
+        padding: 32px;
+        margin: 20px;
+    }
+    
+    .modal-content h2 {
+        font-size: 1.5rem;
+        padding-right: 40px;
+    }
+}
     input[type="password"],
     input[type="date"],
     input[type="time"],
