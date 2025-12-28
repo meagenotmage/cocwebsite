@@ -353,12 +353,16 @@ header nav.desktop-nav ul li a.active::after {
 }
 
 .announcements-wrapper {
-    flex: 3 1 600px;
+    flex: 1 1 55%;
+    min-width: 300px;
+    max-width: 650px;
     display: flex;
 }
 
 .calendar-wrapper {
-    flex: 2 1 400px;
+    flex: 1 1 45%;
+    min-width: 300px;
+    max-width: 500px;
     display: flex;
 }
 
