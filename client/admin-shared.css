@@ -28,8 +28,10 @@ body {
     display: flex;
     flex-direction: column;
     border-right: 1px solid rgba(0, 0, 0, 0.06);
-    flex-shrink: 0;
-    box-shadow: 2px 0 16px rgba(0, 0, 0, 0.04);
+}
+
+.hamburger-btn {
+    display: none; /* Hidden by default on desktop */
 }
 
 .sidebar-title {

@@ -21,6 +21,10 @@ body {
     border-right: 1px solid #E0E0E0;
 }
 
+.hamburger-btn {
+    display: none; /* Hidden by default on desktop */
+}
+
 .sidebar-title {
     font-size: 1.5rem;
     font-weight: 600;

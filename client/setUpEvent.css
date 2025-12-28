@@ -1,275 +1,104 @@
-/* General Setup */
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #F8F9FA;
-    margin: 0;
-    color: #333;
-}
+/* ========================================= */
+/*   EVENT SETUP SPECIFIC STYLES             */
+/* ========================================= */
+/* This file extends admin-shared.css with page-specific styles */
 
-.dashboard-container {
-    display: flex;
-    min-height: 100vh;
-}
-
-/* Sidebar (reusing admin-style.css concepts) */
-.sidebar {
-    width: 250px;
-    background-color: #FFFFFF;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    border-right: 1px solid #E0E0E0;
-    flex-shrink: 0;
-}
-
-.sidebar-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 30px;
-    padding-left: 10px;
-}
-
-.sidebar-nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.sidebar-nav li a {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 12px 15px;
-    text-decoration: none;
-    color: #555;
-    font-weight: 500;
-    border-radius: 8px;
-    margin-bottom: 5px;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-.sidebar-nav li.active a {
-    background-color: #FEEEEE;
-    color: #D32F2F;
-}
-
-.sidebar-nav li:not(.active) a:hover {
-    background-color: #F5F5F5;
-}
-
-.sidebar-nav i {
-    font-size: 1.1rem;
-    width: 20px;
-    text-align: center;
-}
-
-.sidebar-footer {
-    margin-top: auto;
-}
-
-.sidebar-footer a {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    text-decoration: none;
-    color: #555;
-    padding: 12px 15px;
-}
-
-/* Main Content */
-.main-content {
-    flex-grow: 1;
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-}
-
-.card {
-    background-color: #FFFFFF;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.card h2 {
-    margin-top: 0;
-    margin-bottom: 25px;
-    font-size: 1.4rem;
-    font-weight: 600;
-}
-
-/* Form Styling */
+/* Form Grid for Event Fields */
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px 30px;
 }
 
-.form-group {
-    display: flex;
-    flex-direction: column;
-}
-
 .form-group-full {
     grid-column: 1 / -1;
 }
 
-.form-group label {
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-    color: #555;
-}
-
-.form-group input,
-.form-group textarea {
-    padding: 12px;
-    border: 1px solid #E0E0E0;
-    border-radius: 8px;
-    background-color: #F8F9FA;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
-}
-.form-group input[type="date"],
-.form-group input[type="time"]{
-    position: relative;
-}
-
-.form-group textarea {
-    min-height: 80px;
-    resize: vertical;
-}
-
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 15px;
-    margin-top: 30px;
-}
-
-.btn {
-    padding: 10px 25px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
-    font-size: 0.9rem;
-    transition: background-color 0.3s;
-}
-.btn-clear {
-    background-color: #FFF;
-    border: 1px solid #D32F2F;
-    color: #D32F2F;
-}
-.btn-publish {
-    background-color: #8B0000;
-    color: #FFF;
-}
-.btn-publish:hover {
-    background-color: #A52A2A;
-}
-
 /* Events Table Styling */
-.table-container {
-    width: 100%;
-    overflow-x: auto;
-}
-
 .events-table {
     width: 100%;
     border-collapse: collapse;
 }
 
-.events-table th, .events-table td {
-    padding: 12px 15px;
-    text-align: left;
-    font-size: 0.9rem;
-}
-
 .events-table thead {
-    background-color: #8B0000;
-    color: #FFF;
+    background-color: var(--primary-red-dark, #8B0000);
 }
 
-.events-table tbody tr {
-    border-bottom: 1px solid #E0E0E0;
+.events-table thead th {
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    color: white;
+    border-bottom: none;
+}
+
+.events-table tbody td {
+    padding: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.events-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
 .events-table tbody tr:nth-child(even) {
-    background-color: #FEEEEE;
+    background-color: #FDECEC;
+}
+
+.events-table tbody tr:nth-child(odd) {
+    background-color: #FFFFFF;
 }
 
 .events-table .actions {
-    display: flex;
-    gap: 15px;
+    text-align: right;
 }
 
 .events-table .actions i {
     cursor: pointer;
     color: #555;
     transition: color 0.2s;
+    margin-left: 15px;
 }
+
 .events-table .actions i:hover {
     color: #D32F2F;
 }
 
 /* Status Colors */
-.status-ongoing { color: #FFA500; } /* Orange */
-.status-upcoming { color: #32CD32; } /* LimeGreen */
-.status-ended { color: #808080; } /* Gray */
+.status-ongoing { 
+    color: #FFA500;
+    font-weight: 500;
+} 
 
+.status-upcoming { 
+    color: #32CD32;
+    font-weight: 500;
+} 
+
+.status-ended { 
+    color: #808080;
+    font-weight: 500;
+}
+
+/* Responsive Design */
 @media (max-width: 992px) {
     .form-grid {
         grid-template-columns: 1fr;
     }
 }
+
 @media (max-width: 768px) {
-    .dashboard-container {
-        flex-direction: column;
-    }
-    .sidebar {
-        width: 100%;
-        box-sizing: border-box;
-        height: auto;
-        position: relative;
+    .events-table {
+        font-size: 0.85rem;
     }
     
-    /* Mobile Hamburger Toggle */
-    .hamburger-btn {
-        display: block;
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: #8B3A3A;
-        background: none;
-        border: none;
-        padding: 5px 10px;
-        z-index: 1000;
+    .events-table thead th,
+    .events-table tbody td {
+        padding: 10px 8px;
     }
     
-    .hamburger-btn:hover {
-        color: #A02C2A;
-    }
-    
-    .sidebar-nav {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease;
-    }
-    
-    .sidebar-nav.active {
-        max-height: 500px;
-    }
-    
-    .sidebar-title {
-        font-size: 1.5rem;
-        padding: 20px;
-    }
-    
-    .sidebar-nav ul {
-        flex-direction: column;
-        padding: 0 20px 20px;
+    .events-table .actions i {
+        margin-left: 10px;
+        font-size: 1rem;
     }
 }
