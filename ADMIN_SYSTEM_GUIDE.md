@@ -42,10 +42,10 @@ Your COC Website now has a fully functional admin system that allows you to crea
 
 ### 🔐 Login Credentials
 
-**Email:** cocadmin@coc.web  
-**Password:** password123
+**Email:** [REDACTED]  
+**Password:** [REDACTED]
 
-> ⚠️ **Security Note:** Change these credentials in production! Currently stored in `client/adminLogIn.js`
+> ⚠️ **Security Note:** Contact the system administrator for current credentials.
 
 ### Option 1: Local Development
 
@@ -138,9 +138,10 @@ Your COC Website now has a fully functional admin system that allows you to crea
 
 Currently, the admin pages are accessible directly. For production, you should:
 
-1. **Current Login Credentials** (in adminLogIn.js):
-   - Email: `cocadmin@coc.web`
-   - Password: `password123`
+1. **Current Login Credentials:**
+   - Email: [REDACTED]
+   - Password: [REDACTED]
+   - Contact system administrator for access
 
 2. **Recommended Next Steps:**
    - Add authentication middleware on backend

@@ -2,6 +2,12 @@
 node_modules/
 package-lock.json
 
+# Deployment Documentation (contains sensitive information)
+DEPLOYMENT_GUIDE.md
+DEPLOYMENT_CHECKLIST.md
+DEPLOYMENT_SUMMARY.md
+TROUBLESHOOTING.md
+
 # Environment Variables
 .env
 .env.local

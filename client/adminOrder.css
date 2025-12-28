@@ -337,14 +337,22 @@ td[class^="status-"] { font-weight: bold; cursor: pointer;}
     }
     
     /* Add hamburger button */
-    .sidebar::before {
-        content: '\2630';
+    .hamburger-btn {
+        display: block;
         position: absolute;
         top: 20px;
         right: 20px;
         font-size: 1.5rem;
         cursor: pointer;
         color: #8B3A3A;
+        background: none;
+        border: none;
+        padding: 5px 10px;
+        z-index: 1000;
+    }
+    
+    .hamburger-btn:hover {
+        color: #A02C2A;
     }
     
     .sidebar-title {

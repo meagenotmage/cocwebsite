@@ -2,14 +2,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // ======================= //
     //   MOBILE NAV TOGGLE     //
     // ======================= //
-    const sidebar = document.querySelector('.sidebar');
+    const hamburgerBtn = document.querySelector('.hamburger-btn');
     const sidebarNav = document.querySelector('.sidebar-nav');
     
-    if (sidebar && window.innerWidth <= 768) {
-        sidebar.addEventListener('click', function(e) {
-            if (e.target === sidebar || e.target.classList.contains('sidebar-title')) {
-                sidebarNav.classList.toggle('active');
-            }
+    if (hamburgerBtn && sidebarNav) {
+        hamburgerBtn.addEventListener('click', function() {
+            sidebarNav.classList.toggle('active');
         });
     }
     

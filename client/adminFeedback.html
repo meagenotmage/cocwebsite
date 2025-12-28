@@ -15,6 +15,7 @@
         <!--        SIDEBAR          -->
         <!-- ======================= -->
         <aside class="sidebar">
+            <button class="hamburger-btn" aria-label="Toggle menu">☰</button>
             <h1 class="sidebar-title">Hi, Admin!</h1>
             <nav class="sidebar-nav">
                 <ul>
@@ -39,5 +40,19 @@
             </div>
         </main>
     </div>
+    
+    <script>
+        // Mobile nav toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburgerBtn = document.querySelector('.hamburger-btn');
+            const sidebarNav = document.querySelector('.sidebar-nav');
+            
+            if (hamburgerBtn && sidebarNav) {
+                hamburgerBtn.addEventListener('click', function() {
+                    sidebarNav.classList.toggle('active');
+                });
+            }
+        });
+    </script>
 </body>
 </html>

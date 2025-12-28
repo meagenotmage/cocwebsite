@@ -231,11 +231,45 @@ body {
         width: 100%;
         box-sizing: border-box;
         height: auto;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
+        position: relative;
     }
-    .sidebar-nav, .sidebar-title {
-        display: none; /* Simplification for mobile */
+    
+    /* Mobile Hamburger Toggle */
+    .hamburger-btn {
+        display: block;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #8B3A3A;
+        background: none;
+        border: none;
+        padding: 5px 10px;
+        z-index: 1000;
+    }
+    
+    .hamburger-btn:hover {
+        color: #A02C2A;
+    }
+    
+    .sidebar-nav {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+    
+    .sidebar-nav.active {
+        max-height: 500px;
+    }
+    
+    .sidebar-title {
+        font-size: 1.5rem;
+        padding: 20px;
+    }
+    
+    .sidebar-nav ul {
+        flex-direction: column;
+        padding: 0 20px 20px;
     }
 }
