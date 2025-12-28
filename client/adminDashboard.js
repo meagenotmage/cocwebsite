@@ -7,10 +7,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const hamburgerBtn = document.querySelector('.hamburger-btn');
     const sidebarNav = document.querySelector('.sidebar-nav');
     
+    console.log('Hamburger button:', hamburgerBtn);
+    console.log('Sidebar nav:', sidebarNav);
+    
     if (hamburgerBtn && sidebarNav) {
+        console.log('Adding click listener to hamburger');
         hamburgerBtn.addEventListener('click', function() {
+            console.log('Hamburger clicked!');
             sidebarNav.classList.toggle('active');
+            console.log('Active class toggled. Has active?', sidebarNav.classList.contains('active'));
         });
+    } else {
+        console.error('Missing elements - hamburgerBtn:', !!hamburgerBtn, 'sidebarNav:', !!sidebarNav);
     }
 
     // ======================= //
