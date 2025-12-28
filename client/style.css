@@ -511,7 +511,8 @@ header nav.desktop-nav ul li a.active::after {
     margin-bottom: 24px;
 }
 .calendar-grid > div,
-.calendar-grid .day {
+.calendar-grid .day,
+.calendar-grid .calendar-day {
     padding: 8px;
     border-radius: var(--border-radius-sm);
     background: rgba(255, 255, 255, 0.5);
@@ -519,10 +520,15 @@ header nav.desktop-nav ul li a.active::after {
     font-weight: 500;
     transition: var(--transition);
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
 }
 
 .calendar-grid > div:hover,
-.calendar-grid .day:hover {
+.calendar-grid .day:hover,
+.calendar-grid .calendar-day:hover {
     background: rgba(139, 58, 58, 0.1);
     transform: scale(1.05);
     border-color: var(--primary-red);
@@ -540,14 +546,16 @@ header nav.desktop-nav ul li a.active::after {
     color: var(--text-muted);
 }
 .event-day,
-.calendar-grid .day.event-day {
+.calendar-grid .day.event-day,
+.calendar-grid .calendar-day.event-day {
     background: rgba(229, 57, 53, 0.15) !important;
     color: var(--primary-red) !important;
     font-weight: 700;
     border: 2px solid var(--primary-red-bright) !important;
 }
 .today,
-.calendar-grid .day.today {
+.calendar-grid .day.today,
+.calendar-grid .calendar-day.today {
     background: var(--primary-red) !important;
     color: white !important;
     font-weight: 700;
@@ -740,29 +748,35 @@ footer {
     margin: 0 auto;
     padding-left: 24px;
     padding-right: 24px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .footer-main {
-    flex: 1;
+    flex: 1 1 250px;
     text-align: left;
+    min-width: 200px;
 }
 
 .footer-menu {
-    flex: 1;
+    flex: 1 1 200px;
     text-align: left;
+    min-width: 150px;
 }
 
 .footer-social {
-    flex: 1;
+    flex: 1 1 200px;
     text-align: left;
+    min-width: 150px;
 }
 
 .footer-logos {
-    flex: 1;
+    flex: 0 0 auto;
     display: flex;
     gap: 24px;
     align-items: center;
     justify-content: flex-end;
+    min-width: 180px;
 }
 
 .footer-logo {
@@ -1124,15 +1138,25 @@ footer {
         grid-template-columns: 1fr;
     }
     
-    /* MODIFIED: Footer adjustments for tablets */
+    /* Footer adjustments for tablets */
     .footer-content {
-        gap: 20px; /* Reduce gap to save space */
+        gap: 32px;
+        flex-wrap: wrap;
     }
-
-    .footer-right-column {
-        flex-direction: column; /* Stack social above logos to save horizontal space */
-        align-items: flex-start;
-        gap: 20px;
+    
+    .footer-main {
+        flex: 1 1 100%;
+        min-width: 100%;
+    }
+    
+    .footer-menu,
+    .footer-social {
+        flex: 1 1 45%;
+    }
+    
+    .footer-logos {
+        flex: 1 1 100%;
+        justify-content: center;
     }
 }
 
@@ -1226,23 +1250,28 @@ footer {
 
     /* Footer - Stack on mobile */
     footer {
-        padding: 30px 20px;
+        padding: 40px 20px 0;
     }
     
     .footer-content {
         flex-direction: column;
         align-items: center;
         text-align: center;
+        gap: 32px;
+        padding-bottom: 32px;
     }
     
     .footer-main,
     .footer-menu,
     .footer-social {
         text-align: center;
+        width: 100%;
+        min-width: 100%;
     }
     
     .footer-logos {
         justify-content: center;
+        width: 100%;
     }
     
     .footer-logo,
@@ -1255,7 +1284,7 @@ footer {
     }
     
     .social-icons i {
-        font-size: 32px;
+        font-size: 20px;
     }
 }
 
