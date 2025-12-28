@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const plusBtn = productModal.querySelector('.quantity-btn.plus');
     const nameTemplateInputContainer = productModal.querySelector('.name-template-input');
     const nameTemplateInput = document.getElementById('template-name');
+    const nameInputFieldContainer = productModal.querySelector('.name-input-field');
+    const uniformNameInput = document.getElementById('uniform-name');
     const sizesContainer = productModal.querySelector('.sizes');
     
     // Load cart from localStorage
@@ -66,6 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const price = item.dataset.price;
             const imgSrc = item.dataset.imgSrc;
             const id = item.dataset.id;
+            const requiresName = item.dataset.requiresName === 'true';
+            
             productModal.querySelector('#modal-name').textContent = name;
             productModal.querySelector('#modal-price').textContent = `₱ ${price}`;
             productModal.querySelector('#modal-img').src = imgSrc;
@@ -73,15 +77,24 @@ document.addEventListener('DOMContentLoaded', () => {
             addToCartBtn.dataset.name = name;
             addToCartBtn.dataset.price = price;
             addToCartBtn.dataset.img = imgSrc;
+            addToCartBtn.dataset.requiresName = requiresName;
             quantityInput.value = '1';
             
             if (name === 'COC Nameplate') {
                 sizesContainer.style.display = 'none';
                 nameTemplateInputContainer.style.display = 'block';
+                if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'none';
                 nameTemplateInput.value = '';
+            } else if (requiresName) {
+                sizesContainer.style.display = 'block';
+                nameTemplateInputContainer.style.display = 'none';
+                if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'block';
+                if (uniformNameInput) uniformNameInput.value = '';
+                setActiveSize('');
             } else {
                 sizesContainer.style.display = 'block';
                 nameTemplateInputContainer.style.display = 'none';
+                if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'none';
                 setActiveSize('');
             }
             productModal.style.display = 'flex';
@@ -129,12 +142,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addToCartBtn.addEventListener('click', (e) => {
         let customDetail = selectedSize;
+        let customName = null;
+        const requiresName = e.target.dataset.requiresName === 'true';
+        
         if (e.target.dataset.name === 'COC Nameplate') {
             if(nameTemplateInput.value.trim() === '') {
                 showConfirmation('Error', '<p>Please enter a name for the nameplate.</p>', false);
                 return;
             }
             customDetail = nameTemplateInput.value.trim();
+            customName = nameTemplateInput.value.trim();
+        } else if (requiresName) {
+            if (!selectedSize) {
+                showConfirmation('Error', '<p>Please select a size.</p>', false);
+                return;
+            }
+            if (!uniformNameInput || uniformNameInput.value.trim() === '') {
+                showConfirmation('Error', '<p>Please enter a name for the uniform.</p>', false);
+                return;
+            }
+            customName = uniformNameInput.value.trim();
         } else if (!selectedSize) {
             showConfirmation('Error', '<p>Please select a size.</p>', false);
             return;
@@ -146,10 +173,16 @@ document.addEventListener('DOMContentLoaded', () => {
             price: parseFloat(e.target.dataset.price),
             quantity: parseInt(quantityInput.value),
             detail: customDetail,
-            img: e.target.dataset.img
+            img: e.target.dataset.img,
+            customName: customName,
+            size: !customName || e.target.dataset.name === 'COC Nameplate' ? null : customDetail
         };
 
-        const existingItemIndex = cart.findIndex(cartItem => cartItem.id === item.id && cartItem.detail === item.detail);
+        const existingItemIndex = cart.findIndex(cartItem => 
+            cartItem.id === item.id && 
+            cartItem.detail === item.detail && 
+            cartItem.customName === item.customName
+        );
 
         if (existingItemIndex > -1) {
             cart[existingItemIndex].quantity += item.quantity;
@@ -160,10 +193,12 @@ document.addEventListener('DOMContentLoaded', () => {
         productModal.style.display = 'none';
         
         const detailLabel = item.name === 'COC Nameplate' ? 'Name' : 'Size';
+        const nameInfo = customName && item.name !== 'COC Nameplate' ? `<p>Name: ${customName}</p>` : '';
         showConfirmation(
             'Added to Cart!',
             `<p><strong>${item.quantity} x ${item.name}</strong></p>
              <p>${detailLabel}: ${item.detail}</p>
+             ${nameInfo}
              <p>Price: ₱${(item.price * item.quantity).toFixed(2)}</p>`
         );
     });
@@ -177,7 +212,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Direct checkout from product modal
     productModalCheckoutBtn.addEventListener('click', () => {
         let customDetail = selectedSize;
+        let customName = null;
         const productName = addToCartBtn.dataset.name;
+        const requiresName = addToCartBtn.dataset.requiresName === 'true';
         
         if (productName === 'COC Nameplate') {
             if(nameTemplateInput.value.trim() === '') {
@@ -185,6 +222,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             customDetail = nameTemplateInput.value.trim();
+            customName = nameTemplateInput.value.trim();
+        } else if (requiresName) {
+            if (!selectedSize) {
+                showConfirmation('Error', '<p>Please select a size.</p>', false);
+                return;
+            }
+            if (!uniformNameInput || uniformNameInput.value.trim() === '') {
+                showConfirmation('Error', '<p>Please enter a name for the uniform.</p>', false);
+                return;
+            }
+            customName = uniformNameInput.value.trim();
         } else if (!selectedSize) {
             showConfirmation('Error', '<p>Please select a size.</p>', false);
             return;
@@ -196,7 +244,9 @@ document.addEventListener('DOMContentLoaded', () => {
             price: parseFloat(addToCartBtn.dataset.price),
             quantity: parseInt(quantityInput.value),
             detail: customDetail,
-            img: addToCartBtn.dataset.img
+            img: addToCartBtn.dataset.img,
+            customName: customName,
+            size: !customName || productName === 'COC Nameplate' ? null : customDetail
         };
 
         // Store in session and redirect to checkout
@@ -267,6 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemTotal = item.price * item.quantity;
             totalPrice += itemTotal;
             const detailLabel = item.name === 'COC Nameplate' ? 'Name' : 'Size';
+            const nameInfo = item.customName && item.name !== 'COC Nameplate' ? `<p>Name: ${item.customName}</p>` : '';
             const cartItemDiv = document.createElement('div');
             cartItemDiv.classList.add('cart-item');
             cartItemDiv.innerHTML = `
@@ -274,6 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="cart-item-details">
                     <p>${item.name}</p>
                     <p>${detailLabel}: ${item.detail}</p>
+                    ${nameInfo}
                     <p>Qty: ${item.quantity}</p>
                 </div>
                 <div class="cart-item-price">₱${itemTotal.toFixed(2)}</div>

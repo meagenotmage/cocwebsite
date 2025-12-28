@@ -96,11 +96,11 @@ document.addEventListener('DOMContentLoaded', function () {
             let itemsHTML = '';
             if (order.items && order.items.length > 0) {
                 itemsHTML = order.items.map(item => {
-                    // For nameplate, show the custom name in the Name column
+                    // For items with custom names (nameplate and uniforms), show the custom name in the Name column
                     let customerName = order.fullName;
                     let productName = item.name;
                     
-                    if (item.name && item.name.toLowerCase().includes('nameplate') && item.customName) {
+                    if (item.customName) {
                         customerName = item.customName;
                         productName = item.name;
                     }
