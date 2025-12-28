@@ -739,10 +739,9 @@ footer {
 }
 
 .footer-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 32px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 48px;
     padding-bottom: 48px;
     max-width: 1200px;
     margin: 0 auto;
@@ -750,29 +749,26 @@ footer {
     padding-right: 24px;
     width: 100%;
     box-sizing: border-box;
+    align-items: start;
 }
 
 .footer-main {
-    flex: 1 1 auto;
     text-align: left;
 }
 
 .footer-menu {
-    flex: 0 0 auto;
     text-align: left;
 }
 
 .footer-social {
-    flex: 0 0 auto;
     text-align: left;
 }
 
 .footer-logos {
-    flex: 0 0 auto;
     display: flex;
-    gap: 24px;
-    align-items: center;
-    justify-content: flex-end;
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
 }
 
 .footer-logo {
@@ -836,6 +832,7 @@ footer {
 .social-icons {
     display: flex;
     gap: 16px;
+    flex-wrap: wrap;
 }
 
 .social-icons a {
@@ -942,9 +939,11 @@ footer {
     -webkit-backdrop-filter: blur(24px);
     padding: 48px;
     border-radius: var(--border-radius);
-    width: 100%;
-    max-width: 800px;
-    min-width: 500px;
+    width: 90%;              /* Adjust width */
+    max-width: 600px;        /* Maximum width */
+    max-height: 80vh;        /* Maximum height */
+    padding: 2rem;           /* Internal spacing */
+    border-radius: 12px;     /* Rounded corners */
     position: relative;
     box-shadow: var(--shadow-lg);
     border: 1px solid rgba(255, 255, 255, 0.3);
@@ -1137,23 +1136,19 @@ footer {
     
     /* Footer adjustments for tablets */
     .footer-content {
+        grid-template-columns: 1fr 1fr;
         gap: 32px;
-        flex-wrap: wrap;
     }
     
     .footer-main {
-        flex: 1 1 100%;
-        min-width: 100%;
-    }
-    
-    .footer-menu,
-    .footer-social {
-        flex: 1 1 45%;
+        grid-column: 1 / -1;
     }
     
     .footer-logos {
-        flex: 1 1 100%;
+        grid-column: 1 / -1;
+        flex-direction: row;
         justify-content: center;
+        align-items: center;
     }
 }
 
@@ -1264,9 +1259,7 @@ footer {
     }
     
     .footer-content {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
+        grid-template-columns: 1fr;
         gap: 32px;
         padding-bottom: 32px;
     }
@@ -1275,13 +1268,12 @@ footer {
     .footer-menu,
     .footer-social {
         text-align: center;
-        width: 100%;
-        min-width: 100%;
     }
     
     .footer-logos {
+        flex-direction: row;
         justify-content: center;
-        width: 100%;
+        align-items: center;
     }
     
     .footer-logo,
