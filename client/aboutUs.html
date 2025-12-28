@@ -3,36 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/coc.png" />
     <title>About Us - College of Communications</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="responsive.css">
     <link rel="stylesheet" href="aboutUs.css">
 </head>
 <body>
     <header>
         <div class="container">
-            <div class="logo">
-                <img src="https://i.imgur.com/rLd7YUN.png" alt="Logo">
-            </div>
-            <nav>
+            <a href="index.html" class="logo">
+                <img src="assets/coc.png" alt="College of Communications Logo">
+            </a>
+            <nav class="desktop-nav">
                 <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="order.html">Order</a></li>
-                    <li><a href="feedback.html">Feedback</a></li>
-                    <li><a href="processingLogs.html">Processing Logs</a></li>
-                    <li><a href="aboutUs.html" class="active">About Us</a></li>
+                    <li><a href="index.html">HOME</a></li>
+                    <li><a href="order.html">ORDER</a></li>
+                    <li><a href="aboutUs.html" class="active">ABOUT US</a></li>
                 </ul>
             </nav>
+            <button class="hamburger" id="hamburger-btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
         </div>
     </header>
 
-    <!-- ADDED: Mobile Navigation Menu -->
     <div class="mobile-nav" id="mobile-nav">
-        <button class="mobile-nav-close" id="mobile-nav-close-btn">×</button>
         <ul>
-            <li><a href="index.html" class="active">Home</a></li>
-            <li><a href="order.html">Order</a></li>
-            <li><a href="feedback.html">Feedback</a></li>
-            <li><a href="processingLogs.html">Processing Logs</a></li>
-            <li><a href="aboutUs.html">About Us</a></li>
+            <li><a href="index.html">HOME</a></li>
+            <li class="mobile-dropdown">
+                <a href="#" class="mobile-dropdown-toggle">SERVICES <i class="fa-solid fa-chevron-down"></i></a>
+                <ul class="mobile-dropdown-menu">
+                    <li><a href="order.html">ORDER</a></li>
+                </ul>
+            </li>
+            <li><a href="aboutUs.html" class="active">ABOUT US</a></li>
         </ul>
     </div>
 
@@ -227,42 +236,47 @@
     <!-- ======================= -->
     <footer>
         <div class="container footer-content">
-            <div class="footer-info">
-                <img src="assets/COCSC.png" alt="College Logo" class="footer-logo">
-                <p>WVSU College of Communication, Luna St. La Paz<br>Iloilo City, Philippines 5000</p>
+            <div class="footer-main">
+                <a href="adminLogIn.html" style="display: inline-block;">
+                    <img src="assets/COCSC.png" alt="College Logo" class="footer-logo">
+                </a>
+                <p>WVSU College of Communication, Luna St. La Paz</p>
+                <p>Iloilo City, Philippines 5000</p>
                 <p>coc.sec@wvsu.edu.ph</p>
                 <p>admission.coc@wvsu.edu.ph</p>
             </div>
+            
             <div class="footer-menu">
                 <h3>Menu</h3>
                 <ul>
-                    <li><a href="#">Orders</a></li>
-                    <li><a href="#">Feedback</a></li>
-                    <li><a href="#">Processing Logs</a></li>
-                    <li><a href="#">About Us</a></li>
+                    <li><a href="order.html">Orders</a></li>
+                    <li><a href="feedback.html">Feedback</a></li>
+                    <li><a href="processingLogs.html">Processing Logs</a></li>
+                    <li><a href="aboutUs.html">About Us</a></li>
                 </ul>
             </div>
-            <div class="footer-right-column">
-                <div class="footer-social">
-                    <h3>Social Media</h3>
-                    <div class="social-icons">
-                        <a href="https://www.facebook.com/wvsucocsc" target="_blank"><i class="fa-brands fa-facebook"></i></a>
-                        <a href="https://www.facebook.com/wvsucoc" target="_blank"><i class="fa-brands fa-facebook"></i></a>
-                        <a href="https://www.instagram.com/wvsucocsc/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-
-                    </div>
+            
+            <div class="footer-social">
+                <h3>Social Media</h3>
+                <div class="social-icons">
+                    <a href="https://www.facebook.com/wvsucocsc" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="https://www.facebook.com/wvsucoc" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="https://www.instagram.com/wvsucocsc/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>
                 </div>
-                <div class="footer-extra-logos">
-                     <img src="assets/wvsu.png" alt="WVSU Seal">
-                     <a href="adminLogIn.html">
-                     <img src="assets/coc.png" alt="COC Seal">
-                    </a>
-                </div>
+            </div>
+            
+            <div class="footer-logos">
+                <img src="assets/wvsu.png" alt="WVSU Seal">
+                <a href="adminLogIn.html">
+                    <img src="assets/coc.png" alt="COC Seal">
+                </a>
             </div>
         </div>
         <div class="copyright">
             <p>Copyright © COCSC 2025. All Rights Reserved.</p>
         </div>
     </footer>
+
+    <script src="mobile-nav.js"></script>
 </body>
 </html>
