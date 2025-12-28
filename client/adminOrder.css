@@ -303,3 +303,108 @@ td[class^="status-"] { font-weight: bold; cursor: pointer;}
     color: #856404;
     font-weight: 600;
 }
+
+/* Timestamp Column */
+.timestamp {
+    font-size: 0.85rem;
+    color: #666;
+    white-space: nowrap;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid #E0E0E0;
+    }
+    
+    .sidebar-title {
+        font-size: 1.3rem;
+        padding-left: 0;
+    }
+    
+    .sidebar-nav ul {
+        display: flex;
+        overflow-x: auto;
+        gap: 5px;
+    }
+    
+    .sidebar-nav li a {
+        flex-direction: column;
+        gap: 5px;
+        padding: 10px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+    
+    .sidebar-nav i {
+        font-size: 1.2rem;
+    }
+    
+    .main-content {
+        padding: 15px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .search-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .search-group,
+    .filter-group {
+        min-width: 100%;
+        max-width: 100%;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .orders-table {
+        min-width: 900px;
+        font-size: 0.85rem;
+    }
+    
+    .orders-table th,
+    .orders-table td {
+        padding: 10px 8px;
+    }
+    
+    .actions i {
+        font-size: 1rem;
+        padding: 6px;
+    }
+    
+    .timestamp {
+        font-size: 0.75rem;
+    }
+    
+    .details-table {
+        font-size: 0.85rem;
+    }
+    
+    .receipt-verification {
+        padding: 15px;
+    }
+    
+    .receipt-actions {
+        flex-direction: column;
+    }
+    
+    .verify-btn,
+    .reject-btn {
+        width: 100%;
+    }
+}

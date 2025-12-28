@@ -15,11 +15,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 displayOrders(allOrders);
             } else {
                 console.error('Failed to load orders');
-                ordersTbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">Failed to load orders</td></tr>';
+                ordersTbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">Failed to load orders</td></tr>';
             }
         } catch (error) {
             console.error('Error loading orders:', error);
-            ordersTbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">Error loading orders. Please check if the server is running.</td></tr>';
+            ordersTbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">Error loading orders. Please check if the server is running.</td></tr>';
         }
     }
 
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Display orders in the table
     function displayOrders(orders) {
         if (orders.length === 0) {
-            ordersTbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">No orders yet</td></tr>';
+            ordersTbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">No orders yet</td></tr>';
             return;
         }
 
@@ -66,6 +66,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 paymentStatusText = 'Pending Verification';
             }
             
+            // Format timestamp
+            let timestamp = 'N/A';
+            if (order.createdAt) {
+                const orderDate = new Date(order.createdAt);
+                timestamp = orderDate.toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            }
+            
             // Create summary row
             const summaryRow = document.createElement('tr');
             summaryRow.className = 'order-summary';
@@ -79,6 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <td>${order.paymentMethod}</td>
                 <td>P ${order.total.toFixed(2)}</td>
                 <td>${orderNumber}</td>
+                <td class="timestamp">${timestamp}</td>
                 <td class="${order.status === 'pending_payment' && order.receiptUrl ? 'status-pending' : paymentStatusClass}">${paymentStatusText}</td>
                 <td class="${receivedStatusClass}">${order.status === 'received' ? 'Received' : 'Not Received'}</td>
                 <td class="actions">
@@ -138,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             
             detailsRow.innerHTML = `
-                <td colspan="8">
+                <td colspan="9">
                     ${receiptSection}
                     <table class="details-table">
                         <thead>

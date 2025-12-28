@@ -82,18 +82,22 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (name === 'COC Nameplate') {
                 sizesContainer.style.display = 'none';
-                nameTemplateInputContainer.style.display = 'block';
+                if (nameTemplateInputContainer) {
+                    nameTemplateInputContainer.style.display = 'block';
+                    if (nameTemplateInput) nameTemplateInput.value = '';
+                }
                 if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'none';
-                nameTemplateInput.value = '';
             } else if (requiresName) {
                 sizesContainer.style.display = 'block';
-                nameTemplateInputContainer.style.display = 'none';
-                if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'block';
-                if (uniformNameInput) uniformNameInput.value = '';
+                if (nameTemplateInputContainer) nameTemplateInputContainer.style.display = 'none';
+                if (nameInputFieldContainer) {
+                    nameInputFieldContainer.style.display = 'block';
+                    if (uniformNameInput) uniformNameInput.value = '';
+                }
                 setActiveSize('');
             } else {
                 sizesContainer.style.display = 'block';
-                nameTemplateInputContainer.style.display = 'none';
+                if (nameTemplateInputContainer) nameTemplateInputContainer.style.display = 'none';
                 if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'none';
                 setActiveSize('');
             }
@@ -146,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const requiresName = e.target.dataset.requiresName === 'true';
         
         if (e.target.dataset.name === 'COC Nameplate') {
-            if(nameTemplateInput.value.trim() === '') {
+            if(!nameTemplateInput || nameTemplateInput.value.trim() === '') {
                 showConfirmation('Error', '<p>Please enter a name for the nameplate.</p>', false);
                 return;
             }
@@ -217,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const requiresName = addToCartBtn.dataset.requiresName === 'true';
         
         if (productName === 'COC Nameplate') {
-            if(nameTemplateInput.value.trim() === '') {
+            if(!nameTemplateInput || nameTemplateInput.value.trim() === '') {
                 showConfirmation('Error', '<p>Please enter a name for the nameplate.</p>', false);
                 return;
             }

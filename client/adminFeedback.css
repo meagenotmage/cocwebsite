@@ -91,3 +91,53 @@ body {
     font-weight: 500;
     color: #888;
 }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid #E0E0E0;
+    }
+    
+    .sidebar-title {
+        font-size: 1.3rem;
+        padding-left: 0;
+    }
+    
+    .sidebar-nav ul {
+        display: flex;
+        overflow-x: auto;
+        gap: 5px;
+    }
+    
+    .sidebar-nav li a {
+        flex-direction: column;
+        gap: 5px;
+        padding: 10px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+    
+    .sidebar-nav i {
+        font-size: 1.2rem;
+    }
+    
+    .main-content {
+        padding: 15px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .placeholder-card p {
+        font-size: 1rem;
+    }
+}

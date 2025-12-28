@@ -27,3 +27,20 @@
 .announcements-table .actions i:hover {
     color: #D32F2F;
 }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .announcements-table {
+        font-size: 0.85rem;
+    }
+    
+    .announcements-table thead th,
+    .announcements-table tbody td {
+        padding: 10px 8px;
+    }
+    
+    .announcements-table .actions i {
+        margin-left: 10px;
+        font-size: 1rem;
+    }
+}
