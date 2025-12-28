@@ -344,11 +344,13 @@ body {
     .sidebar-nav {
         max-height: 0;
         overflow: hidden;
-        transition: max-height 0.3s ease;
+        transition: max-height 0.3s ease-in-out;
+        display: block;
     }
     
     .sidebar-nav.active {
-        max-height: 500px;
+        max-height: 600px;
+        overflow: visible;
     }
     
     /* Add hamburger button */

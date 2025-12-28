@@ -69,23 +69,20 @@ document.addEventListener('DOMContentLoaded', function () {
             const orderNumber = String(orderIndex + 1).padStart(4, '0');
             const paymentStatusClass = order.status === 'paid' ? 'status-paid' : 'status-not-paid';
             
-            // Determine payment status display
-            let paymentStatusText = 'Not Paid';
+            // Determine payment status display (Paid or Pending)
+            let paymentStatusText = 'Pending';
             if (order.status === 'paid') {
                 paymentStatusText = 'Paid ✓';
             } else if (order.status === 'pending_payment' && order.receiptUrl) {
-                paymentStatusText = 'Pending Verification';
+                paymentStatusText = 'Pending';
             }
             
-            // Determine received/delivery status display
-            let deliveryStatusText = 'Not Paid';
-            let deliveryStatusClass = 'status-not-paid';
-            if (order.status === 'paid' || order.status === 'received') {
-                deliveryStatusText = 'Paid';
-                deliveryStatusClass = 'status-paid';
-            } else if (order.status === 'pending_payment' && order.receiptUrl) {
-                deliveryStatusText = 'Pending Verification';
-                deliveryStatusClass = 'status-pending';
+            // Determine received/delivery status display (Received or Not Received)
+            let deliveryStatusText = 'Not Received';
+            let deliveryStatusClass = 'status-not-received';
+            if (order.status === 'received') {
+                deliveryStatusText = 'Received';
+                deliveryStatusClass = 'status-received';
             }
             
             // Format timestamp
@@ -252,11 +249,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // 3. INLINE STATUS EDITING LOGIC
     ordersTbody.addEventListener('click', function(e) {
         const target = e.target;
-        // Check if a status cell was clicked and it's not already being edited
-        if ((target.cellIndex === 5 || target.cellIndex === 6) && !target.querySelector('select')) {
-            const currentStatus = target.textContent;
-            const isPaymentStatus = target.cellIndex === 5;
-            const options = isPaymentStatus ? ['Paid', 'Not Paid'] : ['Paid', 'Not Paid'];
+        // Check if Payment Status (column 6) or Status (column 7) was clicked, but NOT timestamp (column 5)
+        if ((target.cellIndex === 6 || target.cellIndex === 7) && !target.querySelector('select')) {
+            const currentStatus = target.textContent.trim();
+            const isPaymentStatus = target.cellIndex === 6;
+            const options = isPaymentStatus ? ['Paid', 'Pending'] : ['Received', 'Not Received'];
 
             // Create a select dropdown
             const select = document.createElement('select');
