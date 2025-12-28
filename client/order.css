@@ -28,6 +28,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 140px 24px 80px;
     box-sizing: border-box;
     position: relative;
+    text-align: center;
 }
 
 .hero::after {
@@ -46,6 +47,8 @@ h1, h2, h3, h4, h5, h6 {
     max-width: 900px;
     margin: 0 auto;
     width: 100%;
+    position: relative;
+    z-index: 1;
 }
 
 .hero .hero-content h1 {
@@ -139,6 +142,7 @@ h1, h2, h3, h4, h5, h6 {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 32px;
     margin-bottom: 40px;
+    width: 100%;
 }
 
 .product-item {
@@ -747,14 +751,42 @@ h1, h2, h3, h4, h5, h6 {
         margin-bottom: 20px;
     }
     
-    /* Merchandise grid - keep grid but single column */
+    /* Merchandise grid - horizontal scroll on mobile only */
     .merchandise-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        scroll-behavior: smooth !important;
+        gap: 16px !important;
+        padding: 20px 0 !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(139, 58, 58, 0.3) rgba(0, 0, 0, 0.1);
+        grid-template-columns: unset;
+    }
+    
+    .merchandise-grid::-webkit-scrollbar {
+        height: 8px;
+    }
+    
+    .merchandise-grid::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+    }
+    
+    .merchandise-grid::-webkit-scrollbar-thumb {
+        background: rgba(139, 58, 58, 0.3);
+        border-radius: 10px;
+    }
+    
+    .merchandise-grid::-webkit-scrollbar-thumb:hover {
+        background: rgba(139, 58, 58, 0.5);
     }
     
     .product-item {
-        max-width: 100%;
+        min-width: 280px;
+        max-width: 280px;
+        flex-shrink: 0;
     }
     
     .product-item img {
