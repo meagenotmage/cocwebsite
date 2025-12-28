@@ -47,7 +47,11 @@ const upload = multer({
 // Configure CORS to allow multiple origins
 const allowedOrigins = process.env.CORS_ORIGIN 
   ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
-  : ['http://localhost:8080'];
+  : [
+      'http://localhost:8080',
+      'https://college-of-communication-4ui4lsauk-meydjs-projects.vercel.app',
+      'https://college-of-communication.vercel.app'
+    ];
 
 const corsOptions = {
   origin: function (origin, callback) {

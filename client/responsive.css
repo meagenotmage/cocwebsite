@@ -9,6 +9,28 @@
 .show-mobile { display: block; }
 
 /* ======================= */
+/*    TABLET SCREENS       */
+/* ======================= */
+@media (min-width: 769px) and (max-width: 1024px) {
+    /* Keep announcements and calendar side by side on tablets */
+    .info-section {
+        gap: 20px;
+    }
+    
+    .announcements-wrapper {
+        flex: 1 1 50%;
+        min-width: 280px;
+        max-width: 550px;
+    }
+    
+    .calendar-wrapper {
+        flex: 1 1 50%;
+        min-width: 280px;
+        max-width: 450px;
+    }
+}
+
+/* ======================= */
 /*    MOBILE NAVIGATION    */
 /* ======================= */
 
@@ -165,11 +187,18 @@
         height: 50px;
     }
     
-    /* Info section */
+    /* Info section - Stack vertically on mobile */
     .info-section {
         margin: 40px auto 60px;
         flex-direction: column;
         gap: 24px;
+    }
+    
+    .announcements-wrapper,
+    .calendar-wrapper {
+        flex: 1 1 100%;
+        min-width: 100%;
+        max-width: 100%;
     }
     
     .announcements, .calendar {
