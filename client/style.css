@@ -123,7 +123,7 @@ header nav.desktop-nav ul {
     margin: 0;
     padding: 0;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
 }
 
 header nav.desktop-nav ul li {
@@ -134,8 +134,8 @@ header nav.desktop-nav ul li a {
     color: white;
     text-decoration: none;
     font-weight: 600;
-    font-size: 1rem;
-    padding: 10px 24px;
+    font-size: 0.875rem;
+    padding: 10px 20px;
     border-radius: var(--border-radius-sm);
     transition: var(--transition);
     display: inline-flex;
@@ -341,7 +341,7 @@ header nav.desktop-nav ul li a.active::after {
 /* ======================= */
 .info-section {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: center;
     gap: 32px;
     margin: -80px auto 80px;
@@ -353,16 +353,14 @@ header nav.desktop-nav ul li a.active::after {
 }
 
 .announcements-wrapper {
-    flex: 1 1 55%;
+    flex: 1 1 58%;
     min-width: 0;
-    max-width: 650px;
     display: flex;
 }
 
 .calendar-wrapper {
-    flex: 1 1 45%;
+    flex: 1 1 42%;
     min-width: 0;
-    max-width: 500px;
     display: flex;
 }
 
