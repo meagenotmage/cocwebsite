@@ -68,7 +68,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const orderIndex = allOrdersSorted.findIndex(o => o._id === order._id);
             const orderNumber = String(orderIndex + 1).padStart(4, '0');
             const paymentStatusClass = order.status === 'paid' ? 'status-paid' : 'status-not-paid';
-            const receivedStatusClass = order.status === 'received' ? 'status-received' : 'status-not-received';
             
             // Determine payment status display
             let paymentStatusText = 'Not Paid';
@@ -76,6 +75,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 paymentStatusText = 'Paid ✓';
             } else if (order.status === 'pending_payment' && order.receiptUrl) {
                 paymentStatusText = 'Pending Verification';
+            }
+            
+            // Determine received/delivery status display
+            let deliveryStatusText = 'Not Paid';
+            let deliveryStatusClass = 'status-not-paid';
+            if (order.status === 'paid' || order.status === 'received') {
+                deliveryStatusText = 'Paid';
+                deliveryStatusClass = 'status-paid';
+            } else if (order.status === 'pending_payment' && order.receiptUrl) {
+                deliveryStatusText = 'Pending Verification';
+                deliveryStatusClass = 'status-pending';
             }
             
             // Format timestamp
@@ -107,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <td>${orderNumber}</td>
                 <td class="timestamp">${timestamp}</td>
                 <td class="${order.status === 'pending_payment' && order.receiptUrl ? 'status-pending' : paymentStatusClass}">${paymentStatusText}</td>
-                <td class="${receivedStatusClass}">${order.status === 'received' ? 'Received' : 'Not Received'}</td>
+                <td class="${deliveryStatusClass}">${deliveryStatusText}</td>
                 <td class="actions">
                     <i class="fa-solid fa-chevron-down toggle-details"></i>
                     ${order.receiptUrl ? '<i class="fa-solid fa-image view-receipt" title="View Receipt" data-order-id="' + order._id + '"></i>' : ''}
@@ -246,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if ((target.cellIndex === 5 || target.cellIndex === 6) && !target.querySelector('select')) {
             const currentStatus = target.textContent;
             const isPaymentStatus = target.cellIndex === 5;
-            const options = isPaymentStatus ? ['Paid', 'Not Paid'] : ['Received', 'Not Received'];
+            const options = isPaymentStatus ? ['Paid', 'Not Paid'] : ['Paid', 'Not Paid'];
 
             // Create a select dropdown
             const select = document.createElement('select');

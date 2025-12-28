@@ -371,8 +371,9 @@ body {
     }
     
     .sidebar-title {
-        font-size: 1.5rem;
-        padding: 20px;
+        font-size: 1.3rem;
+        padding: 20px 60px 10px 20px; /* Add right padding to avoid hamburger */
+        margin-bottom: 0;
     }
     
     .sidebar-nav ul {
@@ -381,13 +382,15 @@ body {
     }
     
     .sidebar-nav ul li {
-        display: inline-block;
+        display: block;
+        width: 100%;
     }
     
     .sidebar-nav ul li a {
-        padding: 10px 16px;
+        display: flex;
+        width: 100%;
+        padding: 12px 16px;
         font-size: 0.9rem;
-        white-space: nowrap;
     }
     
     .sidebar-footer {
