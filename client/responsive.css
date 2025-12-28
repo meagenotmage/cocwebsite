@@ -145,11 +145,17 @@
         position: fixed;
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(20px);
+        width: 100%;
+        left: 0;
+        right: 0;
     }
     
     /* Container adjustments */
     .container {
+        width: 100%;
+        max-width: 100%;
         padding: 0 20px;
+        margin: 0 auto;
     }
     
     /* Hero section */
@@ -187,16 +193,21 @@
     
     /* Info section - Stack vertically on mobile */
     .info-section {
-        margin: 40px auto 60px;
+        width: 100%;
+        max-width: 100%;
+        margin: 40px 0 60px;
+        padding: 0;
         flex-direction: column;
         gap: 24px;
     }
     
     .announcements-wrapper,
     .calendar-wrapper {
+        width: 100%;
         flex: 1 1 100%;
         min-width: 100%;
         max-width: 100%;
+        margin: 0;
     }
     
     .announcements, .calendar {
@@ -224,17 +235,23 @@
     
     /* Organizations */
     .organizations {
-        margin: 60px auto;
+        width: 100%;
+        max-width: 100%;
+        margin: 60px 0;
+        padding: 0;
     }
     
     .organizations h2 {
         font-size: 2rem;
         margin-bottom: 40px;
+        text-align: center;
     }
     
     .org-grid {
+        width: 100%;
         grid-template-columns: 1fr !important;
         gap: 24px;
+        padding: 0;
     }
     
     .org-content {
@@ -242,6 +259,7 @@
         align-items: center;
         text-align: center;
         padding: 24px;
+        width: 100%;
     }
     
     .org-content img {
@@ -285,18 +303,24 @@
     .modal-content {
         padding: 32px;
         margin: 20px;
+        width: calc(100% - 40px);
+        max-width: 600px;
     }
     
     .modal-content h2 {
         font-size: 1.5rem;
         padding-right: 40px;
     }
-}
+    
+    /* Form inputs */
+    input[type="text"],
+    input[type="email"],
     input[type="password"],
     input[type="date"],
     input[type="time"],
     textarea,
     select {
+        width: 100%;
         font-size: 16px !important; /* Prevents zoom on iOS */
     }
     
@@ -319,34 +343,39 @@
     
     /* Order/Merchandise Grid */
     .merchandise-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
-        gap: 15px !important;
+        width: 100%;
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+        padding: 0;
     }
     
     .product-item {
-        padding: 10px !important;
+        width: 100%;
+        padding: 0 !important;
     }
     
-    /* Modal adjustments */
-    .modal-content {
-        width: 90% !important;
-        max-width: 400px !important;
-        margin: 20px auto !important;
-        max-height: 90vh;
-        overflow-y: auto;
+    .product-item img {
+        width: 100%;
+        height: auto;
+        max-height: 250px;
+        object-fit: cover;
     }
     
     /* Footer */
     footer {
-        padding: 30px 0 !important;
+        width: 100%;
+        padding: 40px 20px !important;
     }
     
     footer .footer-content {
+        width: 100%;
         flex-direction: column !important;
         text-align: center !important;
+        gap: 20px;
     }
     
     footer .footer-section {
+        width: 100%;
         margin-bottom: 25px;
     }
     
