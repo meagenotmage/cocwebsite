@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
             totalPrice += item.price * item.quantity;
 
             const detailLabel = item.name.includes('Nameplate') ? 'Name' : 'Size';
+            const customNameLabel = item.customName && !item.name.includes('Nameplate') ? `<p>Name: <span class="detail-red">${item.customName}</span></p>` : '';
             
             const orderItemDiv = document.createElement('div');
             orderItemDiv.classList.add('order-item');
@@ -47,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="order-item-details">
                     <h3>${item.name}</h3>
                     <p>${detailLabel}: <span class="detail-red">${item.detail}</span></p>
+                    ${customNameLabel}
                     <div class="order-item-quantity">
                         <span>Quantity:</span>
                         <div class="quantity-controls">
@@ -149,8 +151,8 @@ document.addEventListener('DOMContentLoaded', () => {
             paymentMethod: selectedPaymentMethod.toUpperCase(),
             items: orderData.map(item => ({
                 name: item.name,
-                size: item.name.toLowerCase().includes('nameplate') ? undefined : item.detail,
-                customName: item.name.toLowerCase().includes('nameplate') ? item.detail : undefined,
+                size: item.size || (item.name.toLowerCase().includes('nameplate') ? undefined : item.detail),
+                customName: item.customName || undefined,
                 quantity: item.quantity,
                 price: item.price
             })),

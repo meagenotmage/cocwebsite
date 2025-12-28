@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </div>
                         <div class="event-details">
-                            <h3>${event.name}</h3>
+                            <h3>${event.title || event.name}</h3>
                             <div class="event-info">
                                 <div class="info-item">
                                     <i class="fa-solid fa-calendar"></i>
