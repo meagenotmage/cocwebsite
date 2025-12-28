@@ -14,19 +14,17 @@
 @media (min-width: 769px) and (max-width: 1024px) {
     /* Keep announcements and calendar side by side on tablets */
     .info-section {
-        gap: 20px;
+        gap: 16px;
     }
     
     .announcements-wrapper {
-        flex: 1 1 50%;
-        min-width: 280px;
-        max-width: 550px;
+        flex: 1 1 52%;
+        min-width: 0;
     }
     
     .calendar-wrapper {
-        flex: 1 1 50%;
-        min-width: 280px;
-        max-width: 450px;
+        flex: 1 1 48%;
+        min-width: 0;
     }
 }
 
