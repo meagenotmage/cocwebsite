@@ -2,6 +2,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const API_BASE_URL = CONFIG.API_URL;
 
     // ======================= //
+    //   MOBILE NAV TOGGLE     //
+    // ======================= //
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarNav = document.querySelector('.sidebar-nav');
+    
+    if (sidebar && window.innerWidth <= 768) {
+        sidebar.addEventListener('click', function(e) {
+            if (e.target === sidebar || e.target.classList.contains('sidebar-title')) {
+                sidebarNav.classList.toggle('active');
+            }
+        });
+    }
+
+    // ======================= //
     //      ORDERS CHART       //
     // ======================= //
     const ctx = document.getElementById('ordersChart').getContext('2d');

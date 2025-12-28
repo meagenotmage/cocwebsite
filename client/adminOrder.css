@@ -325,6 +325,28 @@ td[class^="status-"] { font-weight: bold; cursor: pointer;}
         border-bottom: 1px solid #E0E0E0;
     }
     
+    /* Mobile Hamburger Toggle */
+    .sidebar-nav {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+    
+    .sidebar-nav.active {
+        max-height: 500px;
+    }
+    
+    /* Add hamburger button */
+    .sidebar::before {
+        content: '\2630';
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #8B3A3A;
+    }
+    
     .sidebar-title {
         font-size: 1.3rem;
         padding-left: 0;
@@ -332,8 +354,9 @@ td[class^="status-"] { font-weight: bold; cursor: pointer;}
     
     .sidebar-nav ul {
         display: flex;
-        overflow-x: auto;
+        flex-direction: column;
         gap: 5px;
+        padding: 0 20px 20px;
     }
     
     .sidebar-nav li a {

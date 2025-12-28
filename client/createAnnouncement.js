@@ -1,4 +1,18 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // ======================= //
+    //   MOBILE NAV TOGGLE     //
+    // ======================= //
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarNav = document.querySelector('.sidebar-nav');
+    
+    if (sidebar && window.innerWidth <= 768) {
+        sidebar.addEventListener('click', function(e) {
+            if (e.target === sidebar || e.target.classList.contains('sidebar-title')) {
+                sidebarNav.classList.toggle('active');
+            }
+        });
+    }
+    
     const API_BASE_URL = CONFIG.API_URL;
     const announcementForm = document.getElementById('announcement-form');
     const announcementsTbody = document.getElementById('announcements-tbody');
