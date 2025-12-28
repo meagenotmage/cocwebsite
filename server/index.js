@@ -58,12 +58,16 @@ const corsOptions = {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    // Check if origin is in allowed list
-    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
+    // Allow localhost
+    if (origin.includes('localhost')) {
       callback(null, true);
     }
-    // Allow all Vercel preview deployments
-    else if (origin && (origin.endsWith('.vercel.app') || origin.endsWith('-meydjs-projects.vercel.app'))) {
+    // Allow all Vercel deployments
+    else if (origin.includes('vercel.app')) {
+      callback(null, true);
+    }
+    // Check if origin is in allowed list
+    else if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
