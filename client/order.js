@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sizeGuideModal = document.getElementById('size-guide-modal');
     const closeButtons = document.querySelectorAll('.close-button');
     const productItems = document.querySelectorAll('.product-item');
-    const sizeGuideLinks = document.querySelectorAll('.size-guide-link');
+    const modalSizeGuideLink = document.getElementById('modal-size-guide-link');
     const cartLink = document.getElementById('cart-link');
     const cartCountSpan = document.getElementById('cart-count');
     const cartItemsContainer = document.getElementById('cart-items-container');
@@ -84,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (name === 'COC Nameplate') {
                 sizesContainer.style.display = 'none';
+                if (modalSizeGuideLink) modalSizeGuideLink.style.display = 'none';
                 if (nameTemplateInputContainer) {
                     nameTemplateInputContainer.style.display = 'block';
                     if (nameTemplateInput) nameTemplateInput.value = '';
@@ -91,14 +92,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'none';
             } else if (requiresName) {
                 sizesContainer.style.display = 'block';
+                if (modalSizeGuideLink) modalSizeGuideLink.style.display = 'block';
                 if (nameTemplateInputContainer) nameTemplateInputContainer.style.display = 'none';
                 if (nameInputFieldContainer) {
                     nameInputFieldContainer.style.display = 'block';
                     if (uniformNameInput) uniformNameInput.value = '';
                 }
                 setActiveSize('');
+            } else if (name.includes('Uniform')) {
+                sizesContainer.style.display = 'block';
+                if (modalSizeGuideLink) modalSizeGuideLink.style.display = 'block';
+                if (nameTemplateInputContainer) nameTemplateInputContainer.style.display = 'none';
+                if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'none';
+                setActiveSize('');
             } else {
                 sizesContainer.style.display = 'block';
+                if (modalSizeGuideLink) modalSizeGuideLink.style.display = 'none';
                 if (nameTemplateInputContainer) nameTemplateInputContainer.style.display = 'none';
                 if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'none';
                 setActiveSize('');
@@ -119,14 +128,13 @@ document.addEventListener('DOMContentLoaded', () => {
         confirmationModal.style.display = 'none';
     });
 
-    // Size Guide Links
-    sizeGuideLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
+    // Size Guide Link in Modal
+    if (modalSizeGuideLink) {
+        modalSizeGuideLink.addEventListener('click', (e) => {
             e.preventDefault();
-            e.stopPropagation();
             sizeGuideModal.style.display = 'flex';
         });
-    });
+    }
 
     window.addEventListener('click', (event) => {
         if (event.target == productModal || event.target == cartModal) {

@@ -276,24 +276,31 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0;
 }
 
-.size-guide-link {
+#modal-size-guide-link {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    gap: 8px;
     font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: #666;
     text-decoration: none;
-    margin-top: 4px;
-    transition: color 0.3s ease;
+    margin-top: 12px;
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
 }
 
-.size-guide-link:hover {
+#modal-size-guide-link:hover {
     color: var(--primary-red-bright, #E53935);
+    border-color: var(--primary-red-bright, #E53935);
+    background: #fff;
 }
 
-.size-guide-link i {
-    font-size: 0.9rem;
+#modal-size-guide-link i {
+    font-size: 1rem;
 }
 
 .pagination {
