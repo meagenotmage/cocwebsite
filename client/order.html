@@ -69,18 +69,20 @@
                     </div>
                 </div>
                 <div class="merchandise-grid">
-                    <div class="product-item" data-id="1" data-name="COC Type B Uniform" data-price="550" data-img-src="https://i.imgur.com/3qL6s9z.png" data-requires-name="true">
-                        <img src="https://i.imgur.com/3qL6s9z.png" alt="COC Type B Uniform" onerror="this.style.display='none'; this.parentElement.classList.add('image-error');">
+                    <div class="product-item" data-id="1" data-name="COC Type B Uniform" data-price="550" data-img-src="assets/typeB.png" data-requires-name="true">
+                        <img src="assets/typeB.png" alt="COC Type B Uniform" onerror="this.style.display='none'; this.parentElement.classList.add('image-error');">
                         <div class="product-info-text">
                             <h3>COC Type B Uniform</h3>
-                            <p>₱ 550</p>
+                            <p>₱ 600</p>
+                            <a href="#" class="size-guide-link" data-product="shirt"><i class="fa-solid fa-ruler"></i> Size Guide</a>
                         </div>
                     </div>
                     <div class="product-item" data-id="2" data-name="COC Type C Uniform" data-price="550" data-img-src="https://i.imgur.com/OykO2aO.png">
-                        <img src="https://i.imgur.com/OykO2aO.png" alt="COC Type C Uniform" onerror="this.style.display='none'; this.parentElement.classList.add('image-error');">
+                        <img src="assets/typeC.png" alt="COC Type C Uniform" onerror="this.style.display='none'; this.parentElement.classList.add('image-error');">
                         <div class="product-info-text">
                             <h3>COC Type C Uniform</h3>
                             <p>₱ 550</p>
+                            <a href="#" class="size-guide-link" data-product="shirt"><i class="fa-solid fa-ruler"></i> Size Guide</a>
                         </div>
                     </div>
                     <div class="product-item" data-id="3" data-name="COC Nameplate" data-price="700" data-img-src="https://i.imgur.com/1RO9505.png">
@@ -91,7 +93,7 @@
                         </div>
                     </div>
                     <div class="product-item" data-id="4" data-name="COC Lanyard" data-price="120" data-img-src="https://i.imgur.com/1RO9505.png">
-                        <img src="https://i.imgur.com/1RO9505.png" alt="COC Lanyard" onerror="this.style.display='none'; this.parentElement.classList.add('image-error');">
+                        <img src="assets/lanyard.png" alt="COC Lanyard" onerror="this.style.display='none'; this.parentElement.classList.add('image-error');">
                         <div class="product-info-text">
                             <h3>COC Lanyard</h3>
                             <p>₱ 120</p>
@@ -174,6 +176,17 @@
             <h2 id="confirmation-title">Success!</h2>
             <div id="confirmation-message"></div>
             <button class="confirmation-btn" id="confirmation-ok-btn">OK</button>
+        </div>
+    </div>
+
+    <!-- Size Guide Modal -->
+    <div id="size-guide-modal" class="modal">
+        <div class="modal-content size-guide-content">
+            <span class="close-button">×</span>
+            <h2>Size Guide</h2>
+            <div class="size-guide-image">
+                <img src="assets/size-guide.jpg" alt="Size Guide Chart" onerror="this.src='https://via.placeholder.com/600x400?text=Size+Guide+Chart';">
+            </div>
         </div>
     </div>
 

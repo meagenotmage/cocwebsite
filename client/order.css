@@ -276,6 +276,26 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0;
 }
 
+.size-guide-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: #666;
+    text-decoration: none;
+    margin-top: 4px;
+    transition: color 0.3s ease;
+}
+
+.size-guide-link:hover {
+    color: var(--primary-red-bright, #E53935);
+}
+
+.size-guide-link i {
+    font-size: 0.9rem;
+}
+
 .pagination {
     display: none;
 }
@@ -369,6 +389,45 @@ h1, h2, h3, h4, h5, h6 {
     background-color: #c62828;
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(229, 57, 53, 0.4);
+}
+
+/* ======================= */
+/*    SIZE GUIDE MODAL     */
+/* ======================= */
+.size-guide-content {
+    background: white;
+    padding: 32px;
+    border-radius: 15px;
+    max-width: 700px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.size-guide-content h2 {
+    font-family: 'Oswald', sans-serif;
+    color: #333;
+    font-size: 2rem;
+    margin: 0 0 24px 0;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.size-guide-image {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.size-guide-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* ======================= */

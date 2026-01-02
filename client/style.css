@@ -768,9 +768,9 @@ footer {
 
 .footer-logos {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 20px;
-    align-items: flex-start;
+    align-items: center;
 }
 
 .footer-logo {

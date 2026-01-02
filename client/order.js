@@ -2,8 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const productModal = document.getElementById('product-modal');
     const cartModal = document.getElementById('cart-modal');
     const confirmationModal = document.getElementById('confirmation-modal');
+    const sizeGuideModal = document.getElementById('size-guide-modal');
     const closeButtons = document.querySelectorAll('.close-button');
     const productItems = document.querySelectorAll('.product-item');
+    const sizeGuideLinks = document.querySelectorAll('.size-guide-link');
     const cartLink = document.getElementById('cart-link');
     const cartCountSpan = document.getElementById('cart-count');
     const cartItemsContainer = document.getElementById('cart-items-container');
@@ -109,11 +111,21 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', () => {
             productModal.style.display = 'none';
             cartModal.style.display = 'none';
+            sizeGuideModal.style.display = 'none';
         });
     });
 
     confirmationOkBtn.addEventListener('click', () => {
         confirmationModal.style.display = 'none';
+    });
+
+    // Size Guide Links
+    sizeGuideLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            sizeGuideModal.style.display = 'flex';
+        });
     });
 
     window.addEventListener('click', (event) => {
@@ -123,6 +135,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (event.target == confirmationModal) {
             confirmationModal.style.display = 'none';
+        }
+        if (event.target == sizeGuideModal) {
+            sizeGuideModal.style.display = 'none';
         }
     });
 
