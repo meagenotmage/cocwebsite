@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         totalItemsSpan.textContent = totalItems;
-        orderTotalSpan.textContent = `€${totalPrice.toFixed(2)}`;
+        orderTotalSpan.textContent = `₱${totalPrice.toFixed(2)}`;
 
         // Add event listeners for quantity controls and delete
         attachQuantityControls();
