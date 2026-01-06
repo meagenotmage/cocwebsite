@@ -90,6 +90,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (nameTemplateInput) nameTemplateInput.value = '';
                 }
                 if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'none';
+            } else if (name === 'COC Lanyard') {
+                // Lanyard doesn't need a size - it's one size fits all
+                sizesContainer.style.display = 'none';
+                if (modalSizeGuideLink) modalSizeGuideLink.style.display = 'none';
+                if (nameTemplateInputContainer) nameTemplateInputContainer.style.display = 'none';
+                if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'none';
+                setActiveSize('One Size');
             } else if (requiresName) {
                 sizesContainer.style.display = 'block';
                 if (modalSizeGuideLink) modalSizeGuideLink.style.display = 'block';
@@ -100,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 setActiveSize('');
             } else if (name.includes('Uniform')) {
+                // All uniforms should have size guide
                 sizesContainer.style.display = 'block';
                 if (modalSizeGuideLink) modalSizeGuideLink.style.display = 'block';
                 if (nameTemplateInputContainer) nameTemplateInputContainer.style.display = 'none';
@@ -171,14 +179,18 @@ document.addEventListener('DOMContentLoaded', () => {
         let customDetail = selectedSize;
         let customName = null;
         const requiresName = e.target.dataset.requiresName === 'true';
+        const productName = e.target.dataset.name;
         
-        if (e.target.dataset.name === 'COC Nameplate') {
+        if (productName === 'COC Nameplate') {
             if(!nameTemplateInput || nameTemplateInput.value.trim() === '') {
                 showConfirmation('Error', '<p>Please enter a name for the nameplate.</p>', false);
                 return;
             }
             customDetail = nameTemplateInput.value.trim();
             customName = nameTemplateInput.value.trim();
+        } else if (productName === 'COC Lanyard') {
+            // Lanyard doesn't require size selection
+            customDetail = 'One Size';
         } else if (requiresName) {
             if (!selectedSize) {
                 showConfirmation('Error', '<p>Please select a size.</p>', false);
@@ -250,6 +262,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             customDetail = nameTemplateInput.value.trim();
             customName = nameTemplateInput.value.trim();
+        } else if (productName === 'COC Lanyard') {
+            // Lanyard doesn't require size selection
+            customDetail = 'One Size';
         } else if (requiresName) {
             if (!selectedSize) {
                 showConfirmation('Error', '<p>Please select a size.</p>', false);
