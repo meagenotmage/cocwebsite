@@ -69,13 +69,22 @@ function populateReceipt(order) {
     // Total
     document.getElementById('receipt-total').textContent = `₱ ${order.total.toFixed(2)}`;
 
-    // GCash receipt image
-    if (order.paymentMethod === 'GCASH' && order.receiptUrl) {
+    // GCash receipt image - show if payment method is GCash and receipt was uploaded
+    if (order.receiptUrl && (order.paymentMethod === 'GCASH' || order.paymentMethod === 'GCash')) {
         const paymentProofSection = document.getElementById('payment-proof-section');
         const gcashReceiptImg = document.getElementById('gcash-receipt');
         
         gcashReceiptImg.src = order.receiptUrl;
+        gcashReceiptImg.onerror = () => {
+            console.error('Failed to load GCash receipt image');
+        };
         paymentProofSection.style.display = 'block';
+        console.log('Displaying GCash receipt');
+    } else {
+        console.log('No GCash receipt to display', {
+            hasReceiptUrl: !!order.receiptUrl,
+            paymentMethod: order.paymentMethod
+        });
     }
 }
 
