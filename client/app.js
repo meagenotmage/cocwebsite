@@ -270,6 +270,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Scroll Blur Effect for Organization Cards ---
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: [0, 0.25, 0.5, 0.75, 1]
+    };
+
+    const handleIntersect = (entries) => {
+        entries.forEach(entry => {
+            if (entry.intersectionRatio < 0.5) {
+                entry.target.classList.add('blur-on-scroll');
+            } else {
+                entry.target.classList.remove('blur-on-scroll');
+            }
+        });
+    };
+
+    const observer = new IntersectionObserver(handleIntersect, observerOptions);
+
+    // Observe all organization cards
+    const orgCards = document.querySelectorAll('.org-card');
+    orgCards.forEach(card => observer.observe(card));
+
     // --- Initial Load ---
     fetchAndDisplayAnnouncements();
     fetchEventsAndRender();

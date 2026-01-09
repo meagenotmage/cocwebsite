@@ -277,16 +277,28 @@
     }
     
     .org-content {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        padding: 24px;
+        flex-direction: row;
+        align-items: flex-start;
+        text-align: left;
+        padding: 16px;
         width: 100%;
+        gap: 16px;
     }
     
     .org-content img {
-        max-width: 100px;
-        max-height: 100px;
+        max-width: 80px;
+        max-height: 80px;
+    }
+    
+    .org-info p {
+        font-size: 0.875rem;
+        line-height: 1.5;
+        margin: 0 0 8px 0;
+    }
+    
+    .org-title {
+        padding: 12px 16px;
+        font-size: 0.875rem;
     }
     
     /* Footer */

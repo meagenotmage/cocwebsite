@@ -668,6 +668,13 @@ header nav.desktop-nav ul li a.active::after {
     box-shadow: var(--shadow-md);
 }
 
+/* Blur effect on scroll */
+.org-card.blur-on-scroll {
+    filter: blur(2px);
+    opacity: 0.7;
+    transform: scale(0.98);
+}
+
 .org-card:hover {
     transform: translateY(-8px);
     box-shadow: var(--shadow-lg);
