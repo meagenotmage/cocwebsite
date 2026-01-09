@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (eventForDay) {
                 dayDiv.classList.add('event-day');
-                dayDiv.addEventListener('click', () => showEventModal(eventForDay));
+                dayDiv.addEventListener('click', () => showEventModal(eventForDay, dateStr));
             }
 
             calendarGrid.appendChild(dayDiv);
@@ -156,19 +156,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- Event Modal Logic ---
-    function showEventModal(event) {
+    function showEventModal(event, clickedDate) {
         eventModalTitle.textContent = event.title;
         
         // Format time and duration
         let timeText = '';
-        if (event.startDate || event.date) {
-            const eventDate = new Date(event.startDate || event.date);
-            timeText = eventDate.toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
+        
+        // Display date range if both start and end dates exist
+        if (event.startDate && event.endDate && event.startDate !== event.endDate) {
+            const startDate = new Date(event.startDate);
+            const endDate = new Date(event.endDate);
+            
+            const startFormatted = startDate.toLocaleDateString('en-US', {
                 month: 'long',
-                day: 'numeric'
+                day: 'numeric',
+                year: 'numeric'
             });
+            
+            const endFormatted = endDate.toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+            });
+            
+            timeText = `${startFormatted} - ${endFormatted}`;
+        } else {
+            // Single date event
+            const dateToDisplay = event.startDate || event.date;
+            if (dateToDisplay) {
+                const eventDate = new Date(dateToDisplay);
+                timeText = eventDate.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+        }
             
             if (event.startTime && event.endTime) {
                 // Convert 24-hour time to 12-hour format with AM/PM
