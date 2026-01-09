@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const eventModal = document.getElementById('event-modal');
     const eventModalTitle = document.getElementById('event-modal-title');
+    const eventModalDatetime = document.getElementById('event-modal-datetime');
     const eventModalDescription = document.getElementById('event-modal-description');
     const eventModalCloseBtn = document.getElementById('event-modal-close-btn');
 
@@ -157,6 +158,54 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Event Modal Logic ---
     function showEventModal(event) {
         eventModalTitle.textContent = event.title;
+        
+        // Format time and duration
+        let timeText = '';
+        if (event.startDate || event.date) {
+            const eventDate = new Date(event.startDate || event.date);
+            timeText = eventDate.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            if (event.startTime && event.endTime) {
+                // Convert 24-hour time to 12-hour format with AM/PM
+                const formatTime = (timeStr) => {
+                    const [hours, minutes] = timeStr.split(':');
+                    const hour = parseInt(hours);
+                    const ampm = hour >= 12 ? 'PM' : 'AM';
+                    const hour12 = hour % 12 || 12;
+                    return `${hour12}:${minutes} ${ampm}`;
+                };
+                
+                const startTimeFormatted = formatTime(event.startTime);
+                const endTimeFormatted = formatTime(event.endTime);
+                
+                // Calculate duration
+                const [startHours, startMinutes] = event.startTime.split(':').map(Number);
+                const [endHours, endMinutes] = event.endTime.split(':').map(Number);
+                const startTotalMinutes = startHours * 60 + startMinutes;
+                const endTotalMinutes = endHours * 60 + endMinutes;
+                const durationMinutes = endTotalMinutes - startTotalMinutes;
+                const durationHours = Math.floor(durationMinutes / 60);
+                const durationMins = durationMinutes % 60;
+                
+                let durationText = '';
+                if (durationHours > 0 && durationMins > 0) {
+                    durationText = `${durationHours} hour${durationHours > 1 ? 's' : ''} ${durationMins} minute${durationMins > 1 ? 's' : ''}`;
+                } else if (durationHours > 0) {
+                    durationText = `${durationHours} hour${durationHours > 1 ? 's' : ''}`;
+                } else {
+                    durationText = `${durationMins} minute${durationMins > 1 ? 's' : ''}`;
+                }
+                
+                timeText += ` • ${startTimeFormatted} - ${endTimeFormatted} (${durationText})`;
+            }
+        }
+        
+        eventModalDatetime.textContent = timeText;
         eventModalDescription.textContent = event.description;
         eventModal.classList.remove('hidden');
     }
