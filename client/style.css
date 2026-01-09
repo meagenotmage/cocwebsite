@@ -692,8 +692,8 @@ header nav.desktop-nav ul li a.active::after {
 }
 
 .org-content img {
-    max-width: 120px;
-    max-height: 120px;
+    max-width: 150px;
+    max-height: 150px;
     flex-shrink: 0;
     border-radius: var(--border-radius-sm);
     border: 2px solid rgba(139, 58, 58, 0.1);
@@ -1051,15 +1051,16 @@ footer {
     position: fixed;
     top: 65px;
     right: 10px;
-    background: rgba(0, 0, 0, 0.98);
-    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     min-width: 180px;
     max-width: 220px;
     padding: 10px 0;
     border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     z-index: 9999;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .mobile-nav.open {
@@ -1077,7 +1078,7 @@ footer {
 }
 
 .mobile-nav ul li a {
-    color: white;
+    color: #333;
     text-decoration: none;
     font-size: 0.85rem;
     padding: 10px 16px;
