@@ -993,6 +993,14 @@ footer {
     margin: 0;
 }
 
+.modal-content .modal-datetime {
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+    margin-bottom: 16px;
+    font-weight: 500;
+    font-style: italic;
+}
+
 .modal-close-btn {
     position: absolute;
     top: 20px;

@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const announcementsContainer = document.getElementById('announcements-container');
     const announcementModal = document.getElementById('announcement-modal');
     const announcementModalTitle = document.getElementById('modal-title');
+    const announcementModalDatetime = document.getElementById('modal-datetime');
     const announcementModalBody = document.getElementById('modal-body');
     const announcementModalCloseBtn = document.querySelector('#announcement-modal .modal-close-btn');
 
@@ -27,6 +28,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Announcements Logic ---
     function showAnnouncementModal(announcement) {
         announcementModalTitle.textContent = announcement.title;
+        
+        // Format and display date and time
+        const date = new Date(announcement.date);
+        const formattedDateTime = date.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+        announcementModalDatetime.textContent = formattedDateTime;
+        
         announcementModalBody.textContent = announcement.content;
         announcementModal.classList.remove('hidden');
     }
