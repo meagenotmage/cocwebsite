@@ -193,40 +193,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         }
+        
+        if (event.startTime && event.endTime) {
+            // Convert 24-hour time to 12-hour format with AM/PM
+            const formatTime = (timeStr) => {
+                const [hours, minutes] = timeStr.split(':');
+                const hour = parseInt(hours);
+                const ampm = hour >= 12 ? 'PM' : 'AM';
+                const hour12 = hour % 12 || 12;
+                return `${hour12}:${minutes} ${ampm}`;
+            };
             
-            if (event.startTime && event.endTime) {
-                // Convert 24-hour time to 12-hour format with AM/PM
-                const formatTime = (timeStr) => {
-                    const [hours, minutes] = timeStr.split(':');
-                    const hour = parseInt(hours);
-                    const ampm = hour >= 12 ? 'PM' : 'AM';
-                    const hour12 = hour % 12 || 12;
-                    return `${hour12}:${minutes} ${ampm}`;
-                };
-                
-                const startTimeFormatted = formatTime(event.startTime);
-                const endTimeFormatted = formatTime(event.endTime);
-                
-                // Calculate duration
-                const [startHours, startMinutes] = event.startTime.split(':').map(Number);
-                const [endHours, endMinutes] = event.endTime.split(':').map(Number);
-                const startTotalMinutes = startHours * 60 + startMinutes;
-                const endTotalMinutes = endHours * 60 + endMinutes;
-                const durationMinutes = endTotalMinutes - startTotalMinutes;
-                const durationHours = Math.floor(durationMinutes / 60);
-                const durationMins = durationMinutes % 60;
-                
-                let durationText = '';
-                if (durationHours > 0 && durationMins > 0) {
-                    durationText = `${durationHours} hour${durationHours > 1 ? 's' : ''} ${durationMins} minute${durationMins > 1 ? 's' : ''}`;
-                } else if (durationHours > 0) {
-                    durationText = `${durationHours} hour${durationHours > 1 ? 's' : ''}`;
-                } else {
-                    durationText = `${durationMins} minute${durationMins > 1 ? 's' : ''}`;
-                }
-                
-                timeText += ` • ${startTimeFormatted} - ${endTimeFormatted} (${durationText})`;
+            const startTimeFormatted = formatTime(event.startTime);
+            const endTimeFormatted = formatTime(event.endTime);
+            
+            // Calculate duration
+            const [startHours, startMinutes] = event.startTime.split(':').map(Number);
+            const [endHours, endMinutes] = event.endTime.split(':').map(Number);
+            const startTotalMinutes = startHours * 60 + startMinutes;
+            const endTotalMinutes = endHours * 60 + endMinutes;
+            const durationMinutes = endTotalMinutes - startTotalMinutes;
+            const durationHours = Math.floor(durationMinutes / 60);
+            const durationMins = durationMinutes % 60;
+            
+            let durationText = '';
+            if (durationHours > 0 && durationMins > 0) {
+                durationText = `${durationHours} hour${durationHours > 1 ? 's' : ''} ${durationMins} minute${durationMins > 1 ? 's' : ''}`;
+            } else if (durationHours > 0) {
+                durationText = `${durationHours} hour${durationHours > 1 ? 's' : ''}`;
+            } else {
+                durationText = `${durationMins} minute${durationMins > 1 ? 's' : ''}`;
             }
+            
+            timeText += ` • ${startTimeFormatted} - ${endTimeFormatted} (${durationText})`;
         }
         
         eventModalDatetime.textContent = timeText;
