@@ -333,14 +333,34 @@
     }
 
     .order-item {
-        flex-direction: column;
-        text-align: center;
+        flex-wrap: wrap;
+        position: relative;
+        padding: 16px;
     }
 
     .order-item-img {
         width: 100%;
         max-width: 200px;
         height: auto;
+        margin: 0 auto;
+    }
+    
+    .order-item-details {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .order-item-price {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .delete-item-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        font-size: 1.3rem;
+        padding: 4px 8px;
     }
     
     .payment-methods {
