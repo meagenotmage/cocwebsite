@@ -504,11 +504,15 @@ h1, h2, h3, h4, h5, h6 {
     flex: 1;
     min-width: 380px;
     max-width: 520px;
+    display: flex;
+    align-items: flex-start;
 }
 
 .modal-image img {
     width: 100%;
     height: auto;
+    max-height: none;
+    object-fit: contain;
     border-radius: var(--border-radius-sm, 8px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     background: #f0f0f0;
