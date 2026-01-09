@@ -212,6 +212,13 @@
     box-shadow: var(--shadow-md, 0 4px 16px rgba(0, 0, 0, 0.12));
 }
 
+/* Blur effect on scroll */
+.officer-card.blur-on-scroll {
+    filter: blur(2px);
+    opacity: 0.7;
+    transform: scale(0.98);
+}
+
 .officer-card:hover {
     transform: translateY(-8px);
     box-shadow: var(--shadow-lg, 0 8px 32px rgba(0, 0, 0, 0.16));
@@ -275,10 +282,12 @@
     .officer-row.cols-2,
     .officer-row.cols-4 {
         grid-template-columns: 1fr;
+        gap: 16px;
     }
     
     .info-box {
         max-width: 100%;
+        padding: 20px;
     }
     
     .officers-header h2 {
@@ -288,5 +297,37 @@
     .officer-row.cols-2,
     .officer-row.cols-4 {
         max-width: 100%;
+    }
+    
+    .officer-card {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
+    }
+    
+    .officer-card img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+    
+    .officer-info {
+        padding: 12px 16px;
+    }
+    
+    .officer-info h4 {
+        font-size: 0.75rem;
+        margin: 0 0 6px 0;
+    }
+    
+    .officer-info .name {
+        font-size: 0.95rem;
+        margin: 0 0 2px 0;
+    }
+    
+    .officer-info .nickname {
+        font-size: 0.85rem;
     }
 }

@@ -113,11 +113,11 @@
     background: var(--primary-red-bright, #E53935);
     color: white;
     border: none;
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     border-radius: var(--border-radius-sm, 8px);
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
     transition: var(--transition, all 0.3s cubic-bezier(0.4, 0, 0.2, 1));
     display: flex;
@@ -131,10 +131,11 @@
 }
 
 .quantity-controls span {
-    min-width: 32px;
+    min-width: 28px;
     text-align: center;
     font-weight: 600;
     font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
 }
 
 .delete-item-btn {
