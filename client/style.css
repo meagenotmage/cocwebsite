@@ -1049,8 +1049,8 @@ footer {
 .mobile-nav {
     display: none;
     position: fixed;
-    top: 65px;
-    right: 10px;
+    top: 50px;
+    right: 5px;
     background: rgba(92, 92, 92, 0.644);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -1080,12 +1080,12 @@ footer {
 .mobile-nav ul li a {
     color: white;
     text-decoration: none;
-    font-size: 0.85rem;
+    font-size: 0.30rem;
     padding: 10px 16px;
     transition: all 0.3s;
     display: block;
     text-transform: uppercase;
-    font-weight: 600;
+    font-weight: 300;
 }
 
 .mobile-nav ul li a:hover,
