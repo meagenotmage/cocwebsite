@@ -151,7 +151,7 @@ header nav.desktop-nav ul li a i {
 }
 
 header nav.desktop-nav ul li a:hover {
-    color: #fff;
+    color: #9c0707;
     background: rgba(255, 255, 255, 0.15);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
