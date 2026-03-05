@@ -6,8 +6,6 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const bcrypt = require('bcryptjs');
-const session = require('express-session');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -82,21 +80,6 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' })); // Increased limit for base64 images
 app.use(express.urlencoded({ limit: '50mb', extended: true })); // Also increase URL encoded limit
 
-// Session middleware for authentication
-const isProduction = process.env.NODE_ENV === 'production';
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'default-secret-key',
-  resave: false,
-  saveUninitialized: false,
-  proxy: true, // Required when behind a reverse proxy (Render)
-  cookie: {
-    secure: isProduction,       // HTTPS only in production
-    httpOnly: true,             // Prevent JS access to cookie
-    sameSite: isProduction ? 'none' : 'lax', // 'none' required for cross-origin (Vercel → Render)
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
-}));
-
 // Serve uploaded files statically
 app.use('/uploads', express.static(uploadsDir));
 
@@ -147,14 +130,6 @@ const Announcement = mongoose.model('Announcement', announcementSchema);
 const Event = mongoose.model('Event', eventSchema);
 const Order = mongoose.model('Order', orderSchema);
 
-// --- AUTHENTICATION MIDDLEWARE ---
-const requireAuth = (req, res, next) => {
-  if (req.session && req.session.isAdmin) {
-    return next();
-  }
-  return res.status(401).json({ message: 'Unauthorized. Please log in.' });
-};
-
 
 // --- 4. API ROUTES (WITH CORRECTED PATHS) ---
 
@@ -185,63 +160,8 @@ app.get('/api/events', async (req, res) => {
 
 // --- ADMIN ROUTES ---
 
-// Admin Login
-app.post('/api/admin/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required.' });
-    }
-    
-    // Get admin credentials from environment variables
-    const adminEmail = process.env.ADMIN_EMAIL;
-    const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
-    
-    // Check if email matches
-    if (email !== adminEmail) {
-      return res.status(401).json({ message: 'Invalid email or password.' });
-    }
-    
-    // Compare password with hashed password
-    const isPasswordValid = await bcrypt.compare(password, adminPasswordHash);
-    
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Invalid email or password.' });
-    }
-    
-    // Set session
-    req.session.isAdmin = true;
-    req.session.adminEmail = email;
-    
-    res.json({ message: 'Login successful!', success: true });
-  } catch (err) {
-    console.error('Error during login:', err);
-    res.status(500).json({ message: 'Login failed. Please try again.' });
-  }
-});
-
-// Admin Logout
-app.post('/api/admin/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({ message: 'Logout failed.' });
-    }
-    res.json({ message: 'Logout successful!' });
-  });
-});
-
-// Check if admin is authenticated
-app.get('/api/admin/check', (req, res) => {
-  if (req.session && req.session.isAdmin) {
-    res.json({ authenticated: true, email: req.session.adminEmail });
-  } else {
-    res.json({ authenticated: false });
-  }
-});
-
 // Create new announcement (POST)
-app.post('/api/announcements', requireAuth, async (req, res) => {
+app.post('/api/announcements', async (req, res) => {
   try {
     const { title, content } = req.body;
     
@@ -264,7 +184,7 @@ app.post('/api/announcements', requireAuth, async (req, res) => {
 });
 
 // Delete announcement (DELETE)
-app.delete('/api/announcements/:id', requireAuth, async (req, res) => {
+app.delete('/api/announcements/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const announcement = await Announcement.findByIdAndDelete(id);
@@ -282,7 +202,7 @@ app.delete('/api/announcements/:id', requireAuth, async (req, res) => {
 });
 
 // Update announcement (PUT)
-app.put('/api/announcements/:id', requireAuth, async (req, res) => {
+app.put('/api/announcements/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { title, content } = req.body;
@@ -301,7 +221,7 @@ app.put('/api/announcements/:id', requireAuth, async (req, res) => {
 });
 
 // Create new event (POST)
-app.post('/api/events', requireAuth, async (req, res) => {
+app.post('/api/events', async (req, res) => {
   try {
     console.log('Received event creation request:', req.body);
     
@@ -335,7 +255,7 @@ app.post('/api/events', requireAuth, async (req, res) => {
 });
 
 // Delete event (DELETE)
-app.delete('/api/events/:id', requireAuth, async (req, res) => {
+app.delete('/api/events/:id', async (req, res) => {
   try {
     const { id } = req.params;
     await Event.findByIdAndDelete(id);
@@ -347,7 +267,7 @@ app.delete('/api/events/:id', requireAuth, async (req, res) => {
 });
 
 // Update event (PUT)
-app.put('/api/events/:id', requireAuth, async (req, res) => {
+app.put('/api/events/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, date, startDate, endDate, startTime, endTime, location } = req.body;
@@ -369,7 +289,7 @@ app.put('/api/events/:id', requireAuth, async (req, res) => {
 
 // Orders Routes
 // Get all orders (for admin)
-app.get('/api/orders', requireAuth, async (req, res) => {
+app.get('/api/orders', async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
     res.json(orders);
@@ -438,7 +358,7 @@ app.post('/api/orders/upload-receipt', upload.single('receipt'), async (req, res
 });
 
 // Update order status (for admin)
-app.put('/api/orders/:id', requireAuth, async (req, res) => {
+app.put('/api/orders/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { status, receiptUrl } = req.body;
@@ -462,7 +382,7 @@ app.put('/api/orders/:id', requireAuth, async (req, res) => {
 });
 
 // Delete order (for admin)
-app.delete('/api/orders/:id', requireAuth, async (req, res) => {
+app.delete('/api/orders/:id', async (req, res) => {
   try {
     const { id } = req.params;
     await Order.findByIdAndDelete(id);

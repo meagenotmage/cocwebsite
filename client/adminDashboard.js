@@ -1,14 +1,4 @@
-import { requireAuth, initLogoutButtons } from './auth-utils.js';
-
-// Check authentication before loading admin dashboard
-document.addEventListener('DOMContentLoaded', async function() {
-    // Check authentication first
-    const isAuthenticated = await requireAuth();
-    if (!isAuthenticated) return;
-    
-    // Initialize logout buttons
-    initLogoutButtons();
-    
+document.addEventListener('DOMContentLoaded', function() {
     const API_BASE_URL = CONFIG.API_URL;
 
     // ======================= //

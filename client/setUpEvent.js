@@ -1,13 +1,4 @@
-import { requireAuth, initLogoutButtons } from './auth-utils.js';
-
-document.addEventListener('DOMContentLoaded', async function() {
-    // Check authentication first
-    const isAuthenticated = await requireAuth();
-    if (!isAuthenticated) return;
-    
-    // Initialize logout buttons
-    initLogoutButtons();
-    
+document.addEventListener('DOMContentLoaded', function() {
     console.log('DOMContentLoaded - setUpEvent.js loaded');
     console.log('CONFIG available:', typeof CONFIG !== 'undefined');
     console.log('CONFIG.API_URL:', CONFIG?.API_URL);
