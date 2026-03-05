@@ -2,10 +2,19 @@
 node_modules/
 package-lock.json
 
-# Deployment Documentation (contains sensitive information)
-DEPLOYMENT_GUIDE.md
+# Internal dev documentation (local only, not for production)
+ADMIN_SYSTEM_GUIDE.md
+ARCHITECTURE.md
 DEPLOYMENT_CHECKLIST.md
+DEPLOYMENT_GUIDE.md
 DEPLOYMENT_SUMMARY.md
+KEEP_ALIVE_README.md
+keep-alive.ps1
+keep-alive.sh
+PROJECT_STATUS.md
+QUICK_START.md
+REDESIGN_SUMMARY.md
+RESPONSIVE_UPDATE_GUIDE.md
 TROUBLESHOOTING.md
 
 # Environment Variables
