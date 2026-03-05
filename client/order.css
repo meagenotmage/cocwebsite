@@ -831,6 +831,8 @@ h1, h2, h3, h4, h5, h6 {
 
 #cart-modal .modal-content {
     max-width: 650px;
+    padding: 36px 32px 32px;
+    overflow: visible;
 }
 
 #cart-modal h2 {

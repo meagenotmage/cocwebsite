@@ -27,7 +27,7 @@
                 </ul>
             </nav>
             <div class="sidebar-footer">
-                <a href="admin.html"><i class="fa-solid fa-question-circle"></i> Log out</a>
+                <a href="adminLogIn.html"><i class="fa-solid fa-right-from-bracket"></i> Log out</a>
             </div>
         </aside>
 
@@ -35,8 +35,8 @@
         <!--       MAIN CONTENT      -->
         <!-- ======================= -->
         <main class="main-content">
-            <div class="card orders-card">
-                <h2>Orders</h2>
+            <div class="card orders-card clickable-card" data-href="adminOrder.html">
+                <h2>Orders <span class="card-nav-arrow">View All →</span></h2>
                 <p class="subtitle">Orders per Merch</p>
                 <div class="chart-container">
                     <canvas id="ordersChart"></canvas>
@@ -57,22 +57,22 @@
                 </div>
             </div>
 
-            <div class="card events-card">
-                <h2>Upcoming Events</h2>
+            <div class="card events-card clickable-card" data-href="setUpEvent.html">
+                <h2>Upcoming Events <span class="card-nav-arrow">View All →</span></h2>
                 <div class="events-list">
                     <!-- JS will populate this -->
                 </div>
             </div>
 
-            <div class="card feedbacks-card">
-                <h2>Feedbacks</h2>
+            <div class="card feedbacks-card clickable-card" data-href="adminFeedback.html">
+                <h2>Feedbacks <span class="card-nav-arrow">View All →</span></h2>
                 <div class="empty-state">
                     <p>No Feedbacks Yet</p>
                 </div>
             </div>
 
-            <div class="card announcements-card">
-                <h2>Announcements</h2>
+            <div class="card announcements-card clickable-card" data-href="createAnnouncement.html">
+                <h2>Announcements <span class="card-nav-arrow">View All →</span></h2>
                 <div class="announcement-list">
                     <!-- Will be populated by JS -->
                 </div>

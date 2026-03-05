@@ -18,7 +18,27 @@ document.addEventListener('DOMContentLoaded', function() {
             e.stopPropagation();
             sidebarNav.classList.toggle('active');
         });
+
+        // Close nav when clicking outside on mobile
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth <= 768 && sidebarNav.classList.contains('active')) {
+                if (!sidebarNav.contains(e.target) && e.target !== hamburgerBtn) {
+                    sidebarNav.classList.remove('active');
+                }
+            }
+        });
     }
+
+    // ======================= //
+    //   CARD CLICK NAV        //
+    // ======================= //
+    document.querySelectorAll('.clickable-card[data-href]').forEach(function(card) {
+        card.addEventListener('click', function(e) {
+            // Don't navigate if clicking a button or link inside the card
+            if (e.target.closest('a, button')) return;
+            window.location.href = card.getAttribute('data-href');
+        });
+    });
 
     // ======================= //
     //      ORDERS CHART       //

@@ -95,6 +95,16 @@ body {
     padding: 25px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.card.clickable-card {
+    cursor: pointer;
+}
+
+.card.clickable-card:hover {
+    box-shadow: 0 8px 24px rgba(139, 58, 58, 0.18);
+    transform: translateY(-3px);
 }
 
 .card h2 {
@@ -102,6 +112,26 @@ body {
     margin-bottom: 5px;
     font-size: 1.4rem;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.card-nav-arrow {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #8B3A3A;
+    background: rgba(139,58,58,0.08);
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+
+.clickable-card:hover .card-nav-arrow {
+    background: rgba(139,58,58,0.18);
 }
 
 .card .subtitle {
@@ -435,27 +465,3 @@ body {
     }
 }
 
-@media (max-width: 768px) {
-    .dashboard-container {
-        flex-direction: column;
-    }
-    .sidebar {
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        padding: 10px 20px;
-        box-sizing: border-box;
-    }
-    .sidebar-nav {
-        display: none; /* Hide for simplicity, could be a dropdown */
-    }
-    .sidebar-footer {
-        margin: 0;
-    }
-    .main-content {
-        padding: 20px;
-        gap: 20px;
-    }
-}
