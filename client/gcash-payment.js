@@ -10,6 +10,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // Display order items
     displayOrderItems(orderData);
 
+    // Copy GCash number
+    const copyBtn = document.getElementById('copy-gcash-btn');
+    const copyIcon = document.getElementById('copy-icon');
+    const gcashNumber = document.getElementById('gcash-number');
+
+    copyBtn.addEventListener('click', () => {
+        const number = gcashNumber.textContent.replace(/\s+/g, '');
+        navigator.clipboard.writeText(number).then(() => {
+            copyIcon.classList.replace('fa-copy', 'fa-check');
+            copyBtn.classList.add('copied');
+            copyBtn.title = 'Copied!';
+            setTimeout(() => {
+                copyIcon.classList.replace('fa-check', 'fa-copy');
+                copyBtn.classList.remove('copied');
+                copyBtn.title = 'Copy GCash number';
+            }, 2000);
+        });
+    });
+
     // Receipt upload handling
     let receiptFile = null;
     const receiptUpload = document.getElementById('receipt-upload');
