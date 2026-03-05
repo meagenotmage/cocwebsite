@@ -275,9 +275,9 @@
 
 .pillars-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 28px;
-    max-width: 1100px;
+    max-width: 1300px;
     margin: 0 auto;
 }
 
@@ -430,12 +430,37 @@
     background: rgba(255, 255, 255, 0.45);
     border-radius: 6px;
     padding: 6px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.pillar-role {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 2px 8px;
+    line-height: 1.4;
+}
+
+.pillar-role.head {
+    background: var(--primary-red, #8B3A3A);
+    color: #fff;
+}
+
+.pillar-role.member {
+    background: rgba(139, 58, 58, 0.12);
+    color: var(--primary-red, #8B3A3A);
 }
 
 /* Footer styles inherited from style.css */
 
 /* Responsive Styles */
-@media (max-width: 1024px) {
+@media (max-width: 1100px) {
     .pillars-grid {
         grid-template-columns: repeat(3, 1fr);
     }

@@ -1,8 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const orderData = JSON.parse(sessionStorage.getItem('orderData'));
-    const pendingOrderId = sessionStorage.getItem('pendingOrderId');
+    const orderData = JSON.parse(sessionStorage.getItem('pendingOrderData'));
 
-    if (!orderData || !pendingOrderId) {
+    if (!orderData) {
         alert('No order data found. Redirecting to order page.');
         window.location.href = 'order.html';
         return;
@@ -84,23 +83,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Convert receipt to base64 for permanent storage
                 const base64Image = await convertToBase64(receiptFile);
 
-                // Update order status to "paid" with receipt base64
-                const response = await fetch(`${CONFIG.API_URL}/api/orders/${pendingOrderId}`, {
-                    method: 'PUT',
+                // NOW create the order in the DB — only after receipt is uploaded
+                const response = await fetch(`${CONFIG.API_URL}/api/orders`, {
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
+                        ...orderData,
                         status: 'paid',
                         receiptUrl: base64Image
                     })
                 });
 
+                const result = await response.json();
+
                 if (response.ok) {
-                    // Update local order data
-                    orderData.status = 'paid';
-                    sessionStorage.setItem('orderData', JSON.stringify(orderData));
-                    sessionStorage.removeItem('pendingOrderId');
+                    // Store confirmed order for receipt page
+                    if (result.order && result.order.orderNumber) {
+                        sessionStorage.setItem('orderNumber', result.order.orderNumber);
+                    }
+                    sessionStorage.setItem('orderData', JSON.stringify(result.order));
+                    sessionStorage.removeItem('pendingOrderData');
                     
                     // Redirect to receipt
                     window.location.href = 'receipt.html';

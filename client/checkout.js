@@ -167,6 +167,16 @@ document.addEventListener('DOMContentLoaded', () => {
             clearSavedUserData();
         }
 
+        // GCash: don't create the order in DB yet — wait until receipt is confirmed
+        if (selectedPaymentMethod === 'gcash') {
+            sessionStorage.removeItem('checkoutData');
+            try { localStorage.removeItem('cocCart'); } catch (e) {}
+            sessionStorage.setItem('pendingOrderData', JSON.stringify(formData));
+            window.location.href = 'gcash-payment.html';
+            return;
+        }
+
+        // Cash: create order in DB immediately
         try {
             const response = await fetch(`${CONFIG.API_URL}/api/orders`, {
                 method: 'POST',
@@ -192,18 +202,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (result.order && result.order.orderNumber) {
                     sessionStorage.setItem('orderNumber', result.order.orderNumber);
                 }
-                
-                // Redirect to GCash payment or receipt based on payment method
-                if (selectedPaymentMethod === 'gcash') {
-                    // Store order ID and data for GCash payment
-                    sessionStorage.setItem('pendingOrderId', result.order._id);
-                    sessionStorage.setItem('orderData', JSON.stringify(result.order));
-                    window.location.href = 'gcash-payment.html';
-                } else {
-                    // For cash, go directly to receipt
-                    sessionStorage.setItem('orderData', JSON.stringify(result.order));
-                    window.location.href = 'receipt.html';
-                }
+
+                sessionStorage.setItem('orderData', JSON.stringify(result.order));
+                window.location.href = 'receipt.html';
             } else {
                 alert('Error placing order: ' + (result.message || 'Please try again'));
             }

@@ -64,6 +64,42 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const modalImgThumbnails = document.getElementById('modal-img-thumbnails');
+
+    // Build image viewer thumbnails
+    function buildImageViewer(images) {
+        const mainImg = productModal.querySelector('#modal-img');
+        modalImgThumbnails.innerHTML = '';
+
+        if (!images || images.length === 0) return;
+
+        // Set main image to first
+        mainImg.src = images[0].src;
+
+        // Only show thumbnails if there are multiple images
+        if (images.length < 2) {
+            modalImgThumbnails.style.display = 'none';
+            return;
+        }
+        modalImgThumbnails.style.display = 'flex';
+
+        images.forEach((img, i) => {
+            const thumb = document.createElement('div');
+            thumb.className = 'thumb' + (i === 0 ? ' active' : '');
+            thumb.innerHTML = `<img src="${img.src}" alt="${img.label}"><span>${img.label}</span>`;
+            thumb.addEventListener('click', () => {
+                mainImg.style.opacity = '0';
+                setTimeout(() => {
+                    mainImg.src = img.src;
+                    mainImg.style.opacity = '1';
+                }, 150);
+                modalImgThumbnails.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+                thumb.classList.add('active');
+            });
+            modalImgThumbnails.appendChild(thumb);
+        });
+    }
+
     productItems.forEach(item => {
         item.addEventListener('click', () => {
             const name = item.dataset.name;
@@ -71,16 +107,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const imgSrc = item.dataset.imgSrc;
             const id = item.dataset.id;
             const requiresName = item.dataset.requiresName === 'true';
-            
+            const imagesRaw = item.dataset.images;
+
             productModal.querySelector('#modal-name').textContent = name;
             productModal.querySelector('#modal-price').textContent = `₱ ${price}`;
-            productModal.querySelector('#modal-img').src = imgSrc;
             addToCartBtn.dataset.id = id;
             addToCartBtn.dataset.name = name;
             addToCartBtn.dataset.price = price;
-            addToCartBtn.dataset.img = imgSrc;
+            addToCartBtn.dataset.img = imagesRaw ? JSON.parse(imagesRaw)[0].src : imgSrc;
             addToCartBtn.dataset.requiresName = requiresName;
             quantityInput.value = '1';
+
+            // Build image viewer
+            let images = [];
+            try { images = imagesRaw ? JSON.parse(imagesRaw) : [{src: imgSrc, label: 'View'}]; } catch(e) { images = [{src: imgSrc, label: 'View'}]; }
+            buildImageViewer(images);
             
             if (name === 'COC Nameplate') {
                 sizesContainer.style.display = 'none';

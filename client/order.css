@@ -503,19 +503,84 @@ h1, h2, h3, h4, h5, h6 {
 .modal-image {
     flex: 1;
     min-width: 380px;
-    max-width: 520px;
+    max-width: 420px;
     display: flex;
-    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
 }
 
-.modal-image img {
+/* Fixed-dimension main image viewer */
+.modal-img-main {
     width: 100%;
-    height: auto;
-    max-height: none;
-    object-fit: contain;
+    aspect-ratio: 1 / 1;
+    background: #f5f5f5;
     border-radius: var(--border-radius-sm, 8px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    background: #f0f0f0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-img-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: var(--border-radius-sm, 8px);
+    transition: opacity 0.2s ease;
+}
+
+/* Thumbnail strip */
+.modal-img-thumbnails {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.modal-img-thumbnails .thumb {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    border-radius: 8px;
+    padding: 6px;
+    border: 2px solid transparent;
+    background: #f5f5f5;
+    transition: all 0.2s ease;
+}
+
+.modal-img-thumbnails .thumb:hover {
+    border-color: var(--primary-red, #8B3A3A);
+    background: rgba(139, 58, 58, 0.05);
+}
+
+.modal-img-thumbnails .thumb.active {
+    border-color: var(--primary-red, #8B3A3A);
+    background: rgba(139, 58, 58, 0.08);
+}
+
+.modal-img-thumbnails .thumb img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.modal-img-thumbnails .thumb span {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-muted, #666);
+}
+
+.modal-img-thumbnails .thumb.active span {
+    color: var(--primary-red, #8B3A3A);
 }
 
 .modal-details {
@@ -931,6 +996,10 @@ h1, h2, h3, h4, h5, h6 {
     .modal-image {
         min-width: 100%;
         max-width: 100%;
+    }
+
+    .modal-img-thumbnails .thumb img {
+        aspect-ratio: 1 / 1;
     }
     
     .modal-details {
