@@ -1,5 +1,5 @@
 // Authentication utility functions
-import { API_URL } from './config.js';
+// Uses CONFIG.API_URL from the globally loaded config.js
 
 /**
  * Check if the user is authenticated
@@ -7,7 +7,7 @@ import { API_URL } from './config.js';
  */
 export async function requireAuth() {
     try {
-        const response = await fetch(`${API_URL}/api/admin/check`, {
+        const response = await fetch(`${CONFIG.API_URL}/api/admin/check`, {
             method: 'GET',
             credentials: 'include'
         });
@@ -30,7 +30,7 @@ export async function requireAuth() {
  */
 export async function logout() {
     try {
-        const response = await fetch(`${API_URL}/api/admin/logout`, {
+        const response = await fetch(`${CONFIG.API_URL}/api/admin/logout`, {
             method: 'POST',
             credentials: 'include'
         });

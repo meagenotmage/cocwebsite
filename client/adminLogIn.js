@@ -1,6 +1,3 @@
-// Import the API URL from config
-import { API_URL } from './config.js';
-
 const loginForm = document.getElementById("login-form");
 
 loginForm.addEventListener("submit", async function(event) {
@@ -12,7 +9,7 @@ loginForm.addEventListener("submit", async function(event) {
 
     try {
         // Send credentials to the server for authentication
-        const response = await fetch(`${API_URL}/api/admin/login`, {
+        const response = await fetch(`${CONFIG.API_URL}/api/admin/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -35,6 +32,18 @@ loginForm.addEventListener("submit", async function(event) {
         alert('Login failed. Please try again.');
     }
 });
+
+function togglePassword() {
+    const passwordField = document.getElementById("password");
+    const toggleIcon = document.querySelector(".toggle-password");
+    if (passwordField.type === "password") {
+        passwordField.type = "text";
+        toggleIcon.textContent = "Show";
+    } else {
+        passwordField.type = "password";
+        toggleIcon.textContent = "Hide";
+    }
+}
 
 function togglePassword() {
     const passwordField = document.getElementById("password");
