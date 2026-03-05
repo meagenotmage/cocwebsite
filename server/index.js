@@ -1,5 +1,5 @@
 // --- 1. SETUP ---
-require('dotenv').config(); // Loads variables from .env file
+require('dotenv').config({ path: require('path').join(__dirname, '.env') }); // Loads variables from .env file
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -83,13 +83,16 @@ app.use(express.json({ limit: '50mb' })); // Increased limit for base64 images
 app.use(express.urlencoded({ limit: '50mb', extended: true })); // Also increase URL encoded limit
 
 // Session middleware for authentication
+const isProduction = process.env.NODE_ENV === 'production';
 app.use(session({
   secret: process.env.SESSION_SECRET || 'default-secret-key',
   resave: false,
   saveUninitialized: false,
+  proxy: true, // Required when behind a reverse proxy (Render)
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-    httpOnly: true,
+    secure: isProduction,       // HTTPS only in production
+    httpOnly: true,             // Prevent JS access to cookie
+    sameSite: isProduction ? 'none' : 'lax', // 'none' required for cross-origin (Vercel → Render)
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
