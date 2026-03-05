@@ -19,7 +19,6 @@ async function seed() {
   const hashed = await bcrypt.hash(password, 10);
 
   await Admin.deleteMany({}); // clear old admin
-  await Admin.create({ email, hashed });
   await Admin.findOneAndUpdate(
     { email },
     { email, password: hashed },

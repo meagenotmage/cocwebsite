@@ -184,6 +184,24 @@ app.get('/api/events', async (req, res) => {
 
 // --- ADMIN AUTH ROUTES ---
 
+// One-time admin setup (only works when no admin exists; call with POST /api/admin/setup)
+app.post('/api/admin/setup', async (req, res) => {
+  try {
+    const existing = await Admin.countDocuments();
+    if (existing > 0) {
+      return res.status(403).json({ message: 'Admin already exists. Setup not allowed.' });
+    }
+    const email = 'cocadmin@coc.web';
+    const password = 'Admin@2026';
+    const hashed = await bcrypt.hash(password, 10);
+    await Admin.create({ email, password: hashed });
+    res.json({ success: true, message: `Admin created: ${email}` });
+  } catch (err) {
+    console.error('Setup error:', err);
+    res.status(500).json({ message: 'Setup failed.' });
+  }
+});
+
 // Login
 app.post('/api/admin/login', async (req, res) => {
   try {
