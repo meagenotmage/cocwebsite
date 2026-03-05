@@ -301,7 +301,7 @@ app.get('/api/orders', async (req, res) => {
 // Create new order (POST)
 app.post('/api/orders', async (req, res) => {
   try {
-    const { fullName, phone, email, programYear, paymentMethod, items, total, status } = req.body;
+    const { fullName, phone, email, programYear, paymentMethod, items, total, status, receiptUrl } = req.body;
     
     if (!fullName || !phone || !email || !programYear || !paymentMethod || !items || !total) {
       return res.status(400).json({ message: 'All fields are required.' });
@@ -315,7 +315,8 @@ app.post('/api/orders', async (req, res) => {
       paymentMethod,
       items,
       total,
-      status: status || 'pending'
+      status: status || 'pending',
+      receiptUrl: receiptUrl || undefined
     });
     
     await order.save();
