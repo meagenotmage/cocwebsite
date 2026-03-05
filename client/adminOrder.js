@@ -1,4 +1,6 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
+    if (!await requireAuth()) return;
+    initLogoutButtons();
     // ======================= //
     //   MOBILE NAV TOGGLE     //
     // ======================= //
@@ -21,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
     async function loadOrders() {
         try {
             const response = await fetch(`${CONFIG.API_URL}/api/orders`, {
-                credentials: 'include'
+                headers: { 'Authorization': `Bearer ${getToken()}` }
             });
             if (response.ok) {
                 allOrders = await response.json();
@@ -364,10 +366,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const newStatus = isVerify ? 'paid' : 'pending';
                 const response = await fetch(`${CONFIG.API_URL}/api/orders/${orderId}`, {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
+                    headers: getAuthHeaders(),
                     body: JSON.stringify({ status: newStatus })
                 });
 
@@ -395,7 +394,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 try {
                     const response = await fetch(`${CONFIG.API_URL}/api/orders/${orderId}`, {
                         method: 'DELETE',
-                        credentials: 'include'
+                        headers: { 'Authorization': `Bearer ${getToken()}` }
                     });
 
                     if (response.ok) {

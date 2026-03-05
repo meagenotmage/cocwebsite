@@ -1,63 +1,54 @@
-// Authentication utility functions
-// Uses CONFIG.API_URL from the globally loaded config.js
+// Authentication utility functions (plain script, no ES modules)
+// Requires config.js to be loaded first for CONFIG.API_URL
 
-/**
- * Check if the user is authenticated
- * Redirects to login page if not authenticated
- */
-export async function requireAuth() {
+/** Returns JWT token from localStorage */
+function getToken() {
+    return localStorage.getItem('adminToken');
+}
+
+/** Returns Authorization header object for protected requests */
+function getAuthHeaders() {
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`
+    };
+}
+
+/** Verifies token with server, redirects to login if invalid */
+async function requireAuth() {
+    const token = getToken();
+    if (!token) {
+        window.location.href = 'adminLogIn.html';
+        return false;
+    }
     try {
-        const response = await fetch(`${CONFIG.API_URL}/api/admin/check`, {
-            method: 'GET',
-            credentials: 'include'
+        const response = await fetch(`${CONFIG.API_URL}/api/admin/verify`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
-        const data = await response.json();
-        
-        if (!data.authenticated) {
+        if (!response.ok) {
+            localStorage.removeItem('adminToken');
             window.location.href = 'adminLogIn.html';
             return false;
         }
         return true;
-    } catch (error) {
-        console.error('Auth check error:', error);
+    } catch {
         window.location.href = 'adminLogIn.html';
         return false;
     }
 }
 
-/**
- * Logout the admin user
- */
-export async function logout() {
-    try {
-        const response = await fetch(`${CONFIG.API_URL}/api/admin/logout`, {
-            method: 'POST',
-            credentials: 'include'
-        });
-        
-        if (response.ok) {
-            window.location.href = 'adminLogIn.html';
-        } else {
-            console.error('Logout failed');
-            alert('Logout failed. Please try again.');
-        }
-    } catch (error) {
-        console.error('Logout error:', error);
-        alert('Logout failed. Please try again.');
-    }
+/** Logs out the admin */
+function adminLogout() {
+    localStorage.removeItem('adminToken');
+    window.location.href = 'adminLogIn.html';
 }
 
-/**
- * Initialize logout buttons on admin pages
- */
-export function initLogoutButtons() {
-    const logoutButtons = document.querySelectorAll('.logout-btn, [data-logout]');
-    logoutButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
+/** Attaches logout handler to buttons with class .logout-btn or data-logout */
+function initLogoutButtons() {
+    document.querySelectorAll('.logout-btn, [data-logout]').forEach(btn => {
+        btn.addEventListener('click', e => {
             e.preventDefault();
-            if (confirm('Are you sure you want to logout?')) {
-                logout();
-            }
+            if (confirm('Are you sure you want to logout?')) adminLogout();
         });
     });
 }

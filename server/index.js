@@ -1,11 +1,15 @@
 // --- 1. SETUP ---
-require('dotenv').config({ path: require('path').join(__dirname, '.env') }); // Loads variables from .env file
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'coc-jwt-secret-2026';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -130,6 +134,26 @@ const Announcement = mongoose.model('Announcement', announcementSchema);
 const Event = mongoose.model('Event', eventSchema);
 const Order = mongoose.model('Order', orderSchema);
 
+// Admin schema stored in MongoDB
+const adminSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true }
+});
+const Admin = mongoose.model('Admin', adminSchema);
+
+// --- JWT MIDDLEWARE ---
+const requireAuth = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
+  if (!token) return res.status(401).json({ message: 'Unauthorized. Please log in.' });
+  try {
+    req.admin = jwt.verify(token, JWT_SECRET);
+    next();
+  } catch {
+    return res.status(401).json({ message: 'Session expired. Please log in again.' });
+  }
+};
+
 
 // --- 4. API ROUTES (WITH CORRECTED PATHS) ---
 
@@ -158,10 +182,38 @@ app.get('/api/events', async (req, res) => {
   }
 });
 
+// --- ADMIN AUTH ROUTES ---
+
+// Login
+app.post('/api/admin/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ message: 'Email and password are required.' });
+
+    const admin = await Admin.findOne({ email });
+    if (!admin) return res.status(401).json({ message: 'Invalid email or password.' });
+
+    const isValid = await bcrypt.compare(password, admin.password);
+    if (!isValid) return res.status(401).json({ message: 'Invalid email or password.' });
+
+    // Issue token valid for 8 hours
+    const token = jwt.sign({ email: admin.email }, JWT_SECRET, { expiresIn: '8h' });
+    res.json({ success: true, token });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ message: 'Login failed. Please try again.' });
+  }
+});
+
+// Verify token
+app.get('/api/admin/verify', requireAuth, (req, res) => {
+  res.json({ authenticated: true, email: req.admin.email });
+});
+
 // --- ADMIN ROUTES ---
 
 // Create new announcement (POST)
-app.post('/api/announcements', async (req, res) => {
+app.post('/api/announcements', requireAuth, async (req, res) => {
   try {
     const { title, content } = req.body;
     
@@ -184,7 +236,7 @@ app.post('/api/announcements', async (req, res) => {
 });
 
 // Delete announcement (DELETE)
-app.delete('/api/announcements/:id', async (req, res) => {
+app.delete('/api/announcements/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const announcement = await Announcement.findByIdAndDelete(id);
@@ -202,7 +254,7 @@ app.delete('/api/announcements/:id', async (req, res) => {
 });
 
 // Update announcement (PUT)
-app.put('/api/announcements/:id', async (req, res) => {
+app.put('/api/announcements/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { title, content } = req.body;
@@ -221,7 +273,7 @@ app.put('/api/announcements/:id', async (req, res) => {
 });
 
 // Create new event (POST)
-app.post('/api/events', async (req, res) => {
+app.post('/api/events', requireAuth, async (req, res) => {
   try {
     console.log('Received event creation request:', req.body);
     
@@ -255,7 +307,7 @@ app.post('/api/events', async (req, res) => {
 });
 
 // Delete event (DELETE)
-app.delete('/api/events/:id', async (req, res) => {
+app.delete('/api/events/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     await Event.findByIdAndDelete(id);
@@ -267,7 +319,7 @@ app.delete('/api/events/:id', async (req, res) => {
 });
 
 // Update event (PUT)
-app.put('/api/events/:id', async (req, res) => {
+app.put('/api/events/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, date, startDate, endDate, startTime, endTime, location } = req.body;
@@ -289,7 +341,7 @@ app.put('/api/events/:id', async (req, res) => {
 
 // Orders Routes
 // Get all orders (for admin)
-app.get('/api/orders', async (req, res) => {
+app.get('/api/orders', requireAuth, async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
     res.json(orders);
@@ -358,7 +410,7 @@ app.post('/api/orders/upload-receipt', upload.single('receipt'), async (req, res
 });
 
 // Update order status (for admin)
-app.put('/api/orders/:id', async (req, res) => {
+app.put('/api/orders/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { status, receiptUrl } = req.body;
@@ -382,7 +434,7 @@ app.put('/api/orders/:id', async (req, res) => {
 });
 
 // Delete order (for admin)
-app.delete('/api/orders/:id', async (req, res) => {
+app.delete('/api/orders/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     await Order.findByIdAndDelete(id);
