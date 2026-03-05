@@ -1,4 +1,13 @@
-document.addEventListener('DOMContentLoaded', function() {
+import { requireAuth, initLogoutButtons } from './auth-utils.js';
+
+document.addEventListener('DOMContentLoaded', async function() {
+    // Check authentication first
+    const isAuthenticated = await requireAuth();
+    if (!isAuthenticated) return;
+    
+    // Initialize logout buttons
+    initLogoutButtons();
+    
     // ======================= //
     //   MOBILE NAV TOGGLE     //
     // ======================= //
@@ -51,6 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({ title, content })
             });
 
@@ -80,7 +90,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load all announcements from database
     async function loadAnnouncements() {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/announcements`);
+            const response = await fetch(`${API_BASE_URL}/api/announcements`, {
+                credentials: 'include'
+            });
             if (!response.ok) throw new Error('Failed to fetch announcements');
             
             const announcements = await response.json();
@@ -138,7 +150,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Fetch full content
             try {
-                const response = await fetch(`${API_BASE_URL}/api/announcements`);
+                const response = await fetch(`${API_BASE_URL}/api/announcements`, {
+                    credentials: 'include'
+                });
                 if (!response.ok) throw new Error('Failed to fetch announcements');
                 
                 const announcements = await response.json();
@@ -174,7 +188,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (confirm('Are you sure you want to delete this announcement?')) {
                 try {
                     const response = await fetch(`${API_BASE_URL}/api/announcements/${announcementId}`, {
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        credentials: 'include'
                     });
                     
                     const data = await response.json();

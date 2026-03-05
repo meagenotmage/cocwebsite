@@ -1,4 +1,14 @@
-document.addEventListener('DOMContentLoaded', function() {
+import { requireAuth, initLogoutButtons } from './auth-utils.js';
+
+// Check authentication before loading admin dashboard
+document.addEventListener('DOMContentLoaded', async function() {
+    // Check authentication first
+    const isAuthenticated = await requireAuth();
+    if (!isAuthenticated) return;
+    
+    // Initialize logout buttons
+    initLogoutButtons();
+    
     const API_BASE_URL = CONFIG.API_URL;
 
     // ======================= //
@@ -80,7 +90,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fetch and update orders data
     async function loadOrdersData() {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/orders`);
+            const response = await fetch(`${API_BASE_URL}/api/orders`, {
+                credentials: 'include'
+            });
             if (!response.ok) throw new Error('Failed to fetch orders');
             
             const orders = await response.json();
@@ -126,7 +138,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // ======================= //
     async function loadEvents() {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/events`);
+            const response = await fetch(`${API_BASE_URL}/api/events`, {
+                credentials: 'include'
+            });
             if (!response.ok) throw new Error('Failed to fetch events');
             
             const events = await response.json();
@@ -209,7 +223,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // ======================= //
     async function loadAnnouncements() {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/announcements`);
+            const response = await fetch(`${API_BASE_URL}/api/announcements`, {
+                credentials: 'include'
+            });
             if (!response.ok) throw new Error('Failed to fetch announcements');
             
             const announcements = await response.json();

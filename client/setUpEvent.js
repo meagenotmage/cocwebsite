@@ -1,4 +1,13 @@
-document.addEventListener('DOMContentLoaded', function() {
+import { requireAuth, initLogoutButtons } from './auth-utils.js';
+
+document.addEventListener('DOMContentLoaded', async function() {
+    // Check authentication first
+    const isAuthenticated = await requireAuth();
+    if (!isAuthenticated) return;
+    
+    // Initialize logout buttons
+    initLogoutButtons();
+    
     console.log('DOMContentLoaded - setUpEvent.js loaded');
     console.log('CONFIG available:', typeof CONFIG !== 'undefined');
     console.log('CONFIG.API_URL:', CONFIG?.API_URL);
@@ -95,6 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify(eventData)
             });
 
@@ -126,7 +136,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load all events from database
     async function loadEvents() {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/events`);
+            const response = await fetch(`${API_BASE_URL}/api/events`, {
+                credentials: 'include'
+            });
             if (!response.ok) throw new Error('Failed to fetch events');
             
             const events = await response.json();
@@ -190,7 +202,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Fetch full event data
             try {
-                const response = await fetch(`${API_BASE_URL}/api/events`);
+                const response = await fetch(`${API_BASE_URL}/api/events`, {
+                    credentials: 'include'
+                });
                 if (!response.ok) throw new Error('Failed to fetch events');
                 
                 const events = await response.json();
@@ -231,7 +245,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (confirm('Are you sure you want to delete this event?')) {
                 try {
                     const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`, {
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        credentials: 'include'
                     });
                     
                     if (!response.ok) throw new Error('Failed to delete event');

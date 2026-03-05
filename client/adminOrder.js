@@ -1,4 +1,13 @@
-document.addEventListener('DOMContentLoaded', function () {
+import { requireAuth, initLogoutButtons } from './auth-utils.js';
+
+document.addEventListener('DOMContentLoaded', async function () {
+    // Check authentication first
+    const isAuthenticated = await requireAuth();
+    if (!isAuthenticated) return;
+    
+    // Initialize logout buttons
+    initLogoutButtons();
+    
     // ======================= //
     //   MOBILE NAV TOGGLE     //
     // ======================= //
@@ -20,7 +29,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // Load orders from API
     async function loadOrders() {
         try {
-            const response = await fetch(`${CONFIG.API_URL}/api/orders`);
+            const response = await fetch(`${CONFIG.API_URL}/api/orders`, {
+                credentials: 'include'
+            });
             if (response.ok) {
                 allOrders = await response.json();
                 populateSectionFilter(allOrders);
@@ -365,6 +376,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     headers: {
                         'Content-Type': 'application/json'
                     },
+                    credentials: 'include',
                     body: JSON.stringify({ status: newStatus })
                 });
 
@@ -391,7 +403,8 @@ document.addEventListener('DOMContentLoaded', function () {
             if (confirm('Are you sure you want to delete this order?')) {
                 try {
                     const response = await fetch(`${CONFIG.API_URL}/api/orders/${orderId}`, {
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        credentials: 'include'
                     });
 
                     if (response.ok) {
