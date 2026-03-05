@@ -364,6 +364,17 @@
         padding: 4px 8px;
     }
     
+    .quantity-controls button {
+        width: 24px;
+        height: 24px;
+        font-size: 0.875rem;
+    }
+    
+    .quantity-controls span {
+        min-width: 24px;
+        font-size: 0.875rem;
+    }
+    
     .payment-methods {
         flex-direction: column;
     }

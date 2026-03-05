@@ -960,6 +960,18 @@ h1, h2, h3, h4, h5, h6 {
         font-size: 0.875rem;
     }
     
+    .quantity-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 0.875rem;
+    }
+    
+    #quantity {
+        width: 40px;
+        height: 28px;
+        font-size: 0.875rem;
+    }
+    
     #cart-modal .modal-content {
         max-width: 95%;
     }
