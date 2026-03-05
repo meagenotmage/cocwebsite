@@ -1,6 +1,4 @@
-document.addEventListener('DOMContentLoaded', async function() {
-    if (!await requireAuth()) return;
-    initLogoutButtons();
+document.addEventListener('DOMContentLoaded', function() {
     // ======================= //
     //   MOBILE NAV TOGGLE     //
     // ======================= //
@@ -50,7 +48,10 @@ document.addEventListener('DOMContentLoaded', async function() {
             
             const response = await fetch(url, {
                 method: method,
-                headers: getAuthHeaders(),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
                 body: JSON.stringify({ title, content })
             });
 
@@ -179,7 +180,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 try {
                     const response = await fetch(`${API_BASE_URL}/api/announcements/${announcementId}`, {
                         method: 'DELETE',
-                        headers: { 'Authorization': `Bearer ${getToken()}` }
+                        credentials: 'include'
                     });
                     
                     const data = await response.json();

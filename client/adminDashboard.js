@@ -1,6 +1,4 @@
-document.addEventListener('DOMContentLoaded', async function() {
-    if (!await requireAuth()) return;
-    initLogoutButtons();
+document.addEventListener('DOMContentLoaded', function() {
     const API_BASE_URL = CONFIG.API_URL;
 
     // ======================= //
@@ -83,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     async function loadOrdersData() {
         try {
             const response = await fetch(`${API_BASE_URL}/api/orders`, {
-                headers: { 'Authorization': `Bearer ${getToken()}` }
+                credentials: 'include'
             });
             if (!response.ok) throw new Error('Failed to fetch orders');
             

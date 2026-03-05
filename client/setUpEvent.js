@@ -1,6 +1,4 @@
-document.addEventListener('DOMContentLoaded', async function() {
-    if (!await requireAuth()) return;
-    initLogoutButtons();
+document.addEventListener('DOMContentLoaded', function() {
     console.log('DOMContentLoaded - setUpEvent.js loaded');
     console.log('CONFIG available:', typeof CONFIG !== 'undefined');
     console.log('CONFIG.API_URL:', CONFIG?.API_URL);
@@ -94,7 +92,10 @@ document.addEventListener('DOMContentLoaded', async function() {
             
             const response = await fetch(url, {
                 method: method,
-                headers: getAuthHeaders(),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
                 body: JSON.stringify(eventData)
             });
 
@@ -236,7 +237,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 try {
                     const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`, {
                         method: 'DELETE',
-                        headers: { 'Authorization': `Bearer ${getToken()}` }
+                        credentials: 'include'
                     });
                     
                     if (!response.ok) throw new Error('Failed to delete event');
