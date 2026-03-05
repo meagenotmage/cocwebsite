@@ -361,29 +361,44 @@
     background: transparent;
 }
 
-/* ── Back Face ── */
+/* ── Back Face — glassmorphism to match site design ── */
 .pillar-flip-back {
-    background: linear-gradient(135deg, var(--primary-red-dark, #A02C2A) 0%, var(--primary-red, #8B3A3A) 100%);
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     transform: rotateY(180deg);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 24px 18px;
-    color: #fff;
+    color: var(--text-color, #333);
 }
 
 .pillar-flip-back h3 {
     font-family: 'Oswald', sans-serif;
     font-size: 1.05rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     margin: 0 0 14px 0;
     padding-bottom: 12px;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.35);
     width: 100%;
     text-align: center;
+    color: var(--primary-red, #8B3A3A);
+    position: relative;
+}
+
+.pillar-flip-back h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 48px;
+    height: 3px;
+    background: var(--primary-red, #8B3A3A);
+    border-radius: 2px;
 }
 
 .pillar-flip-back ul {
@@ -402,7 +417,7 @@
     width: 4px;
 }
 .pillar-flip-back ul::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(139, 58, 58, 0.3);
     border-radius: 2px;
 }
 
@@ -411,8 +426,8 @@
     font-size: 0.88rem;
     font-weight: 500;
     text-align: center;
-    color: rgba(255, 255, 255, 0.92);
-    background: rgba(255, 255, 255, 0.12);
+    color: var(--text-color, #333);
+    background: rgba(255, 255, 255, 0.45);
     border-radius: 6px;
     padding: 6px 10px;
 }
