@@ -64,40 +64,61 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const modalImgThumbnails = document.getElementById('modal-img-thumbnails');
+    const sliderDots   = document.getElementById('slider-dots');
+    const sliderLabel  = document.getElementById('slider-label');
 
-    // Build image viewer thumbnails
+    // Build image slider
     function buildImageViewer(images) {
         const mainImg = productModal.querySelector('#modal-img');
-        modalImgThumbnails.innerHTML = '';
+        sliderDots.innerHTML = '';
+        let currentIndex = 0;
 
         if (!images || images.length === 0) return;
 
-        // Set main image to first
-        mainImg.src = images[0].src;
+        // Always query fresh arrow nodes (they get replaced each call)
+        function getPrev() { return document.getElementById('slider-prev'); }
+        function getNext() { return document.getElementById('slider-next'); }
 
-        // Only show thumbnails if there are multiple images
-        if (images.length < 2) {
-            modalImgThumbnails.style.display = 'none';
-            return;
-        }
-        modalImgThumbnails.style.display = 'flex';
-
-        images.forEach((img, i) => {
-            const thumb = document.createElement('div');
-            thumb.className = 'thumb' + (i === 0 ? ' active' : '');
-            thumb.innerHTML = `<img src="${img.src}" alt="${img.label}"><span>${img.label}</span>`;
-            thumb.addEventListener('click', () => {
-                mainImg.style.opacity = '0';
-                setTimeout(() => {
-                    mainImg.src = img.src;
-                    mainImg.style.opacity = '1';
-                }, 150);
-                modalImgThumbnails.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
-                thumb.classList.add('active');
+        function goTo(index) {
+            currentIndex = (index + images.length) % images.length;
+            mainImg.style.opacity = '0';
+            setTimeout(() => {
+                mainImg.src = images[currentIndex].src;
+                sliderLabel.textContent = images[currentIndex].label;
+                mainImg.style.opacity = '1';
+            }, 160);
+            sliderDots.querySelectorAll('.dot').forEach((d, i) => {
+                d.classList.toggle('active', i === currentIndex);
             });
-            modalImgThumbnails.appendChild(thumb);
-        });
+        }
+
+        // Set initial
+        mainImg.src = images[0].src;
+        sliderLabel.textContent = images[0].label;
+
+        const multi = images.length > 1;
+        sliderDots.style.display = multi ? 'flex' : 'none';
+        getPrev().style.display  = multi ? 'flex' : 'none';
+        getNext().style.display  = multi ? 'flex' : 'none';
+
+        if (multi) {
+            // Build dots
+            images.forEach((_, i) => {
+                const dot = document.createElement('span');
+                dot.className = 'dot' + (i === 0 ? ' active' : '');
+                dot.addEventListener('click', () => goTo(i));
+                sliderDots.appendChild(dot);
+            });
+
+            // Replace arrow nodes to clear stale listeners, then re-attach
+            ['slider-prev', 'slider-next'].forEach(id => {
+                const old = document.getElementById(id);
+                const clone = old.cloneNode(true);
+                old.parentNode.replaceChild(clone, old);
+            });
+            document.getElementById('slider-prev').addEventListener('click', () => goTo(currentIndex - 1));
+            document.getElementById('slider-next').addEventListener('click', () => goTo(currentIndex + 1));
+        }
     }
 
     productItems.forEach(item => {
