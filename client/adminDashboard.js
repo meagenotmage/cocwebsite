@@ -259,4 +259,60 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load announcements
     loadAnnouncements();
+
+    // ======================= //
+    //       FEEDBACKS          //
+    // ======================= //
+    async function loadFeedbacks() {
+        const feedbackList = document.querySelector('.feedback-list');
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/feedback`, {
+                credentials: 'include'
+            });
+            if (!response.ok) throw new Error('Failed to fetch feedbacks');
+
+            const feedbacks = await response.json();
+
+            if (!feedbacks || feedbacks.length === 0) {
+                feedbackList.innerHTML = '<div class="empty-state"><p>No Feedbacks Yet</p></div>';
+                return;
+            }
+
+            const recent = feedbacks
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .slice(0, 3);
+
+            const typeLabelMap = {
+                feedback:    { label: 'Feedback',                  cls: 'fb-badge--feedback' },
+                suggestion:  { label: 'Suggestion',               cls: 'fb-badge--suggestion' },
+                partnership: { label: 'Partnership',              cls: 'fb-badge--partnership' }
+            };
+
+            feedbackList.innerHTML = recent.map(fb => {
+                const type = typeLabelMap[fb.type] || { label: fb.type, cls: '' };
+                const date = new Date(fb.createdAt).toLocaleDateString('en-US', {
+                    month: 'short', day: 'numeric', year: 'numeric'
+                });
+                const sender = fb.isAnonymous ? 'Anonymous' : (fb.senderName || fb.senderEmail || 'Anonymous');
+                const preview = fb.message.length > 100 ? fb.message.slice(0, 100) + '…' : fb.message;
+
+                return `
+                    <div class="fb-item">
+                        <div class="fb-item-header">
+                            <span class="fb-badge ${type.cls}">${type.label}</span>
+                            <span class="fb-item-date">${date}</span>
+                        </div>
+                        <p class="fb-item-msg">${preview}</p>
+                        <span class="fb-item-sender"><i class="fa-solid fa-user"></i> ${sender}</span>
+                    </div>
+                `;
+            }).join('');
+
+        } catch (error) {
+            console.error('Error loading feedbacks:', error);
+            feedbackList.innerHTML = '<div class="empty-state"><p>Failed to load feedbacks</p></div>';
+        }
+    }
+
+    loadFeedbacks();
 });
