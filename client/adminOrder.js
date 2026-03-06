@@ -115,13 +115,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 <td>P ${order.total.toFixed(2)}</td>
                 <td>${orderNumber}</td>
                 <td class="timestamp">${timestamp}</td>
-                <td class="${order.status === 'pending_payment' && order.receiptUrl ? 'status-pending' : paymentStatusClass}">${paymentStatusText}</td>
-                <td class="${deliveryStatusClass}">${deliveryStatusText}</td>
-                <td class="actions">
-                    <i class="fa-solid fa-chevron-down toggle-details"></i>
-                    ${order.receiptUrl ? '<i class="fa-solid fa-image view-receipt" title="View Receipt" data-order-id="' + order._id + '"></i>' : ''}
-                    <i class="fa-solid fa-pencil"></i>
-                    <i class="fa-solid fa-trash delete-order" data-order-id="${order._id}"></i>
+                <td class="payment-status-cell"><span class="${order.status === 'pending_payment' && order.receiptUrl ? 'status-pending' : paymentStatusClass}">${paymentStatusText}</span></td>
+                <td class="delivery-status-cell"><span class="${deliveryStatusClass}">${deliveryStatusText}</span></td>
+                <td>
+                    <div class="actions">
+                        <i class="fa-solid fa-chevron-down toggle-details"></i>
+                        ${order.receiptUrl ? '<i class="fa-solid fa-image view-receipt" title="View Receipt" data-order-id="' + order._id + '"></i>' : ''}
+                        <i class="fa-solid fa-pencil"></i>
+                        <i class="fa-solid fa-trash delete-order" data-order-id="${order._id}"></i>
+                    </div>
                 </td>
             `;
 
@@ -252,10 +254,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 3. INLINE STATUS EDITING LOGIC
     ordersTbody.addEventListener('click', function(e) {
-        const target = e.target;
+        const target = e.target.closest('td');
+        if (!target || !target.closest('.order-summary')) return;
         // Check if Payment Status (column 6) or Status (column 7) was clicked, but NOT timestamp (column 5)
         if ((target.cellIndex === 6 || target.cellIndex === 7) && !target.querySelector('select')) {
-            const currentStatus = target.textContent.trim();
+            const currentStatus = target.querySelector('span')?.textContent.trim() || target.textContent.trim();
             const isPaymentStatus = target.cellIndex === 6;
             const options = isPaymentStatus ? ['Paid', 'Pending'] : ['Received', 'Not Received'];
 
@@ -279,9 +282,8 @@ document.addEventListener('DOMContentLoaded', function () {
             // Event listener to handle the change
             const handleUpdate = () => {
                 const newValue = select.value;
-                target.innerHTML = newValue; // Set text back
-                // Update the class for styling
-                target.className = `status-${newValue.toLowerCase().replace(' ', '-')}`;
+                const statusClass = `status-${newValue.toLowerCase().replace(/\s+/g, '-')}`;
+                target.innerHTML = `<span class="${statusClass}">${newValue}</span>`;
             };
             
             select.addEventListener('change', handleUpdate);

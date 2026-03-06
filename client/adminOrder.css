@@ -98,9 +98,12 @@ body {
 
 .list-title {
     margin-top: 0;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     font-size: 1.4rem;
     font-weight: 600;
+    color: #222;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f0;
 }
 
 /* Orders Table */
@@ -120,6 +123,11 @@ body {
     letter-spacing: 0.04em;
     border-bottom: 2px solid #f0f0f0;
     white-space: nowrap;
+}
+.orders-table th.editable::after {
+    content: ' ✎';
+    font-size: 0.7rem;
+    opacity: 0.5;
 }
 .orders-table td {
     padding: 13px 14px;
@@ -143,14 +151,29 @@ body {
 
 
 /* Statuses */
-.status-paid   { display:inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: #e8f5e9; color: #2e7d32; }
-.status-not-paid { display:inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: #fdecea; color: #c62828; }
-.status-received    { display:inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: #e8f5e9; color: #2e7d32; }
-.status-not-received { display:inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: #fdecea; color: #c62828; }
-td[class^="status-"] { cursor: pointer; }
+.status-paid,
+.status-not-paid,
+.status-received,
+.status-not-received,
+.status-pending {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.status-paid     { background: #e8f5e9; color: #2e7d32; }
+.status-not-paid { background: #fdecea; color: #c62828; }
+.status-received     { background: #e8f5e9; color: #2e7d32; }
+.status-not-received { background: #fdecea; color: #c62828; }
+.payment-status-cell,
+.delivery-status-cell { cursor: pointer; }
 
 /* Actions Column */
-.actions { text-align: right; display: flex; gap: 4px; justify-content: flex-end; align-items: center; }
+.orders-table td:last-child { padding: 0 14px; }
+.actions { display: flex; gap: 4px; justify-content: flex-end; align-items: center; }
 .actions i {
     cursor: pointer;
     color: #555;
@@ -320,16 +343,8 @@ td[class^="status-"] { cursor: pointer; }
     object-fit: contain;
 }
 
-/* Pending Status */
-.status-pending {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: #fff3e0;
-    color: #e65100;
-}
+/* Pending Status is already covered by the shared status rule above */
+.status-pending { background: #fff3e0; color: #e65100; }
 
 /* Timestamp Column */
 .timestamp {
