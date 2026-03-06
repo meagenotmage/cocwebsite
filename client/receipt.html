@@ -14,15 +14,21 @@
 <body>
     <div class="receipt-page">
         <div class="receipt-actions no-print">
-            <button onclick="window.print()" class="action-btn print-btn">
-                <i class="fa-solid fa-print"></i> Print Receipt
-            </button>
-            <button onclick="downloadReceipt()" class="action-btn download-btn">
-                <i class="fa-solid fa-download"></i> Download as Image
-            </button>
-            <a href="order.html" class="action-btn back-btn">
-                <i class="fa-solid fa-arrow-left"></i> Back to Orders
-            </a>
+            <div class="receipt-disclaimer">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <strong>Important:</strong> Please download or print this receipt. You will need to present it as proof when claiming your items.
+            </div>
+            <div class="receipt-buttons">
+                <button onclick="window.print()" class="action-btn print-btn">
+                    <i class="fa-solid fa-print"></i> Print Receipt
+                </button>
+                <button onclick="downloadReceipt()" class="action-btn download-btn">
+                    <i class="fa-solid fa-download"></i> Download as Image
+                </button>
+                <a href="order.html" class="action-btn back-btn">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Orders
+                </a>
+            </div>
         </div>
 
         <div class="receipt-container" id="receipt-content">
