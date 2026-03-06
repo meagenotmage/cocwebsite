@@ -5,52 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <link rel="icon" type="image/png" href="assets/coc.png" />
     <title>Feedback - College of Communications</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="responsive.css">
     <link rel="stylesheet" href="feedback.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <!-- ======================= -->
     <!--          HEADER         -->
     <!-- ======================= -->
-    <header>
+    <header role="banner">
         <div class="container">
-            <a href="index.html" class="logo">
-                <img src="assets/coc.png" alt="College Logo"> 
+            <a href="index.html" class="logo" aria-label="College of Communications Home">
+                <img src="assets/coc.png" alt="College of Communications Logo"> 
             </a>
-            <nav class="desktop-nav">
-                <ul>
-                    <li><a href="index.html">HOME</a></li>
-                    <li><a href="order.html">ORDER</a></li>
-                    <li><a href="feedback.html" class="active">FEEDBACK</a></li>
-                    <li><a href="aboutUs.html">ABOUT US</a></li>
+            <nav class="desktop-nav" aria-label="Main navigation">
+                <ul role="menubar">
+                    <li role="none"><a href="index.html" role="menuitem">HOME</a></li>
+                    <li role="none"><a href="order.html" role="menuitem">ORDER</a></li>
+                    <li role="none"><a href="feedback.html" class="active" role="menuitem" aria-current="page">FEEDBACK</a></li>
+                    <li role="none"><a href="aboutUs.html" role="menuitem">ABOUT US</a></li>
                 </ul>
             </nav>
-            <button class="hamburger" id="hamburger-btn">
-                <i class="fa-solid fa-bars"></i>
+            <button class="hamburger" id="hamburger-btn" aria-label="Open mobile menu" aria-expanded="false">
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
             </button>
         </div>
     </header>
 
-    <!-- ADDED: Mobile Navigation Menu -->
-    <div class="mobile-nav" id="mobile-nav">
-        <ul>
-            <li><a href="index.html">HOME</a></li>
-            <li><a href="order.html">ORDER</a></li>
-            <li><a href="feedback.html" class="active">FEEDBACK</a></li>
-            <li><a href="aboutUs.html">ABOUT US</a></li>
+    <div class="mobile-nav" id="mobile-nav" role="navigation" aria-label="Mobile navigation">
+        <ul role="menu">
+            <li role="none"><a href="index.html" role="menuitem">HOME</a></li>
+            <li role="none"><a href="order.html" role="menuitem">ORDER</a></li>
+            <li role="none"><a href="feedback.html" class="active" role="menuitem" aria-current="page">FEEDBACK</a></li>
+            <li role="none"><a href="aboutUs.html" role="menuitem">ABOUT US</a></li>
         </ul>
     </div>
 
     <!-- ======================= -->
     <!--       HERO BANNER       -->
     <!-- ======================= -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>FEEDBACKING</h1>
-            <p>Some Description</p>
-            <a href="mailto:coc.sec@wvsu.edu.ph" class="btn-email">Email Us</a>
+    <section class="hero" aria-label="Feedback section">
+        <div class="container">
+            <div class="hero-content">
+                <p class="hero-tagline">SHARE YOUR VOICE</p>
+                <h1>Feedback</h1>
+                <p class="hero-description">Share your thoughts, ideas, and proposals with the College of Communication.</p>
+            </div>
         </div>
     </section>
 
@@ -159,38 +164,42 @@
     <!-- ======================= -->
     <footer>
         <div class="container footer-content">
-            <div class="footer-info">
-                <img src="assets/COCSC.png" alt="COCSC Logo" class="footer-logo">
-                <p>WVSU College of Communication, Luna St. La Paz<br>Iloilo City, Philippines 5000</p>
-                <p class="email">coc.sec@wvsu.edu.ph</p>
-                <p class="email">admission.coc@wvsu.edu.ph</p>
+            <div class="footer-main">
+                <a href="adminLogIn.html" style="display: inline-block;">
+                    <img src="assets/COCSC.png" alt="College Logo" class="footer-logo">
+                </a>
+                <p>WVSU College of Communication, Luna St. La Paz</p>
+                <p>Iloilo City, Philippines 5000</p>
+                <p>coc.sec@wvsu.edu.ph</p>
+                <p>admission.coc@wvsu.edu.ph</p>
             </div>
+
             <div class="footer-menu">
                 <h3>Menu</h3>
                 <ul>
-                    <li><a href="#">Orders</a></li>
-                    <li><a href="#">Feedback</a></li>
-                    <li><a href="#">Processing Logs</a></li>
-                    <li><a href="#">About Us</a></li>
+                    <li><a href="order.html">Orders</a></li>
+                    <li><a href="aboutUs.html">About Us</a></li>
                 </ul>
             </div>
-            <div class="footer-right">
+
+            <div class="footer-social">
                 <h3>Social Media</h3>
                 <div class="social-icons">
-                    <a href="#"><i class="fa-brands fa-twitter"></i></a>
-                    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://www.facebook.com/wvsucocsc" target="_blank" rel="noopener noreferrer" aria-label="Visit COCSC Facebook page"><i class="fa-brands fa-facebook" aria-hidden="true"></i></a>
+                    <a href="https://www.facebook.com/wvsucoc" target="_blank" rel="noopener noreferrer" aria-label="Visit COC Facebook page"><i class="fa-brands fa-facebook" aria-hidden="true"></i></a>
+                    <a href="https://www.instagram.com/wvsucocsc/" target="_blank" rel="noopener noreferrer" aria-label="Visit COCSC Instagram page"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
                 </div>
-                <div class="footer-seals">
-                     <img src="assets/wvsu.png" alt="WVSU Seal">
-                     <img src="assets/coc.png" alt="COC Seal">
-                </div>
+            </div>
+
+            <div class="footer-logos">
+                <img src="assets/wvsu.png" alt="WVSU Seal">
+                <a href="adminLogIn.html">
+                    <img src="assets/coc.png" alt="COC Seal">
+                </a>
             </div>
         </div>
-        <div class="copyright-container">
-            <div class="container">
-                <p>Copyright © COCSC 2025. All Rights Reserved.</p>
-            </div>
+        <div class="copyright">
+            <p>Copyright © COCSC 2025. All Rights Reserved.</p>
         </div>
     </footer>
     <script src="config.js"></script>
