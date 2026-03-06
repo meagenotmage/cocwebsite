@@ -7,6 +7,7 @@
     <title>Orders - Admin</title>
     <link rel="stylesheet" href="adminOrder.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -59,6 +60,22 @@
                         <select id="filter-section" class="filter-select">
                             <option value="">All Sections</option>
                         </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-item">Item Type</label>
+                        <select id="filter-item" class="filter-select">
+                            <option value="">All Items</option>
+                            <option value="type b">Type B</option>
+                            <option value="type c">Type C</option>
+                            <option value="nameplate">Nameplate</option>
+                            <option value="lanyard">Lanyard</option>
+                        </select>
+                    </div>
+                    <div class="filter-group export-group">
+                        <label>&nbsp;</label>
+                        <button id="export-excel-btn" class="export-btn">
+                            <i class="fa-solid fa-file-excel"></i> Export to Excel
+                        </button>
                     </div>
                 </div>
                 <div class="table-container">

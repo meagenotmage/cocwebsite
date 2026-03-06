@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('search-name');
     const filterPayment = document.getElementById('filter-payment');
     const filterSection = document.getElementById('filter-section');
+    const filterItem = document.getElementById('filter-item');
+    const exportExcelBtn = document.getElementById('export-excel-btn');
     let allOrders = [];
 
     // Load orders from API
@@ -112,6 +114,7 @@ document.addEventListener('DOMContentLoaded', function () {
             summaryRow.dataset.orderId = order._id;
             summaryRow.dataset.payment = order.paymentMethod;
             summaryRow.dataset.section = order.programYear;
+            summaryRow.dataset.items = order.items ? order.items.map(i => i.name).join('|').toLowerCase() : '';
             summaryRow.innerHTML = `
                 <td>${order.fullName}</td>
                 <td>${order.programYear}</td>
@@ -218,12 +221,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const searchQuery = searchInput.value.toLowerCase();
         const paymentFilter = filterPayment.value;
         const sectionFilter = filterSection.value;
+        const itemFilter = filterItem.value.toLowerCase();
         const rows = ordersTbody.querySelectorAll('.order-summary');
 
         rows.forEach(row => {
             const name = row.dataset.name.toLowerCase();
             const payment = row.dataset.payment;
             const section = row.dataset.section;
+            const items = row.dataset.items || '';
             const detailsRow = row.nextElementSibling;
             
             // Check if row matches all filters
@@ -233,8 +238,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 section.toLowerCase().includes(searchQuery);
             const matchesPayment = !paymentFilter || payment === paymentFilter;
             const matchesSection = !sectionFilter || section === sectionFilter;
+            const matchesItem = !itemFilter || items.includes(itemFilter);
             
-            if (matchesSearch && matchesPayment && matchesSection) {
+            if (matchesSearch && matchesPayment && matchesSection && matchesItem) {
                 row.style.display = '';
                 // Remove inline display style from details row - let CSS class handle visibility
                 if (detailsRow && detailsRow.classList.contains('order-details')) {
@@ -254,6 +260,62 @@ document.addEventListener('DOMContentLoaded', function () {
     searchInput.addEventListener('keyup', applyFilters);
     filterPayment.addEventListener('change', applyFilters);
     filterSection.addEventListener('change', applyFilters);
+    filterItem.addEventListener('change', applyFilters);
+
+    // EXPORT TO EXCEL
+    exportExcelBtn.addEventListener('click', function () {
+        const allOrdersSorted = [...allOrders].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+        // Collect only currently visible orders
+        const visibleRows = Array.from(ordersTbody.querySelectorAll('.order-summary')).filter(r => r.style.display !== 'none');
+        const visibleIds = new Set(visibleRows.map(r => r.dataset.orderId));
+
+        const rows = [['Order #', 'Name', 'Program / Year & Section', 'Payment Method', 'Total Amount', 'Order Time', 'Payment Status', 'Status', 'Items']];
+
+        [...allOrders]
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .filter(order => visibleIds.has(order._id))
+            .forEach(order => {
+                const orderIndex = allOrdersSorted.findIndex(o => o._id === order._id);
+                const orderNumber = String(orderIndex + 1).padStart(4, '0');
+
+                let paymentStatusText = 'Not Paid';
+                if (order.status === 'paid') paymentStatusText = 'Paid';
+                else if (order.status === 'pending_payment') paymentStatusText = 'Pending';
+
+                const deliveryStatusText = order.status === 'received' ? 'Received' : 'Not Received';
+
+                let timestamp = 'N/A';
+                if (order.createdAt) {
+                    timestamp = new Date(order.createdAt).toLocaleString('en-US', {
+                        month: 'short', day: 'numeric', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit', hour12: true
+                    });
+                }
+
+                const itemsSummary = order.items
+                    ? order.items.map(i => `${i.name}${i.size ? ' (' + i.size + ')' : ''} x${i.quantity}`).join(', ')
+                    : '';
+
+                rows.push([
+                    orderNumber,
+                    order.fullName,
+                    order.programYear,
+                    order.paymentMethod,
+                    `P ${order.total.toFixed(2)}`,
+                    timestamp,
+                    paymentStatusText,
+                    deliveryStatusText,
+                    itemsSummary
+                ]);
+            });
+
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!cols'] = [8, 22, 25, 16, 14, 22, 14, 14, 50].map(w => ({ wch: w }));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Orders');
+        XLSX.writeFile(wb, 'orders.xlsx');
+    });
 
     // 3. INLINE STATUS EDITING LOGIC
     ordersTbody.addEventListener('click', function(e) {

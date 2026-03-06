@@ -106,6 +106,30 @@ body {
     border-bottom: 1px solid #f0f0f0;
 }
 
+/* Export button */
+.export-group {
+    justify-content: flex-end;
+}
+.export-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    background-color: #1D6F42;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+}
+.export-btn:hover {
+    background-color: #155232;
+}
+
 /* Orders Table */
 .table-container { overflow-x: auto; }
 .orders-table {
