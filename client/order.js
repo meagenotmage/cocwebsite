@@ -198,9 +198,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     closeButtons.forEach(button => {
         button.addEventListener('click', () => {
-            productModal.style.display = 'none';
-            cartModal.style.display = 'none';
-            sizeGuideModal.style.display = 'none';
+            // Find the parent modal and close only that one
+            const parentModal = button.closest('.modal');
+            if (parentModal) {
+                parentModal.style.display = 'none';
+                // If closing the size guide, reopen the product modal
+                if (parentModal.id === 'size-guide-modal') {
+                    productModal.style.display = 'flex';
+                }
+            } else {
+                // Fallback: close all
+                productModal.style.display = 'none';
+                cartModal.style.display = 'none';
+                sizeGuideModal.style.display = 'none';
+            }
         });
     });
 

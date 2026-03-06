@@ -39,6 +39,29 @@
             <div class="card">
                 <h2 class="list-title">Order Tracking List</h2>
 
+                <!-- Payment Method Settings -->
+                <div class="payment-settings-bar">
+                    <span class="payment-settings-label"><i class="fa-solid fa-sliders"></i> Payment Methods:</span>
+                    <label class="toggle-label">
+                        <span>GCash</span>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="toggle-gcash" checked>
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </label>
+                    <label class="toggle-label">
+                        <span>Cash</span>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="toggle-cash" checked>
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </label>
+                    <button id="save-payment-settings-btn" class="save-settings-btn">
+                        <i class="fa-solid fa-floppy-disk"></i> Save
+                    </button>
+                    <span id="payment-settings-status" class="settings-status"></span>
+                </div>
+
                 <div class="search-container">
                     <div class="search-group">
                         <label for="search-name">Search</label>

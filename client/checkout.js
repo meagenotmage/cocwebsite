@@ -6,22 +6,53 @@ document.addEventListener('DOMContentLoaded', () => {
     const paymentBtns = document.querySelectorAll('.payment-btn');
     
     let orderData = JSON.parse(sessionStorage.getItem('checkoutData')) || [];
-    let selectedPaymentMethod = 'online';
+    let selectedPaymentMethod = 'gcash';
 
     // Load saved user data if "Remember Me" was checked before
     loadSavedUserData();
 
+    // Fetch payment method availability and apply to buttons
+    async function applyPaymentSettings() {
+        try {
+            const res = await fetch(`${CONFIG.API_URL}/api/settings/payment`);
+            if (res.ok) {
+                const { gcashEnabled, cashEnabled } = await res.json();
+                paymentBtns.forEach(btn => {
+                    const method = btn.dataset.method;
+                    const enabled = method === 'gcash' ? gcashEnabled : cashEnabled;
+                    if (!enabled) {
+                        btn.disabled = true;
+                        btn.classList.add('disabled');
+                        btn.classList.remove('active');
+                        btn.title = `${method === 'gcash' ? 'GCash' : 'Cash'} is currently unavailable`;
+                    } else {
+                        btn.disabled = false;
+                        btn.classList.remove('disabled');
+                    }
+                });
+                // Set default to first enabled method
+                const firstEnabled = [...paymentBtns].find(b => !b.disabled);
+                if (firstEnabled) {
+                    paymentBtns.forEach(b => b.classList.remove('active'));
+                    firstEnabled.classList.add('active');
+                    selectedPaymentMethod = firstEnabled.dataset.method;
+                }
+            }
+        } catch (e) {
+            console.error('Could not load payment settings', e);
+        }
+    }
+    applyPaymentSettings();
+
     // Payment method selection
     paymentBtns.forEach(btn => {
         btn.addEventListener('click', () => {
+            if (btn.disabled) return;
             paymentBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             selectedPaymentMethod = btn.dataset.method;
         });
     });
-
-    // Set default payment method
-    selectedPaymentMethod = 'gcash';
 
     // Load order items
     function displayOrderItems() {

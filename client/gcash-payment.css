@@ -38,6 +38,26 @@
     font-size: 1.1rem;
 }
 
+.session-timer {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: #e8f5e9;
+    border: 1px solid #a5d6a7;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: #2e7d32;
+    font-weight: 500;
+}
+.session-timer i { font-size: 1rem; }
+.session-timer.timer-warning {
+    background: #fff3e0;
+    border-color: #ffcc80;
+    color: #e65100;
+}
+
 .payment-content {
     display: grid;
     grid-template-columns: 1fr 1fr;

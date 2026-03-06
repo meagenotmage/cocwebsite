@@ -148,6 +148,13 @@ const feedbackSchema = new mongoose.Schema({
 
 const Feedback = mongoose.model('Feedback', feedbackSchema);
 
+const settingsSchema = new mongoose.Schema({
+  key: { type: String, required: true, unique: true },
+  gcashEnabled: { type: Boolean, default: true },
+  cashEnabled: { type: Boolean, default: true }
+});
+const Settings = mongoose.model('Settings', settingsSchema);
+
 
 // --- 4. API ROUTES (WITH CORRECTED PATHS) ---
 
@@ -485,6 +492,38 @@ app.delete('/api/feedback/:id', async (req, res) => {
   } catch (err) {
     console.error('Error deleting feedback:', err);
     res.status(500).json({ message: 'Failed to delete feedback.' });
+  }
+});
+
+// --- PAYMENT SETTINGS ROUTES ---
+
+// Get payment settings (public — used by checkout page)
+app.get('/api/settings/payment', async (req, res) => {
+  try {
+    let settings = await Settings.findOne({ key: 'payment' });
+    if (!settings) {
+      settings = await Settings.create({ key: 'payment', gcashEnabled: true, cashEnabled: true });
+    }
+    res.json({ gcashEnabled: settings.gcashEnabled, cashEnabled: settings.cashEnabled });
+  } catch (err) {
+    console.error('Error fetching payment settings:', err);
+    res.status(500).json({ message: 'Failed to fetch payment settings.' });
+  }
+});
+
+// Update payment settings (admin)
+app.put('/api/settings/payment', async (req, res) => {
+  try {
+    const { gcashEnabled, cashEnabled } = req.body;
+    const settings = await Settings.findOneAndUpdate(
+      { key: 'payment' },
+      { gcashEnabled, cashEnabled },
+      { new: true, upsert: true }
+    );
+    res.json({ message: 'Payment settings updated!', gcashEnabled: settings.gcashEnabled, cashEnabled: settings.cashEnabled });
+  } catch (err) {
+    console.error('Error updating payment settings:', err);
+    res.status(500).json({ message: 'Failed to update payment settings.' });
   }
 });
 

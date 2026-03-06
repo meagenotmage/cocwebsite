@@ -7,6 +7,43 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // 20-minute session timer
+    const TIMEOUT_MS = 20 * 60 * 1000;
+    const TIMER_KEY = 'gcashSessionExpiry';
+    const timerDisplay = document.getElementById('timer-display');
+    const timerContainer = document.getElementById('session-timer');
+
+    // Set expiry if not already set (first visit)
+    if (!sessionStorage.getItem(TIMER_KEY)) {
+        sessionStorage.setItem(TIMER_KEY, Date.now() + TIMEOUT_MS);
+    }
+
+    function updateTimer() {
+        const expiry = parseInt(sessionStorage.getItem(TIMER_KEY), 10);
+        const remaining = expiry - Date.now();
+
+        if (remaining <= 0) {
+            clearInterval(timerInterval);
+            sessionStorage.removeItem(TIMER_KEY);
+            sessionStorage.removeItem('pendingOrderData');
+            alert('Your payment session has expired. Please start your order again.');
+            window.location.href = 'checkout.html';
+            return;
+        }
+
+        const mins = Math.floor(remaining / 60000);
+        const secs = Math.floor((remaining % 60000) / 1000);
+        timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+        // Warn when under 5 minutes
+        if (remaining < 5 * 60 * 1000) {
+            timerContainer.classList.add('timer-warning');
+        }
+    }
+
+    updateTimer();
+    const timerInterval = setInterval(updateTimer, 1000);
+
     // Display order items
     displayOrderItems(orderData);
 
@@ -124,6 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     sessionStorage.setItem('orderData', JSON.stringify(result.order));
                     sessionStorage.removeItem('pendingOrderData');
+                    sessionStorage.removeItem('gcashSessionExpiry');
                     
                     // Redirect to receipt
                     window.location.href = 'receipt.html';

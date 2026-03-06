@@ -130,6 +130,91 @@ body {
     background-color: #155232;
 }
 
+/* Payment Settings Bar */
+.payment-settings-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 18px;
+    background: #fef9f0;
+    border: 1px solid #f0e0b0;
+    border-radius: 10px;
+    padding: 12px 18px;
+    margin-bottom: 20px;
+}
+.payment-settings-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #555;
+    margin-right: 4px;
+}
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+}
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: #ccc;
+    border-radius: 24px;
+    transition: background-color 0.3s;
+}
+.toggle-slider::before {
+    content: '';
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #fff;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+.toggle-switch input:checked + .toggle-slider {
+    background-color: #2e7d32;
+}
+.toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(20px);
+}
+.save-settings-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background-color: #8B0000;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.save-settings-btn:hover { background-color: #6a0000; }
+.settings-status {
+    font-size: 0.82rem;
+    color: #2e7d32;
+    font-weight: 500;
+}
+
 /* Orders Table */
 .table-container { overflow-x: auto; }
 .orders-table {

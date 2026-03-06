@@ -249,6 +249,16 @@
     border-color: var(--primary-red-bright, #E53935);
 }
 
+.payment-btn.disabled,
+.payment-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background: #f0f0f0;
+    border-color: #ddd;
+    color: #aaa;
+    pointer-events: none;
+}
+
 .form-checkbox {
     display: flex;
     align-items: center;
