@@ -43,6 +43,7 @@
     letter-spacing: 6px;
     text-shadow: 2px 4px 12px rgba(0, 0, 0, 0.3);
     text-transform: uppercase;
+    color: #E53935;
 }
 
 .hero .hero-description {
