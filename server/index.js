@@ -131,6 +131,19 @@ const Announcement = mongoose.model('Announcement', announcementSchema);
 const Event = mongoose.model('Event', eventSchema);
 const Order = mongoose.model('Order', orderSchema);
 
+const feedbackSchema = new mongoose.Schema({
+  type: { type: String, enum: ['feedback', 'suggestion', 'partnership'], required: true },
+  message: { type: String, required: true },
+  isAnonymous: { type: Boolean, default: true },
+  senderName: { type: String },
+  senderEmail: { type: String },
+  status: { type: String, enum: ['unread', 'read'], default: 'unread' },
+  adminNotes: { type: String },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Feedback = mongoose.model('Feedback', feedbackSchema);
+
 
 // --- 4. API ROUTES (WITH CORRECTED PATHS) ---
 
@@ -391,6 +404,83 @@ app.delete('/api/orders/:id', async (req, res) => {
   } catch (err) {
     console.error('Error deleting order:', err);
     res.status(500).json({ message: 'Failed to delete order.' });
+  }
+});
+
+// --- FEEDBACK ROUTES ---
+
+// Submit feedback (POST) — public
+app.post('/api/feedback', async (req, res) => {
+  try {
+    const { type, message, isAnonymous, senderName, senderEmail } = req.body;
+
+    if (!type || !['feedback', 'suggestion', 'partnership'].includes(type)) {
+      return res.status(400).json({ message: 'A valid submission type is required.' });
+    }
+    if (!message || message.trim() === '') {
+      return res.status(400).json({ message: 'Message is required.' });
+    }
+
+    const feedback = new Feedback({
+      type,
+      message: message.trim(),
+      isAnonymous: isAnonymous !== false,
+      senderName: senderName ? senderName.trim() : undefined,
+      senderEmail: senderEmail ? senderEmail.trim().toLowerCase() : undefined
+    });
+
+    await feedback.save();
+    res.status(201).json({ message: 'Feedback submitted successfully!' });
+  } catch (err) {
+    console.error('Error submitting feedback:', err);
+    res.status(500).json({ message: 'Failed to submit feedback.' });
+  }
+});
+
+// Get all feedback (GET) — admin; accepts ?type= filter
+app.get('/api/feedback', async (req, res) => {
+  try {
+    const query = {};
+    if (req.query.type && ['feedback', 'suggestion', 'partnership'].includes(req.query.type)) {
+      query.type = req.query.type;
+    }
+    const feedbacks = await Feedback.find(query).sort({ createdAt: -1 });
+    res.json(feedbacks);
+  } catch (err) {
+    console.error('Error fetching feedback:', err);
+    res.status(500).json({ message: 'Failed to fetch feedback.' });
+  }
+});
+
+// Update feedback status / admin notes (PUT) — admin
+app.put('/api/feedback/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, adminNotes } = req.body;
+
+    const updateData = {};
+    if (status && ['unread', 'read'].includes(status)) updateData.status = status;
+    if (adminNotes !== undefined) updateData.adminNotes = adminNotes;
+
+    const feedback = await Feedback.findByIdAndUpdate(id, updateData, { new: true });
+    if (!feedback) return res.status(404).json({ message: 'Feedback not found.' });
+
+    res.json({ message: 'Feedback updated successfully!', feedback });
+  } catch (err) {
+    console.error('Error updating feedback:', err);
+    res.status(500).json({ message: 'Failed to update feedback.' });
+  }
+});
+
+// Delete feedback (DELETE) — admin
+app.delete('/api/feedback/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Feedback.findByIdAndDelete(id);
+    res.json({ message: 'Feedback deleted successfully!' });
+  } catch (err) {
+    console.error('Error deleting feedback:', err);
+    res.status(500).json({ message: 'Failed to delete feedback.' });
   }
 });
 

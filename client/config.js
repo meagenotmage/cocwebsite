@@ -12,6 +12,7 @@ const CONFIG = {
   ENDPOINTS: {
     ANNOUNCEMENTS: '/api/announcements',
     EVENTS: '/api/events',
+    FEEDBACK: '/api/feedback',
     ROOT: '/'
   }
 };

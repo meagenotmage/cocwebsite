@@ -58,13 +58,99 @@
     <!--      MAIN CONTENT       -->
     <!-- ======================= -->
     <main class="main-content container">
-        <div class="feedback-container">
-            <div class="feedback-header">
-                <h2>Feedbacking</h2>
+        <div class="feedback-page-wrapper">
+
+            <div class="feedback-intro">
+                <h2>Share Your Thoughts</h2>
+                <p>We value your feedback, ideas, and interest in working with us. Select a category below and let us know what's on your mind.</p>
             </div>
-            <div class="feedback-body">
-                <p>...................Coming Soon...................</p>
+
+            <!-- SUCCESS / ERROR banner (hidden by default) -->
+            <div id="feedback-success" class="feedback-banner feedback-banner--success" style="display:none;">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Thank you! Your submission has been received.</span>
             </div>
+            <div id="feedback-error" class="feedback-banner feedback-banner--error" style="display:none;">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span id="feedback-error-text">Something went wrong. Please try again.</span>
+            </div>
+
+            <form id="feedback-form" class="feedback-form" novalidate>
+
+                <!-- TYPE SELECTOR -->
+                <div class="form-group">
+                    <label class="form-label">Submission Type <span class="required">*</span></label>
+                    <div class="type-cards">
+                        <label class="type-card" data-type="feedback">
+                            <input type="radio" name="type" value="feedback">
+                            <div class="type-card-inner">
+                                <i class="fa-solid fa-comments"></i>
+                                <span class="type-card-title">Feedback</span>
+                                <span class="type-card-desc">Share your thoughts on our services &amp; products</span>
+                            </div>
+                        </label>
+                        <label class="type-card" data-type="suggestion">
+                            <input type="radio" name="type" value="suggestion">
+                            <div class="type-card-inner">
+                                <i class="fa-solid fa-lightbulb"></i>
+                                <span class="type-card-title">Suggestions &amp; Insights</span>
+                                <span class="type-card-desc">Constructive ideas to help us improve</span>
+                            </div>
+                        </label>
+                        <label class="type-card" data-type="partnership">
+                            <input type="radio" name="type" value="partnership">
+                            <div class="type-card-inner">
+                                <i class="fa-solid fa-handshake"></i>
+                                <span class="type-card-title">Partnership &amp; Collaboration</span>
+                                <span class="type-card-desc">Propose a collaboration with our organization</span>
+                            </div>
+                        </label>
+                    </div>
+                    <p class="field-error" id="type-error" style="display:none;">Please select a submission type.</p>
+                </div>
+
+                <!-- MESSAGE -->
+                <div class="form-group">
+                    <label class="form-label" for="feedback-message">Message <span class="required">*</span></label>
+                    <textarea id="feedback-message" name="message" rows="6" placeholder="Write your message here…"></textarea>
+                    <p class="field-error" id="message-error" style="display:none;">Please enter a message.</p>
+                </div>
+
+                <!-- ANONYMOUS TOGGLE -->
+                <div class="form-group anonymous-toggle-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="is-anonymous" checked>
+                        <span class="toggle-track"></span>
+                        <span class="toggle-text">Submit anonymously</span>
+                    </label>
+                </div>
+
+                <!-- CONTACT FIELDS (hidden by default) -->
+                <div id="contact-fields" class="contact-fields" style="display:none;">
+                    <p id="partnership-hint" class="partnership-hint" style="display:none;">
+                        <i class="fa-solid fa-info-circle"></i> Providing your contact details is recommended so we can follow up on your proposal.
+                    </p>
+                    <div class="contact-fields-inner">
+                        <div class="form-group">
+                            <label class="form-label" for="sender-name">Name</label>
+                            <input type="text" id="sender-name" placeholder="Your name (optional)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="sender-email">Email</label>
+                            <input type="email" id="sender-email" placeholder="your@email.com (optional)">
+                            <p class="field-error" id="email-error" style="display:none;">Please enter a valid email address.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" id="submit-btn" class="submit-btn">
+                        <span id="submit-btn-text">Submit</span>
+                        <span id="submit-btn-loading" style="display:none;"><i class="fa-solid fa-spinner fa-spin"></i> Submitting…</span>
+                    </button>
+                </div>
+
+            </form>
         </div>
     </main>
 
@@ -107,6 +193,7 @@
             </div>
         </div>
     </footer>
-
+    <script src="config.js"></script>
+    <script src="feedback.js"></script>
 </body>
 </html>

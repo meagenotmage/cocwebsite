@@ -160,6 +160,7 @@ td[class^="status-"] { font-weight: bold; cursor: pointer;}
 }
 .details-table thead { background-color: #f0f0f0; }
 .details-table td:first-child { padding-left: 25px; } /* Indent */
+.item-program { font-size: 0.78rem; color: #888; }
 
 /* Receipt Verification Section */
 .receipt-verification {

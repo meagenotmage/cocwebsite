@@ -141,9 +141,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         productName = item.name;
                     }
                     
+                    const programLabel = item.program ? `<br><span class="item-program">${item.program}</span>` : '';
+
                     return `
                         <tr>
-                            <td>${customerName}</td>
+                            <td>${customerName}${programLabel}</td>
                             <td>${productName}${item.size ? ' - ' + item.size : ''}</td>
                             <td>${item.quantity}</td>
                             <td>P ${item.price.toFixed(2)}</td>

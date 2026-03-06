@@ -20,14 +20,14 @@
             <nav class="sidebar-nav">
                 <ul>
                     <li><a href="admin.html"><i class="fa-solid fa-tachograph-digital"></i> Dashboard</a></li>
-                    <li class="active"><a href="adminFeedback.html"><i class="fa-solid fa-users"></i> Feedbacks</a></li>
+                    <li class="active"><a href="adminFeedback.html"><i class="fa-solid fa-comments"></i> Feedbacks</a></li>
                     <li><a href="adminOrder.html"><i class="fa-solid fa-box-archive"></i> Orders</a></li>
                     <li><a href="setUpEvent.html"><i class="fa-solid fa-calendar-plus"></i> Set-Up Event</a></li>
                     <li><a href="createAnnouncement.html"><i class="fa-solid fa-bullhorn"></i> Announcements</a></li>
                 </ul>
             </nav>
             <div class="sidebar-footer">
-                <a href="adminLogIn.html"><i class="fa-solid fa-question-circle"></i> Log out</a>
+                <a href="adminLogIn.html"><i class="fa-solid fa-right-from-bracket"></i> Log out</a>
             </div>
         </aside>
 
@@ -35,24 +35,89 @@
         <!--       MAIN CONTENT      -->
         <!-- ======================= -->
         <main class="main-content">
-            <div class="card placeholder-card">
-                <p>FEEDBACK COMING SOON!</p>
+            <div class="card">
+
+                <!-- Filter bar -->
+                <div class="feedback-toolbar">
+                    <div class="toolbar-left">
+                        <h2 class="list-title">
+                            Feedback Submissions
+                            <span class="unread-badge" id="unread-badge" style="display:none;"></span>
+                        </h2>
+                    </div>
+                    <div class="toolbar-right">
+                        <label for="filter-type" class="sr-only">Filter by type</label>
+                        <select id="filter-type" class="filter-select">
+                            <option value="">All Submissions</option>
+                            <option value="feedback">Feedback</option>
+                            <option value="suggestion">Suggestions &amp; Insights</option>
+                            <option value="partnership">Partnership &amp; Collaboration</option>
+                        </select>
+                        <select id="filter-status" class="filter-select">
+                            <option value="">All Statuses</option>
+                            <option value="unread">Unread</option>
+                            <option value="read">Read</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="table-container">
+                    <table class="feedback-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Message Preview</th>
+                                <th>Sender</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feedback-tbody">
+                            <!-- Rows injected by adminFeedback.js -->
+                        </tbody>
+                    </table>
+                    <p id="feedback-empty" class="empty-msg" style="display:none;">No submissions found.</p>
+                </div>
             </div>
         </main>
     </div>
-    
-    <script>
-        // Mobile nav toggle
-        document.addEventListener('DOMContentLoaded', function() {
-            const hamburgerBtn = document.querySelector('.hamburger-btn');
-            const sidebarNav = document.querySelector('.sidebar-nav');
-            
-            if (hamburgerBtn && sidebarNav) {
-                hamburgerBtn.addEventListener('click', function() {
-                    sidebarNav.classList.toggle('active');
-                });
-            }
-        });
-    </script>
+
+    <!-- ======================= -->
+    <!--    DETAIL MODAL         -->
+    <!-- ======================= -->
+    <div id="feedback-modal" class="fb-modal-overlay" style="display:none;" role="dialog" aria-modal="true">
+        <div class="fb-modal-content">
+            <button class="fb-modal-close" id="fb-modal-close" aria-label="Close">&times;</button>
+
+            <div class="fb-modal-header">
+                <span id="modal-type-badge" class="type-badge"></span>
+                <span id="modal-date" class="modal-date"></span>
+            </div>
+
+            <div class="fb-modal-section">
+                <h4>Message</h4>
+                <p id="modal-message" class="modal-message-body"></p>
+            </div>
+
+            <div class="fb-modal-section">
+                <h4>Sender</h4>
+                <p id="modal-sender" class="modal-sender-detail"></p>
+            </div>
+
+            <div class="fb-modal-section">
+                <h4>Admin Notes</h4>
+                <textarea id="modal-notes" rows="4" placeholder="Add internal notes here…"></textarea>
+                <button class="save-notes-btn" id="save-notes-btn">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Notes
+                </button>
+                <span id="notes-saved-msg" class="notes-saved-msg" style="display:none;">Saved!</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="adminFeedback.js"></script>
 </body>
 </html>
