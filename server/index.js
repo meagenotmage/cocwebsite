@@ -118,7 +118,8 @@ const orderSchema = new mongoose.Schema({
     size: String,
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },
-    customName: String
+    customName: String,
+    program: String
   }],
   total: { type: Number, required: true },
   status: { type: String, default: 'pending' },

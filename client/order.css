@@ -432,7 +432,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .size-guide-image img {
     max-width: 100%;
-    height: fit-content;
+    max-height: 65vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -714,6 +717,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Name Input Field for Uniforms */
 .name-input-field {
     margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 .name-input-field label {

@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const detailLabel = item.name.includes('Nameplate') ? 'Name' : 'Size';
             const customNameLabel = item.customName && !item.name.includes('Nameplate') ? `<p>Name: <span class="detail-red">${item.customName}</span></p>` : '';
+            const programLabel = item.program ? `<p>Program: <span class="detail-red">${item.program}</span></p>` : '';
             
             const orderItemDiv = document.createElement('div');
             orderItemDiv.classList.add('order-item');
@@ -49,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h3>${item.name}</h3>
                     <p>${detailLabel}: <span class="detail-red">${item.detail}</span></p>
                     ${customNameLabel}
+                    ${programLabel}
                     <div class="order-item-quantity">
                         <span>Quantity:</span>
                         <div class="quantity-controls">
@@ -153,6 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 name: item.name,
                 size: item.size || (item.name.toLowerCase().includes('nameplate') ? undefined : item.detail),
                 customName: item.customName || undefined,
+                program: item.program || undefined,
                 quantity: item.quantity,
                 price: item.price
             })),

@@ -24,6 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const nameTemplateInput = document.getElementById('template-name');
     const nameInputFieldContainer = productModal.querySelector('.name-input-field');
     const uniformNameInput = document.getElementById('uniform-name');
+    const programInputFieldContainer = document.getElementById('program-input-field');
+    const programNameInput = document.getElementById('program-name');
     const sizesContainer = productModal.querySelector('.sizes');
     
     // Load cart from localStorage
@@ -152,12 +154,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (nameTemplateInput) nameTemplateInput.value = '';
                 }
                 if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'none';
+                if (programInputFieldContainer) programInputFieldContainer.style.display = 'none';
             } else if (name === 'COC Lanyard') {
                 // Lanyard doesn't need a size - it's one size fits all
                 sizesContainer.style.display = 'none';
                 if (modalSizeGuideLink) modalSizeGuideLink.style.display = 'none';
                 if (nameTemplateInputContainer) nameTemplateInputContainer.style.display = 'none';
                 if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'none';
+                if (programInputFieldContainer) programInputFieldContainer.style.display = 'none';
                 setActiveSize('One Size');
             } else if (requiresName) {
                 sizesContainer.style.display = 'block';
@@ -167,6 +171,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     nameInputFieldContainer.style.display = 'block';
                     if (uniformNameInput) uniformNameInput.value = '';
                 }
+                if (programInputFieldContainer) {
+                    programInputFieldContainer.style.display = 'block';
+                    if (programNameInput) programNameInput.value = '';
+                }
                 setActiveSize('');
             } else if (name.includes('Uniform')) {
                 // All uniforms should have size guide
@@ -174,12 +182,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (modalSizeGuideLink) modalSizeGuideLink.style.display = 'block';
                 if (nameTemplateInputContainer) nameTemplateInputContainer.style.display = 'none';
                 if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'none';
+                if (programInputFieldContainer) programInputFieldContainer.style.display = 'none';
                 setActiveSize('');
             } else {
                 sizesContainer.style.display = 'block';
                 if (modalSizeGuideLink) modalSizeGuideLink.style.display = 'none';
                 if (nameTemplateInputContainer) nameTemplateInputContainer.style.display = 'none';
                 if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'none';
+                if (programInputFieldContainer) programInputFieldContainer.style.display = 'none';
                 setActiveSize('');
             }
             productModal.style.display = 'flex';
@@ -240,6 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
     addToCartBtn.addEventListener('click', (e) => {
         let customDetail = selectedSize;
         let customName = null;
+        let customProgram = null;
         const requiresName = e.target.dataset.requiresName === 'true';
         const productName = e.target.dataset.name;
         
@@ -263,6 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             customName = uniformNameInput.value.trim();
+            customProgram = programNameInput ? programNameInput.value.trim() : '';
         } else if (!selectedSize) {
             showConfirmation('Error', '<p>Please select a size.</p>', false);
             return;
@@ -276,13 +288,15 @@ document.addEventListener('DOMContentLoaded', () => {
             detail: customDetail,
             img: e.target.dataset.img,
             customName: customName,
+            program: customProgram || null,
             size: !customName || e.target.dataset.name === 'COC Nameplate' ? null : customDetail
         };
 
         const existingItemIndex = cart.findIndex(cartItem => 
             cartItem.id === item.id && 
             cartItem.detail === item.detail && 
-            cartItem.customName === item.customName
+            cartItem.customName === item.customName &&
+            cartItem.program === item.program
         );
 
         if (existingItemIndex > -1) {
@@ -295,11 +309,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const detailLabel = item.name === 'COC Nameplate' ? 'Name' : 'Size';
         const nameInfo = customName && item.name !== 'COC Nameplate' ? `<p>Name: ${customName}</p>` : '';
+        const programInfo = customProgram ? `<p>Program: ${customProgram}</p>` : '';
         showConfirmation(
             'Added to Cart!',
             `<p><strong>${item.quantity} x ${item.name}</strong></p>
              <p>${detailLabel}: ${item.detail}</p>
              ${nameInfo}
+             ${programInfo}
              <p>Price: ₱${(item.price * item.quantity).toFixed(2)}</p>`
         );
     });
@@ -314,6 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
     productModalCheckoutBtn.addEventListener('click', () => {
         let customDetail = selectedSize;
         let customName = null;
+        let customProgram = null;
         const productName = addToCartBtn.dataset.name;
         const requiresName = addToCartBtn.dataset.requiresName === 'true';
         
@@ -337,6 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             customName = uniformNameInput.value.trim();
+            customProgram = programNameInput ? programNameInput.value.trim() : '';
         } else if (!selectedSize) {
             showConfirmation('Error', '<p>Please select a size.</p>', false);
             return;
@@ -350,6 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
             detail: customDetail,
             img: addToCartBtn.dataset.img,
             customName: customName,
+            program: customProgram || null,
             size: !customName || productName === 'COC Nameplate' ? null : customDetail
         };
 
@@ -422,6 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
             totalPrice += itemTotal;
             const detailLabel = item.name === 'COC Nameplate' ? 'Name' : 'Size';
             const nameInfo = item.customName && item.name !== 'COC Nameplate' ? `<p>Name: ${item.customName}</p>` : '';
+            const programInfo = item.program ? `<p>Program: ${item.program}</p>` : '';
             const cartItemDiv = document.createElement('div');
             cartItemDiv.classList.add('cart-item');
             cartItemDiv.innerHTML = `
@@ -430,6 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p>${item.name}</p>
                     <p>${detailLabel}: ${item.detail}</p>
                     ${nameInfo}
+                    ${programInfo}
                     <p>Qty: ${item.quantity}</p>
                 </div>
                 <div class="cart-item-price">₱${itemTotal.toFixed(2)}</div>
