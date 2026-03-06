@@ -193,21 +193,6 @@ body {
 .toggle-switch input:checked + .toggle-slider::before {
     transform: translateX(20px);
 }
-.save-settings-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    background-color: #8B0000;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
 .save-settings-btn:hover { background-color: #6a0000; }
 .settings-status {
     font-size: 0.82rem;

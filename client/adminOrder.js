@@ -19,8 +19,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const exportExcelBtn = document.getElementById('export-excel-btn');
     const toggleGcash = document.getElementById('toggle-gcash');
     const toggleCash = document.getElementById('toggle-cash');
-    const saveSettingsBtn = document.getElementById('save-payment-settings-btn');
-    const settingsStatus = document.getElementById('payment-settings-status');
     let allOrders = [];
 
     // Load payment settings
@@ -38,26 +36,21 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     loadPaymentSettings();
 
-    saveSettingsBtn.addEventListener('click', async () => {
+    async function savePaymentSettings() {
         try {
-            const res = await fetch(`${CONFIG.API_URL}/api/settings/payment`, {
+            await fetch(`${CONFIG.API_URL}/api/settings/payment`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify({ gcashEnabled: toggleGcash.checked, cashEnabled: toggleCash.checked })
             });
-            if (res.ok) {
-                settingsStatus.textContent = 'Saved!';
-                setTimeout(() => { settingsStatus.textContent = ''; }, 2500);
-            } else {
-                settingsStatus.style.color = '#c62828';
-                settingsStatus.textContent = 'Failed to save.';
-            }
         } catch (e) {
-            settingsStatus.style.color = '#c62828';
-            settingsStatus.textContent = 'Error saving settings.';
+            console.error('Error saving payment settings', e);
         }
-    });
+    }
+
+    toggleGcash.addEventListener('change', savePaymentSettings);
+    toggleCash.addEventListener('change', savePaymentSettings);
 
     // Load orders from API
     async function loadOrders() {
