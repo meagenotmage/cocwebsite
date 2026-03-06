@@ -69,14 +69,18 @@ document.addEventListener('DOMContentLoaded', function () {
             );
             const orderIndex = allOrdersSorted.findIndex(o => o._id === order._id);
             const orderNumber = String(orderIndex + 1).padStart(4, '0');
-            const paymentStatusClass = order.status === 'paid' ? 'status-paid' : 'status-not-paid';
-            
-            // Determine payment status display (Paid or Pending)
-            let paymentStatusText = 'Pending';
+
+            // Payment status badge
+            let paymentStatusClass, paymentStatusText;
             if (order.status === 'paid') {
-                paymentStatusText = 'Paid ✓';
-            } else if (order.status === 'pending_payment' && order.receiptUrl) {
+                paymentStatusClass = 'status-paid';
+                paymentStatusText = 'Paid';
+            } else if (order.status === 'pending_payment') {
+                paymentStatusClass = 'status-pending';
                 paymentStatusText = 'Pending';
+            } else {
+                paymentStatusClass = 'status-not-paid';
+                paymentStatusText = 'Not Paid';
             }
             
             // Determine received/delivery status display (Received or Not Received)
@@ -115,13 +119,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 <td>P ${order.total.toFixed(2)}</td>
                 <td>${orderNumber}</td>
                 <td class="timestamp">${timestamp}</td>
-                <td class="payment-status-cell"><span class="${order.status === 'pending_payment' && order.receiptUrl ? 'status-pending' : paymentStatusClass}">${paymentStatusText}</span></td>
+                <td class="payment-status-cell"><span class="${paymentStatusClass}">${paymentStatusText}</span></td>
                 <td class="delivery-status-cell"><span class="${deliveryStatusClass}">${deliveryStatusText}</span></td>
                 <td>
                     <div class="actions">
                         <i class="fa-solid fa-chevron-down toggle-details"></i>
                         ${order.receiptUrl ? '<i class="fa-solid fa-image view-receipt" title="View Receipt" data-order-id="' + order._id + '"></i>' : ''}
-                        <i class="fa-solid fa-pencil"></i>
                         <i class="fa-solid fa-trash delete-order" data-order-id="${order._id}"></i>
                     </div>
                 </td>
@@ -260,10 +263,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if ((target.cellIndex === 6 || target.cellIndex === 7) && !target.querySelector('select')) {
             const currentStatus = target.querySelector('span')?.textContent.trim() || target.textContent.trim();
             const isPaymentStatus = target.cellIndex === 6;
-            const options = isPaymentStatus ? ['Paid', 'Pending'] : ['Received', 'Not Received'];
+            const options = isPaymentStatus ? ['Paid', 'Pending', 'Not Paid'] : ['Received', 'Not Received'];
 
             // Create a select dropdown
             const select = document.createElement('select');
+            select.className = 'inline-status-select';
             options.forEach(option => {
                 const opt = document.createElement('option');
                 opt.value = option;

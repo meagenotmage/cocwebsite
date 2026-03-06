@@ -164,12 +164,32 @@ body {
     font-weight: 600;
     white-space: nowrap;
 }
-.status-paid     { background: #e8f5e9; color: #2e7d32; }
-.status-not-paid { background: #fdecea; color: #c62828; }
+.status-paid         { background: #e8f5e9; color: #2e7d32; }
+.status-not-paid     { background: #fdecea; color: #c62828; }
 .status-received     { background: #e8f5e9; color: #2e7d32; }
 .status-not-received { background: #fdecea; color: #c62828; }
+.status-pending      { background: #fff3e0; color: #e65100; }
 .payment-status-cell,
 .delivery-status-cell { cursor: pointer; }
+
+/* Inline status edit dropdown */
+.inline-status-select {
+    padding: 5px 10px;
+    border: 1.5px solid #ddd;
+    border-radius: 7px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.8rem;
+    color: #444;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    min-width: 110px;
+}
+.inline-status-select:focus {
+    border-color: #8B0000;
+    box-shadow: 0 0 0 3px rgba(139,0,0,0.08);
+}
 
 /* Actions Column */
 .orders-table td:last-child { padding: 0 14px; }
@@ -342,9 +362,6 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     object-fit: contain;
 }
-
-/* Pending Status is already covered by the shared status rule above */
-.status-pending { background: #fff3e0; color: #e65100; }
 
 /* Timestamp Column */
 .timestamp {
