@@ -66,6 +66,10 @@ const corsOptions = {
     else if (origin.includes('vercel.app')) {
       callback(null, true);
     }
+    // Allow all Netlify deployments
+    else if (origin.includes('netlify.app')) {
+      callback(null, true);
+    }
     // Check if origin is in allowed list
     else if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
       callback(null, true);
