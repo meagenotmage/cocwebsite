@@ -105,40 +105,61 @@ body {
 
 /* Orders Table */
 .table-container { overflow-x: auto; }
-.orders-table { width: 100%; border-collapse: collapse; }
-.orders-table th, .orders-table td { padding: 12px 10px; text-align: left; font-size: 0.85rem; }
-
-/* Main Header */
-.orders-table > thead > tr { background-color: #8B0000; color: #FFF; }
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+.orders-table th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid #f0f0f0;
+    white-space: nowrap;
+}
+.orders-table td {
+    padding: 13px 14px;
+    border-bottom: 1px solid #f5f5f5;
+    vertical-align: middle;
+    color: #333;
+    font-size: 0.88rem;
+}
+.orders-table tbody tr:last-child td {
+    border-bottom: none;
+}
+.orders-table tbody tr:hover {
+    background: #fafafa;
+}
 
 /* Order Summary Row */
 .order-summary {
-    background-color: #FEEEEE;
-    border-bottom: 2px solid #fff;
-    font-weight: 500;
+    border-bottom: 1px solid #f5f5f5;
 }
 .order-summary td { vertical-align: middle; }
-.order-summary:nth-child(odd) { background-color: #FDECEC; }
-.order-summary:nth-child(even) { background-color: #FADADD; }
 
 
 /* Statuses */
-.status-paid { color: #2E8B57; }
-.status-not-paid { color: #DC143C; }
-.status-received { color: #2E8B57; }
-.status-not-received { color: #DC143C; }
-td[class^="status-"] { font-weight: bold; cursor: pointer;}
+.status-paid   { display:inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: #e8f5e9; color: #2e7d32; }
+.status-not-paid { display:inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: #fdecea; color: #c62828; }
+.status-received    { display:inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: #e8f5e9; color: #2e7d32; }
+.status-not-received { display:inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: #fdecea; color: #c62828; }
+td[class^="status-"] { cursor: pointer; }
 
 /* Actions Column */
-.actions { text-align: right; }
+.actions { text-align: right; display: flex; gap: 4px; justify-content: flex-end; align-items: center; }
 .actions i {
     cursor: pointer;
-    color: #333;
-    transition: color 0.2s, transform 0.3s;
-    margin: 0 5px;
-    font-size: 1rem;
+    color: #555;
+    transition: background 0.15s, color 0.15s;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 0.95rem;
 }
-.actions i:hover { color: #D32F2F; }
+.actions i:hover { background: #fdecea; color: #D32F2F; }
 .actions .toggle-details.is-open { transform: rotate(180deg); }
 
 /* Order Details Row */
@@ -301,9 +322,13 @@ td[class^="status-"] { font-weight: bold; cursor: pointer;}
 
 /* Pending Status */
 .status-pending {
-    background-color: #FFF3CD;
-    color: #856404;
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
     font-weight: 600;
+    background: #fff3e0;
+    color: #e65100;
 }
 
 /* Timestamp Column */
