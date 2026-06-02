@@ -111,7 +111,14 @@ const eventSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+// Order Counter Schema - maintains persistent order numbering across deletions
+const orderCounterSchema = new mongoose.Schema({
+  _id: { type: String, default: 'orderCounter' },
+  count: { type: Number, default: 0 }
+});
+
 const orderSchema = new mongoose.Schema({
+  orderNumber: { type: Number, unique: true, required: true }, // Persistent order number - survives deletions
   fullName: { type: String, required: true },
   phone: { type: String, required: true },
   email: { type: String, required: true },
@@ -128,12 +135,18 @@ const orderSchema = new mongoose.Schema({
   total: { type: Number, required: true },
   status: { type: String, default: 'pending' },
   receiptUrl: { type: String },
+  markedForDeletion: { type: Boolean, default: false },
+  deletionWarningDate: { type: Date, default: null }, // Date when deletion warning was issued
   createdAt: { type: Date, default: Date.now }
 });
+
+// Prevent TTL indexes from accidentally deleting orders
+orderSchema.set('skipVersioning', true);
 
 const Announcement = mongoose.model('Announcement', announcementSchema);
 const Event = mongoose.model('Event', eventSchema);
 const Order = mongoose.model('Order', orderSchema);
+const OrderCounter = mongoose.model('OrderCounter', orderCounterSchema);
 
 const feedbackSchema = new mongoose.Schema({
   type: { type: String, enum: ['feedback', 'suggestion', 'partnership'], required: true },
@@ -333,7 +346,17 @@ app.post('/api/orders', async (req, res) => {
       return res.status(400).json({ message: 'All fields are required.' });
     }
     
+    // Get the next persistent order number using atomic counter
+    let counter = await OrderCounter.findByIdAndUpdate(
+      'orderCounter',
+      { $inc: { count: 1 } },
+      { new: true, upsert: true }
+    );
+    
+    const orderNumber = counter.count;
+    
     const order = new Order({
+      orderNumber: orderNumber,
       fullName,
       phone,
       email,
@@ -347,14 +370,7 @@ app.post('/api/orders', async (req, res) => {
     
     await order.save();
     
-    // Calculate order number based on creation order
-    const allOrders = await Order.find().sort({ createdAt: 1 });
-    const orderIndex = allOrders.findIndex(o => o._id.toString() === order._id.toString());
-    const orderNumber = String(orderIndex + 1).padStart(4, '0');
-    
-    // Add order number to response
     const orderWithNumber = order.toObject();
-    orderWithNumber.orderNumber = orderNumber;
     
     res.status(201).json({ message: 'Order placed successfully!', order: orderWithNumber });
   } catch (err) {
@@ -406,17 +422,157 @@ app.put('/api/orders/:id', async (req, res) => {
   }
 });
 
-// Delete order (for admin)
-app.delete('/api/orders/:id', async (req, res) => {
+// Delete order (for admin) - DISABLED. Use mark-for-deletion instead for safety
+// app.delete('/api/orders/:id', async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     await Order.findByIdAndDelete(id);
+//     res.json({ message: 'Order deleted successfully!' });
+//   } catch (err) {
+//     console.error('Error deleting order:', err);
+//     res.status(500).json({ message: 'Failed to delete order.' });
+//   }
+// });
+
+// Mark order for deletion with 7-day warning (for admin)
+app.post('/api/orders/:id/mark-for-deletion', async (req, res) => {
   try {
     const { id } = req.params;
-    await Order.findByIdAndDelete(id);
-    res.json({ message: 'Order deleted successfully!' });
+    const order = await Order.findByIdAndUpdate(
+      id,
+      { 
+        markedForDeletion: true,
+        deletionWarningDate: new Date()
+      },
+      { new: true }
+    );
+    
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found.' });
+    }
+    
+    const deleteDate = new Date(order.deletionWarningDate);
+    deleteDate.setDate(deleteDate.getDate() + 7);
+    
+    res.json({ 
+      message: 'Order marked for deletion with 7-day warning.',
+      order,
+      deleteDate: deleteDate.toISOString(),
+      daysUntilDeletion: 7
+    });
   } catch (err) {
-    console.error('Error deleting order:', err);
-    res.status(500).json({ message: 'Failed to delete order.' });
+    console.error('Error marking order for deletion:', err);
+    res.status(500).json({ message: 'Failed to mark order for deletion.' });
   }
 });
+
+// Get orders marked for deletion (for admin)
+app.get('/api/orders/marked-for-deletion', async (req, res) => {
+  try {
+    const orders = await Order.find({ markedForDeletion: true }).sort({ deletionWarningDate: -1 });
+    
+    const ordersWithWarningInfo = orders.map(order => {
+      const deleteDate = new Date(order.deletionWarningDate);
+      deleteDate.setDate(deleteDate.getDate() + 7);
+      const daysUntilDeletion = Math.ceil((deleteDate - new Date()) / (1000 * 60 * 60 * 24));
+      
+      return {
+        ...order.toObject(),
+        deleteDate: deleteDate.toISOString(),
+        daysUntilDeletion: Math.max(0, daysUntilDeletion)
+      };
+    });
+    
+    res.json(ordersWithWarningInfo);
+  } catch (err) {
+    console.error('Error fetching marked orders:', err);
+    res.status(500).json({ message: 'Failed to fetch marked orders.' });
+  }
+});
+
+// Cancel deletion warning (for admin)
+app.post('/api/orders/:id/cancel-deletion', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findByIdAndUpdate(
+      id,
+      { 
+        markedForDeletion: false,
+        deletionWarningDate: null
+      },
+      { new: true }
+    );
+    
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found.' });
+    }
+    
+    res.json({ 
+      message: 'Deletion warning cancelled.',
+      order
+    });
+  } catch (err) {
+    console.error('Error cancelling deletion:', err);
+    res.status(500).json({ message: 'Failed to cancel deletion.' });
+  }
+});
+
+// Get deletion warnings (orders that are 7+ days marked and ready to delete)
+app.get('/api/orders/deletion-warnings', async (req, res) => {
+  try {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    const ordersReadyForDeletion = await Order.find({
+      markedForDeletion: true,
+      deletionWarningDate: { $lte: sevenDaysAgo }
+    }).sort({ deletionWarningDate: 1 });
+    
+    res.json({
+      warningCount: ordersReadyForDeletion.length,
+      orders: ordersReadyForDeletion,
+      message: `${ordersReadyForDeletion.length} order(s) ready for permanent deletion after 7-day warning period.`
+    });
+  } catch (err) {
+    console.error('Error fetching deletion warnings:', err);
+    res.status(500).json({ message: 'Failed to fetch deletion warnings.' });
+  }
+});
+
+// Permanently delete order after 7-day warning period (for admin only)
+app.delete('/api/orders/:id/permanent-delete', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findById(id);
+    
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found.' });
+    }
+    
+    if (!order.markedForDeletion) {
+      return res.status(400).json({ message: 'Order has not been marked for deletion. Use /mark-for-deletion first.' });
+    }
+    
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    if (order.deletionWarningDate > sevenDaysAgo) {
+      const deleteDate = new Date(order.deletionWarningDate);
+      deleteDate.setDate(deleteDate.getDate() + 7);
+      return res.status(400).json({ 
+        message: 'Deletion warning period has not expired yet.',
+        deleteDate: deleteDate.toISOString()
+      });
+    }
+    
+    await Order.findByIdAndDelete(id);
+    res.json({ message: 'Order permanently deleted after 7-day warning period.' });
+  } catch (err) {
+    console.error('Error permanently deleting order:', err);
+    res.status(500).json({ message: 'Failed to permanently delete order.' });
+  }
+});
+
 
 // --- FEEDBACK ROUTES ---
 
@@ -536,9 +692,58 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// --- 4b. DELETION WARNING CHECK ---
+async function checkDeletionWarnings() {
+  try {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    const threeHoursFromNow = new Date();
+    threeHoursFromNow.setHours(threeHoursFromNow.getHours() + 3);
+    
+    // Get orders ready for deletion (7+ days marked)
+    const readyForDeletion = await Order.find({
+      markedForDeletion: true,
+      deletionWarningDate: { $lte: sevenDaysAgo }
+    });
+    
+    // Get orders with warning expiring soon (3+ days, but less than 7)
+    const sixDaysAgo = new Date();
+    sixDaysAgo.setDate(sixDaysAgo.getDate() - 6);
+    const ordersWithWarningExpiringSoon = await Order.find({
+      markedForDeletion: true,
+      deletionWarningDate: { $gt: sevenDaysAgo, $lte: sixDaysAgo }
+    });
+    
+    if (readyForDeletion.length > 0) {
+      console.warn(`
+⚠️  [DELETION ALERT] ${readyForDeletion.length} order(s) marked for deletion are now ready for permanent deletion!
+Orders: ${readyForDeletion.map(o => `#${o.orderNumber}`).join(', ')}
+Action required: Admin must call DELETE /api/orders/:id/permanent-delete to finalize deletion.
+      `);
+    }
+    
+    if (ordersWithWarningExpiringSoon.length > 0) {
+      console.log(`
+⚠️  [DELETION WARNING] ${ordersWithWarningExpiringSoon.length} order(s) will be ready for deletion soon (in 1-3 days).
+Orders: ${ordersWithWarningExpiringSoon.map(o => `#${o.orderNumber}`).join(', ')}
+      `);
+    }
+  } catch (err) {
+    console.error('Error checking deletion warnings:', err);
+  }
+}
+
+
 // --- 5. START SERVER ---
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  
+  // Check for orders marked for deletion on startup
+  checkDeletionWarnings();
+  
+  // Check for deletion warnings every 24 hours
+  setInterval(checkDeletionWarnings, 24 * 60 * 60 * 1000);
   
   // Self-ping to keep Render service active (every 14 minutes)
   if (process.env.NODE_ENV === 'production' && process.env.RENDER_SERVICE_URL) {

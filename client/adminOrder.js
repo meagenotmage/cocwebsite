@@ -98,12 +98,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         ordersTbody.innerHTML = '';
         sortedOrders.forEach((order, index) => {
-            // Sequential order number based on creation order (oldest = 0001)
-            const allOrdersSorted = [...orders].sort((a, b) => 
-                new Date(a.createdAt) - new Date(b.createdAt)
-            );
-            const orderIndex = allOrdersSorted.findIndex(o => o._id === order._id);
-            const orderNumber = String(orderIndex + 1).padStart(4, '0');
+            // Use persistent orderNumber from database
+            const orderNumber = String(order.orderNumber).padStart(4, '0');
 
             // Payment status badge
             let paymentStatusClass, paymentStatusText;
@@ -143,11 +139,25 @@ document.addEventListener('DOMContentLoaded', function () {
             // Create summary row
             const summaryRow = document.createElement('tr');
             summaryRow.className = 'order-summary';
+            if (order.markedForDeletion) {
+                summaryRow.classList.add('marked-for-deletion');
+            }
             summaryRow.dataset.name = order.fullName;
             summaryRow.dataset.orderId = order._id;
             summaryRow.dataset.payment = order.paymentMethod;
             summaryRow.dataset.section = order.programYear;
             summaryRow.dataset.items = order.items ? order.items.map(i => i.name).join('|').toLowerCase() : '';
+            
+            // Calculate days until deletion if marked
+            let deletionWarningHTML = '';
+            if (order.markedForDeletion && order.deletionWarningDate) {
+                const deleteDate = new Date(order.deletionWarningDate);
+                deleteDate.setDate(deleteDate.getDate() + 7);
+                const daysUntilDeletion = Math.ceil((deleteDate - new Date()) / (1000 * 60 * 60 * 24));
+                const warningClass = daysUntilDeletion <= 0 ? 'deletion-ready' : 'deletion-warning';
+                deletionWarningHTML = `<span class="deletion-badge ${warningClass}" title="Marked for deletion">🗑️ ${Math.max(0, daysUntilDeletion)}d</span>`;
+            }
+            
             summaryRow.innerHTML = `
                 <td>${order.fullName}</td>
                 <td>${order.programYear}</td>
@@ -159,9 +169,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 <td class="delivery-status-cell"><span class="${deliveryStatusClass}">${deliveryStatusText}</span></td>
                 <td>
                     <div class="actions">
+                        ${deletionWarningHTML}
                         <i class="fa-solid fa-chevron-down toggle-details"></i>
                         ${order.receiptUrl ? '<i class="fa-solid fa-image view-receipt" title="View Receipt" data-order-id="' + order._id + '"></i>' : ''}
-                        <i class="fa-solid fa-trash delete-order" data-order-id="${order._id}"></i>
+                        ${order.markedForDeletion ? `<i class="fa-solid fa-undo cancel-deletion" title="Cancel Deletion" data-order-id="${order._id}"></i>` : `<i class="fa-solid fa-trash delete-order" title="Mark for Deletion" data-order-id="${order._id}"></i>`}
                     </div>
                 </td>
             `;
@@ -297,8 +308,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // EXPORT TO EXCEL
     exportExcelBtn.addEventListener('click', function () {
-        const allOrdersSorted = [...allOrders].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-
         // Collect only currently visible orders
         const visibleRows = Array.from(ordersTbody.querySelectorAll('.order-summary')).filter(r => r.style.display !== 'none');
         const visibleIds = new Set(visibleRows.map(r => r.dataset.orderId));
@@ -309,8 +318,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .filter(order => visibleIds.has(order._id))
             .forEach(order => {
-                const orderIndex = allOrdersSorted.findIndex(o => o._id === order._id);
-                const orderNumber = String(orderIndex + 1).padStart(4, '0');
+                const orderNumber = String(order.orderNumber).padStart(4, '0');
 
                 let paymentStatusText = 'Not Paid';
                 if (order.status === 'paid') paymentStatusText = 'Paid';
@@ -487,32 +495,58 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // 6. DELETE ACTION
+    // 6. DELETE ACTION (Mark for Deletion with 7-day Warning)
     ordersTbody.addEventListener('click', async function(e) {
         if (e.target.classList.contains('fa-trash') || e.target.classList.contains('delete-order')) {
             const summaryRow = e.target.closest('tr');
             const orderId = summaryRow.dataset.orderId;
-            const detailsRow = summaryRow.nextElementSibling;
 
-            if (confirm('Are you sure you want to delete this order?')) {
+            if (confirm('Mark this order for deletion? It will be permanently deleted after 7 days.\n\nYou can cancel the deletion within 7 days.')) {
                 try {
-                    const response = await fetch(`${CONFIG.API_URL}/api/orders/${orderId}`, {
-                        method: 'DELETE',
+                    const response = await fetch(`${CONFIG.API_URL}/api/orders/${orderId}/mark-for-deletion`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
                         credentials: 'include'
                     });
 
                     if (response.ok) {
-                        summaryRow.remove();
-                        if (detailsRow && detailsRow.classList.contains('order-details')) {
-                            detailsRow.remove();
-                        }
-                        alert('Order deleted successfully');
+                        const result = await response.json();
+                        const deleteDate = new Date(result.deleteDate);
+                        alert(`Order #${String(result.order.orderNumber).padStart(4, '0')} marked for deletion.\n\nIt will be permanently deleted on:\n${deleteDate.toLocaleString()}`);
+                        loadOrders(); // Refresh the order list
                     } else {
-                        alert('Failed to delete order');
+                        alert('Failed to mark order for deletion');
                     }
                 } catch (error) {
-                    console.error('Error deleting order:', error);
-                    alert('Error deleting order');
+                    console.error('Error marking order for deletion:', error);
+                    alert('Error marking order for deletion');
+                }
+            }
+        }
+        
+        // Cancel deletion
+        if (e.target.classList.contains('fa-undo') || e.target.classList.contains('cancel-deletion')) {
+            const summaryRow = e.target.closest('tr');
+            const orderId = summaryRow.dataset.orderId;
+
+            if (confirm('Cancel the deletion warning for this order?')) {
+                try {
+                    const response = await fetch(`${CONFIG.API_URL}/api/orders/${orderId}/cancel-deletion`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include'
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        alert(`Deletion cancelled for order #${String(result.order.orderNumber).padStart(4, '0')}`);
+                        loadOrders(); // Refresh the order list
+                    } else {
+                        alert('Failed to cancel deletion');
+                    }
+                } catch (error) {
+                    console.error('Error cancelling deletion:', error);
+                    alert('Error cancelling deletion');
                 }
             }
         }

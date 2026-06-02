@@ -592,3 +592,51 @@ body {
         width: 100%;
     }
 }
+
+/* Deletion Warning Styles */
+.deletion-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-right: 8px;
+    white-space: nowrap;
+}
+
+.deletion-badge.deletion-warning {
+    background-color: #FFF3CD;
+    color: #856404;
+    border: 1px solid #FFEAA7;
+}
+
+.deletion-badge.deletion-ready {
+    background-color: #F8D7DA;
+    color: #721C24;
+    border: 1px solid #F5C6CB;
+    animation: pulse-warning 1.5s infinite;
+}
+
+@keyframes pulse-warning {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.order-summary.marked-for-deletion {
+    background-color: #FFF5F5;
+    opacity: 0.95;
+}
+
+.order-summary.marked-for-deletion td {
+    border-left: 3px solid #D32F2F;
+}
+
+.cancel-deletion {
+    cursor: pointer;
+    color: #1976D2;
+    transition: color 0.3s;
+}
+
+.cancel-deletion:hover {
+    color: #1565C0;
+}
