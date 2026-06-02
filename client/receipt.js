@@ -50,7 +50,7 @@ function populateReceipt(order) {
     
     // Order number - fetch from session or use from order object
     const orderNumber = order.orderNumber || sessionStorage.getItem('orderNumber') || '0001';
-    document.getElementById('order-number').textContent = orderNumber;
+    document.getElementById('order-number').textContent = String(orderNumber).padStart(4, '0');
 
     // Order items
     const itemsTableBody = document.getElementById('receipt-items');
