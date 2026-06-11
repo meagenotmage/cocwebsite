@@ -1,9 +1,3 @@
-const CONFIG = {
-    API_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-      ? 'http://localhost:3001'
-      : 'https://cocwebsite-rocz.onrender.com'
-};
-
 const loginForm = document.getElementById("login-form");
 
 if (loginForm) {
