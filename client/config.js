@@ -13,6 +13,7 @@ const CONFIG = {
     ANNOUNCEMENTS: '/api/announcements',
     EVENTS: '/api/events',
     FEEDBACK: '/api/feedback',
+    LOGIN: '/api/admin/login',
     ROOT: '/'
   }
 };
