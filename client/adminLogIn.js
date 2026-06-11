@@ -1,28 +1,36 @@
+const CONFIG = {
+    API_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:3001'
+      : 'https://cocwebsite-rocz.onrender.com'
+};
+
 const loginForm = document.getElementById("login-form");
 
-loginForm.addEventListener("submit", async function(event) {
-    event.preventDefault();
+if (loginForm) {
+    loginForm.addEventListener("submit", async function(event) {
+        event.preventDefault();
 
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
 
-    try {
-        const response = await fetch('http://localhost:3000/api/admin/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
+        try {
+            // Using the centralized CONFIG object here
+            const response = await fetch(`${CONFIG.API_BASE_URL}${CONFIG.ENDPOINTS.LOGIN}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
 
-        const data = await response.json();
+            const data = await response.json();
 
-        if (data.success) {
-            // Redirect to admin page
-            window.location.href = 'admin.html';
-        } else {
-            alert("Login failed: " + data.message);
+            if (response.ok && data.success) {
+                window.location.href = 'admin.html';
+            } else {
+                alert("Login failed: " + (data.message || "Invalid credentials"));
+            }
+        } catch (error) {
+            console.error("Login Error:", error);
+            alert("Could not connect to the server.");
         }
-    } catch (error) {
-        console.error("Error:", error);
-        alert("Server error. Try again later.");
-    }
-});
+    });
+}
