@@ -1,23 +1,28 @@
-// Admin credentials
-const adminEmail = "cocadmin@coc.web";
-const adminPassword = "Admin@2026";
-
 const loginForm = document.getElementById("login-form");
 
-if (loginForm) {
-    loginForm.addEventListener("submit", function(event) {
-        event.preventDefault();
+loginForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
 
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-        console.log("Attempting login with:", email); // Debugging line
+    try {
+        const response = await fetch('http://localhost:3000/api/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
 
-        if (email === adminEmail && password === adminPassword) {
-            alert("Login Successful!");
+        const data = await response.json();
+
+        if (data.success) {
+            // Redirect to admin page
             window.location.href = 'admin.html';
         } else {
-            alert("Invalid email or password.");
+            alert("Login failed: " + data.message);
         }
-    });
-}
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Server error. Try again later.");
+    }
+});
