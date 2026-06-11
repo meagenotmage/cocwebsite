@@ -12,6 +12,12 @@ const CONFIG = {
         POST_EVENT: '/api/events'
     }
 };
+// Helper function to build full API URL
+function getApiUrl(endpoint) {
+  return CONFIG.API_URL + (CONFIG.ENDPOINTS[endpoint] || endpoint);
+}
 
-// If you want to use this in other files, 
-// just make sure this script is loaded BEFORE your other JS files in HTML.
+// Export for use in other files
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = CONFIG;
+}
