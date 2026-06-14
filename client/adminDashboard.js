@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const API_BASE_URL = CONFIG.API_URL;
+    const API_URL = CONFIG.API_URL;
+    const endpoints = CONFIG.ENDPOINTS;
 
     // ======================= //
     //   MOBILE NAV TOGGLE     //
@@ -80,9 +81,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fetch and update orders data
     async function loadOrdersData() {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/orders`, {
+            const response = await fetch(`${API_URL}/api/orders`, {
                 credentials: 'include'
             });
+            if (response.status === 401) {
+                window.location.href = 'adminLogIn.html';
+                return;
+            }
             if (!response.ok) throw new Error('Failed to fetch orders');
             
             const orders = await response.json();
@@ -118,7 +123,33 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error loading orders data:', error);
         }
     }
-
+    async function updateOrderStatus(orderId, newFields) {
+        // newFields example: { paymentStatus: 'Paid' } or { status: 'Received' }
+        try {
+            const response = await fetch(`${CONFIG.API_URL}/api/orders/${orderId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(newFields)
+            });
+            if (response.ok) {
+                alert("Order Updated!");
+                loadOrdersData(); // Refresh chart and list
+            }
+        } catch (e) { alert("Update failed"); }
+    }
+// Admin Dashboard Toggle Logic (toggle lives on adminOrder.html, not admin.html)
+    const gcashToggle = document.getElementById('toggle-gcash');
+    if (gcashToggle) {
+        gcashToggle.addEventListener('change', async () => {
+            await fetch(`${CONFIG.API_URL}/api/settings/payment`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ gcashEnabled: gcashToggle.checked })
+            });
+        });
+    }
     // Load orders data
     loadOrdersData();
 
@@ -128,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ======================= //
     async function loadEvents() {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/events`, {
+            const response = await fetch(`${API_URL}/api/events`, {
                 credentials: 'include'
             });
             if (!response.ok) throw new Error('Failed to fetch events');
@@ -213,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ======================= //
     async function loadAnnouncements() {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/announcements`, {
+            const response = await fetch(`${API_URL}/api/announcements`, {
                 credentials: 'include'
             });
             if (!response.ok) throw new Error('Failed to fetch announcements');
@@ -228,11 +259,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Sort by date (newest first) and take top 3
             const sortedAnnouncements = announcements
-                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                 .slice(0, 3);
             
             announcementList.innerHTML = sortedAnnouncements.map(announcement => {
-                const date = new Date(announcement.date);
+                const dateValue = announcement.createdAt || announcement.date;
+                const date = new Date(dateValue);
                 const formattedDate = date.toLocaleDateString('en-US', { 
                     month: 'short', 
                     day: 'numeric', 
@@ -266,9 +298,13 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadFeedbacks() {
         const feedbackList = document.querySelector('.feedback-list');
         try {
-            const response = await fetch(`${API_BASE_URL}/api/feedback`, {
+            const response = await fetch(`${API_URL}/api/feedback`, {
                 credentials: 'include'
             });
+            if (response.status === 401) {
+                window.location.href = 'adminLogIn.html';
+                return;
+            }
             if (!response.ok) throw new Error('Failed to fetch feedbacks');
 
             const feedbacks = await response.json();
@@ -289,8 +325,9 @@ document.addEventListener('DOMContentLoaded', function() {
             };
 
             feedbackList.innerHTML = recent.map(fb => {
+                const dateValue = fb.createdAt || fb.date || new Date();                
                 const type = typeLabelMap[fb.type] || { label: fb.type, cls: '' };
-                const date = new Date(fb.createdAt).toLocaleDateString('en-US', {
+                const date = new Date(dateValue).toLocaleDateString('en-US', {
                     month: 'short', day: 'numeric', year: 'numeric'
                 });
                 const sender = fb.isAnonymous ? 'Anonymous' : (fb.senderName || fb.senderEmail || 'Anonymous');

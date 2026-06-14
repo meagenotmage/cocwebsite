@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // Use the API_URL from config.js
-    const API_BASE_URL = CONFIG.API_URL;
+    const API_URL = CONFIG.API_URL;
 
     // --- State Variables ---
     let currentDate = new Date();
@@ -53,10 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchAndDisplayAnnouncements() {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/announcements`);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const response = await fetch(`${CONFIG.API_URL}${CONFIG.ENDPOINTS.ANNOUNCEMENTS}`);
+            if (!response.ok) throw new Error(`Status: ${response.status}`);
             const announcements = await response.json();
-
             announcementsContainer.innerHTML = ''; 
 
             if (announcements.length > 4) {
@@ -84,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 announcementsContainer.appendChild(item);
             });
         } catch (error) {
-            announcementsContainer.innerHTML = '<p>Could not load announcements.</p>';
+            announcementsContainer.innerHTML = '<p>Could not load announcements. Is the server running at ' + CONFIG.API_URL + '?</p>';
             console.error('Error fetching announcements:', error);
         }
     }
@@ -239,9 +238,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchEventsAndRender() {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/events`);
-            allEvents = await response.json();
-            renderCalendar();
+        const response = await fetch(`${CONFIG.API_URL}${CONFIG.ENDPOINTS.EVENTS}`);
+        allEvents = await response.json();
+        renderCalendar();
         } catch (error) {
             console.error("Error fetching events:", error);
         }

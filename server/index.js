@@ -1,11 +1,20 @@
 // --- 1. SETUP ---
 require('dotenv').config({ path: require('path').join(__dirname, '.env') }); // Loads variables from .env file
+const dns = require('dns');
+// Work around ISP/router DNS that blocks MongoDB SRV lookups in Node (common on some networks)
+if (process.env.DNS_SERVERS) {
+  dns.setServers(process.env.DNS_SERVERS.split(',').map(s => s.trim()));
+} else {
+  dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1']);
+}
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const session = require('express-session');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -84,11 +93,30 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' })); // Increased limit for base64 images
 app.use(express.urlencoded({ limit: '50mb', extended: true })); // Also increase URL encoded limit
 
+app.set('trust proxy', 1);
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'dev-session-secret-change-me',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000
+  }
+}));
+
+function requireAuth(req, res, next) {
+  if (req.session && req.session.isAdmin) {
+    return next();
+  }
+  return res.status(401).json({ message: 'Unauthorized. Please log in.' });
+}
+
 // Serve uploaded files statically
 app.use('/uploads', express.static(uploadsDir));
 
 // --- 3. DATABASE CONNECTION ---
-mongoose.connect(process.env.DATABASE_URL)
+mongoose.connect(process.env.DATABASE_URL, { serverSelectionTimeoutMS: 10000 })
   .then(() => console.log('Successfully connected to MongoDB!'))
   .catch(err => console.error('Database connection error:', err));
 
@@ -176,6 +204,59 @@ app.get('/', (req, res) => {
   res.send('COCSC API Server is running.');
 });
 
+// --- ADMIN AUTH ROUTES ---
+app.post('/api/admin/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
+
+    if (!adminEmail || !adminPasswordHash) {
+      return res.status(503).json({ message: 'Admin authentication is not configured.', success: false });
+    }
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required.', success: false });
+    }
+    if (email !== adminEmail) {
+      return res.status(401).json({ message: 'Invalid credentials.', success: false });
+    }
+
+    const valid = await bcrypt.compare(password, adminPasswordHash);
+    if (!valid) {
+      return res.status(401).json({ message: 'Invalid credentials.', success: false });
+    }
+
+    req.session.isAdmin = true;
+    req.session.email = email;
+    req.session.save((err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Failed to create session.', success: false });
+      }
+      res.json({ message: 'Login successful.', success: true });
+    });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ message: 'Login failed.', success: false });
+  }
+});
+
+app.post('/api/admin/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ message: 'Logout failed.' });
+    }
+    res.clearCookie('connect.sid');
+    res.json({ message: 'Logged out successfully.' });
+  });
+});
+
+app.get('/api/admin/check', (req, res) => {
+  res.json({
+    authenticated: !!(req.session && req.session.isAdmin),
+    email: req.session?.email
+  });
+});
+
 // Announcements Route
 app.get('/api/announcements', async (req, res) => {
   try {
@@ -199,7 +280,7 @@ app.get('/api/events', async (req, res) => {
 // --- ADMIN ROUTES ---
 
 // Create new announcement (POST)
-app.post('/api/announcements', async (req, res) => {
+app.post('/api/announcements', requireAuth, async (req, res) => {
   try {
     const { title, content } = req.body;
     
@@ -222,7 +303,7 @@ app.post('/api/announcements', async (req, res) => {
 });
 
 // Delete announcement (DELETE)
-app.delete('/api/announcements/:id', async (req, res) => {
+app.delete('/api/announcements/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const announcement = await Announcement.findByIdAndDelete(id);
@@ -240,7 +321,7 @@ app.delete('/api/announcements/:id', async (req, res) => {
 });
 
 // Update announcement (PUT)
-app.put('/api/announcements/:id', async (req, res) => {
+app.put('/api/announcements/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { title, content } = req.body;
@@ -259,7 +340,7 @@ app.put('/api/announcements/:id', async (req, res) => {
 });
 
 // Create new event (POST)
-app.post('/api/events', async (req, res) => {
+app.post('/api/events', requireAuth, async (req, res) => {
   try {
     console.log('Received event creation request:', req.body);
     
@@ -293,7 +374,7 @@ app.post('/api/events', async (req, res) => {
 });
 
 // Delete event (DELETE)
-app.delete('/api/events/:id', async (req, res) => {
+app.delete('/api/events/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     await Event.findByIdAndDelete(id);
@@ -305,7 +386,7 @@ app.delete('/api/events/:id', async (req, res) => {
 });
 
 // Update event (PUT)
-app.put('/api/events/:id', async (req, res) => {
+app.put('/api/events/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, date, startDate, endDate, startTime, endTime, location } = req.body;
@@ -327,7 +408,7 @@ app.put('/api/events/:id', async (req, res) => {
 
 // Orders Routes
 // Get all orders (for admin)
-app.get('/api/orders', async (req, res) => {
+app.get('/api/orders', requireAuth, async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
     res.json(orders);
@@ -398,8 +479,36 @@ app.post('/api/orders/upload-receipt', upload.single('receipt'), async (req, res
   }
 });
 
+// Upload receipt (admin — cash payment proof or general)
+app.post('/api/orders/:id/receipt', requireAuth, upload.single('receipt'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No receipt image uploaded.' });
+    }
+
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found.' });
+    }
+
+    const receiptUrl = `/uploads/${req.file.filename}`;
+    const updateData = { receiptUrl };
+    const method = (order.paymentMethod || '').toUpperCase();
+
+    if (method === 'CASH' && order.status === 'pending') {
+      updateData.status = 'paid';
+    }
+
+    const updated = await Order.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    res.json({ message: 'Receipt uploaded successfully!', order: updated });
+  } catch (err) {
+    console.error('Error uploading order receipt:', err);
+    res.status(500).json({ message: 'Failed to upload receipt.', error: err.message });
+  }
+});
+
 // Update order status (for admin)
-app.put('/api/orders/:id', async (req, res) => {
+app.put('/api/orders/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { status, receiptUrl } = req.body;
@@ -435,7 +544,7 @@ app.put('/api/orders/:id', async (req, res) => {
 // });
 
 // Mark order for deletion with 7-day warning (for admin)
-app.post('/api/orders/:id/mark-for-deletion', async (req, res) => {
+app.post('/api/orders/:id/mark-for-deletion', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const order = await Order.findByIdAndUpdate(
@@ -467,7 +576,7 @@ app.post('/api/orders/:id/mark-for-deletion', async (req, res) => {
 });
 
 // Get orders marked for deletion (for admin)
-app.get('/api/orders/marked-for-deletion', async (req, res) => {
+app.get('/api/orders/marked-for-deletion', requireAuth, async (req, res) => {
   try {
     const orders = await Order.find({ markedForDeletion: true }).sort({ deletionWarningDate: -1 });
     
@@ -491,7 +600,7 @@ app.get('/api/orders/marked-for-deletion', async (req, res) => {
 });
 
 // Cancel deletion warning (for admin)
-app.post('/api/orders/:id/cancel-deletion', async (req, res) => {
+app.post('/api/orders/:id/cancel-deletion', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const order = await Order.findByIdAndUpdate(
@@ -518,7 +627,7 @@ app.post('/api/orders/:id/cancel-deletion', async (req, res) => {
 });
 
 // Get deletion warnings (orders that are 7+ days marked and ready to delete)
-app.get('/api/orders/deletion-warnings', async (req, res) => {
+app.get('/api/orders/deletion-warnings', requireAuth, async (req, res) => {
   try {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -540,7 +649,7 @@ app.get('/api/orders/deletion-warnings', async (req, res) => {
 });
 
 // Permanently delete order after 7-day warning period (for admin only)
-app.delete('/api/orders/:id/permanent-delete', async (req, res) => {
+app.delete('/api/orders/:id/permanent-delete', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const order = await Order.findById(id);
@@ -605,7 +714,7 @@ app.post('/api/feedback', async (req, res) => {
 });
 
 // Get all feedback (GET) — admin; accepts ?type= filter
-app.get('/api/feedback', async (req, res) => {
+app.get('/api/feedback', requireAuth, async (req, res) => {
   try {
     const query = {};
     if (req.query.type && ['feedback', 'suggestion', 'partnership'].includes(req.query.type)) {
@@ -620,7 +729,7 @@ app.get('/api/feedback', async (req, res) => {
 });
 
 // Update feedback status / admin notes (PUT) — admin
-app.put('/api/feedback/:id', async (req, res) => {
+app.put('/api/feedback/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { status, adminNotes } = req.body;
@@ -640,7 +749,7 @@ app.put('/api/feedback/:id', async (req, res) => {
 });
 
 // Delete feedback (DELETE) — admin
-app.delete('/api/feedback/:id', async (req, res) => {
+app.delete('/api/feedback/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     await Feedback.findByIdAndDelete(id);
@@ -668,7 +777,7 @@ app.get('/api/settings/payment', async (req, res) => {
 });
 
 // Update payment settings (admin)
-app.put('/api/settings/payment', async (req, res) => {
+app.put('/api/settings/payment', requireAuth, async (req, res) => {
   try {
     const { gcashEnabled, cashEnabled } = req.body;
     const settings = await Settings.findOneAndUpdate(

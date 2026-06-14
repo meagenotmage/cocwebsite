@@ -21,6 +21,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const toggleCash = document.getElementById('toggle-cash');
     let allOrders = [];
 
+    function isCashPayment(method) {
+        return (method || '').toUpperCase() === 'CASH';
+    }
+
+    function isGcashPayment(method) {
+        return (method || '').toUpperCase() === 'GCASH';
+    }
+
     // Load payment settings
     async function loadPaymentSettings() {
         try {
@@ -208,9 +216,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 itemsHTML = '<tr><td colspan="4">No item details available.</td></tr>';
             }
 
-            // Add receipt verification section if receipt exists
+            // Receipt / payment proof sections in order details
             let receiptSection = '';
-            if (order.receiptUrl && order.status === 'pending_payment') {
+            if (isCashPayment(order.paymentMethod) && order.status === 'pending' && !order.receiptUrl) {
+                receiptSection = `
+                    <div class="cash-receipt-upload" data-order-id="${order._id}">
+                        <h4><i class="fa-solid fa-money-bill-wave"></i> Cash Payment — Upload Receipt</h4>
+                        <p class="verification-note">Upload a photo of the cash payment receipt as proof that this order has been paid.</p>
+                        <div class="cash-receipt-controls">
+                            <label class="cash-receipt-file-label">
+                                <i class="fa-solid fa-camera"></i> Choose Receipt Photo
+                                <input type="file" class="cash-receipt-input" accept="image/*" data-order-id="${order._id}">
+                            </label>
+                            <div class="cash-receipt-preview" id="preview-${order._id}"></div>
+                            <button type="button" class="upload-cash-receipt-btn" data-order-id="${order._id}" disabled>
+                                <i class="fa-solid fa-upload"></i> Upload & Mark as Paid
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else if (order.receiptUrl && order.status === 'pending_payment' && isGcashPayment(order.paymentMethod)) {
                 receiptSection = `
                     <div class="receipt-verification">
                         <h4>GCash Receipt Verification</h4>
@@ -223,6 +248,13 @@ document.addEventListener('DOMContentLoaded', function () {
                             </button>
                         </div>
                         <p class="verification-note">Please verify the GCash receipt before approving payment.</p>
+                    </div>
+                `;
+            } else if (order.receiptUrl && isCashPayment(order.paymentMethod)) {
+                receiptSection = `
+                    <div class="cash-receipt-upload cash-receipt-done">
+                        <h4><i class="fa-solid fa-circle-check"></i> Cash Payment Receipt Uploaded</h4>
+                        <p class="verification-note">Payment proof is on file. Use the image icon in Actions to view the receipt.</p>
                     </div>
                 `;
             }
@@ -412,6 +444,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             
             const receiptUrl = order.receiptUrl;
+            const receiptTitle = isCashPayment(order.paymentMethod)
+                ? 'Cash Payment Receipt'
+                : 'GCash Payment Receipt';
             
             // Create modal to view receipt
             const modal = document.createElement('div');
@@ -419,7 +454,7 @@ document.addEventListener('DOMContentLoaded', function () {
             modal.innerHTML = `
                 <div class="receipt-modal-content">
                     <span class="close-modal">&times;</span>
-                    <h3>GCash Payment Receipt</h3>
+                    <h3>${receiptTitle}</h3>
                     <div class="receipt-image-container">
                         <div style="text-align: center; padding: 20px;">Loading image...</div>
                     </div>
@@ -461,7 +496,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // 5. VERIFY/REJECT PAYMENT
+    // 5. VERIFY/REJECT PAYMENT (GCash)
     ordersTbody.addEventListener('click', async function(e) {
         const target = e.target.closest('.verify-btn') || e.target.closest('.reject-btn');
         if (!target) return;
@@ -492,6 +527,88 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error('Error updating payment status:', error);
                 alert(`Error ${action}ing payment`);
             }
+        }
+    });
+
+    // 5b. CASH RECEIPT — preview selected image
+    ordersTbody.addEventListener('change', function(e) {
+        if (!e.target.classList.contains('cash-receipt-input')) return;
+
+        const orderId = e.target.dataset.orderId;
+        const preview = document.getElementById(`preview-${orderId}`);
+        const uploadBtn = e.target.closest('.cash-receipt-upload')?.querySelector('.upload-cash-receipt-btn');
+        const file = e.target.files[0];
+
+        if (!preview || !uploadBtn) return;
+
+        preview.innerHTML = '';
+        uploadBtn.disabled = true;
+
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file (JPG, PNG, etc.).');
+            e.target.value = '';
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Image must be 5MB or smaller.');
+            e.target.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            preview.innerHTML = `<img src="${ev.target.result}" alt="Receipt preview" class="cash-receipt-preview-img">`;
+            uploadBtn.disabled = false;
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // 5c. CASH RECEIPT — upload and mark as paid
+    ordersTbody.addEventListener('click', async function(e) {
+        const btn = e.target.closest('.upload-cash-receipt-btn');
+        if (!btn || btn.disabled) return;
+
+        const orderId = btn.dataset.orderId;
+        const container = btn.closest('.cash-receipt-upload');
+        const input = container?.querySelector('.cash-receipt-input');
+        const file = input?.files[0];
+
+        if (!file) {
+            alert('Please choose a receipt photo first.');
+            return;
+        }
+
+        if (!confirm('Upload this receipt and mark the order as paid?')) return;
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading...';
+
+        try {
+            const formData = new FormData();
+            formData.append('receipt', file);
+
+            const response = await fetch(`${CONFIG.API_URL}/api/orders/${orderId}/receipt`, {
+                method: 'POST',
+                credentials: 'include',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert('Cash receipt uploaded. Order marked as paid.');
+                loadOrders();
+            } else {
+                alert(result.message || 'Failed to upload receipt.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-upload"></i> Upload & Mark as Paid';
+            }
+        } catch (error) {
+            console.error('Error uploading cash receipt:', error);
+            alert('Error uploading receipt. Please try again.');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-upload"></i> Upload & Mark as Paid';
         }
     });
 

@@ -380,6 +380,93 @@ body {
     margin: 0;
 }
 
+/* Cash receipt upload (admin) */
+.cash-receipt-upload {
+    background: #E8F5E9;
+    border: 2px solid #66BB6A;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.cash-receipt-upload h4 {
+    color: #2E7D32;
+    margin: 0 0 10px 0;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cash-receipt-upload.cash-receipt-done {
+    background: #F1F8E9;
+    border-color: #A5D6A7;
+}
+
+.cash-receipt-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.cash-receipt-file-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: white;
+    border: 2px dashed #66BB6A;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #2E7D32;
+    width: fit-content;
+    transition: background 0.2s;
+}
+
+.cash-receipt-file-label:hover {
+    background: #f9fff9;
+}
+
+.cash-receipt-file-label input[type="file"] {
+    display: none;
+}
+
+.cash-receipt-preview-img {
+    max-width: 220px;
+    max-height: 160px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    object-fit: contain;
+}
+
+.upload-cash-receipt-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    background: #2E7D32;
+    color: white;
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.upload-cash-receipt-btn:hover:not(:disabled) {
+    background: #1B5E20;
+    transform: translateY(-2px);
+}
+
+.upload-cash-receipt-btn:disabled {
+    background: #9E9E9E;
+    cursor: not-allowed;
+}
+
 /* View Receipt Icon */
 .view-receipt {
     color: #2196F3 !important;
