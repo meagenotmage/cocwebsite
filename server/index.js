@@ -114,7 +114,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true })); // Also increase
 
 app.set('trust proxy', 1);
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'dev-session-secret-change-me',
+  secret: process.env.SESSION_SECRET || 'dev-secret-key',
   resave: false,
   saveUninitialized: false,
   proxy: true,
@@ -183,6 +183,7 @@ const orderSchema = new mongoose.Schema({
   }],
   total: { type: Number, required: true },
   status: { type: String, default: 'pending' },
+  paymentStatus: { type: String, default: 'pending' },
   receiptUrl: { type: String },
   markedForDeletion: { type: Boolean, default: false },
   deletionWarningDate: { type: Date, default: null }, // Date when deletion warning was issued
@@ -467,7 +468,8 @@ app.post('/api/orders', async (req, res) => {
       paymentMethod,
       items,
       total,
-      status: status || 'pending',
+      status: 'pending',
+      paymentStatus: 'pending',
       receiptUrl: receiptUrl || undefined
     });
     
@@ -533,18 +535,23 @@ app.post('/api/orders/:id/receipt', requireAuth, upload.single('receipt'), async
 app.put('/api/orders/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, receiptUrl } = req.body;
+    // Extract both status and paymentStatus from the admin request
+    const { status, paymentStatus, receiptUrl } = req.body;
     
-    const updateData = { status };
-    if (receiptUrl) {
-      updateData.receiptUrl = receiptUrl;
-    }
+    const updateData = {};
+    if (status) updateData.status = status;
+    if (paymentStatus) updateData.paymentStatus = paymentStatus;
+    if (receiptUrl) updateData.receiptUrl = receiptUrl;
     
     const order = await Order.findByIdAndUpdate(
       id,
       updateData,
-      { new: true }
+      { new: true } // Returns the updated document
     );
+    
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found.' });
+    }
     
     res.json({ message: 'Order updated successfully!', order });
   } catch (err) {
