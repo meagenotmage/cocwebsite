@@ -4,8 +4,6 @@
 /* This file extends admin-shared.css with page-specific styles */
 
 /* Additional table styling for announcements */
-    border-bottom: none;
-}
 
 .announcements-table tbody tr:nth-child(even) {
     background-color: #FDECEC;
