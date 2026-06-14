@@ -98,8 +98,8 @@ app.use(session({
   saveUninitialized: false,
   proxy: true,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    secure: true,
+    sameSite: none,
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000
   }
