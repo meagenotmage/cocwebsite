@@ -17,8 +17,11 @@ const session = require('express-session');
 const bcrypt = require('bcryptjs');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 10000;
 
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 // Create uploads directory if it doesn't exist
 const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) {
@@ -54,13 +57,7 @@ const upload = multer({
 
 // --- 2. MIDDLEWARE ---
 // Configure CORS to allow multiple origins
-const allowedOrigins = process.env.CORS_ORIGIN 
-  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
-  : [
-      'http://localhost:8080',
-      'https://college-of-communication-4ui4lsauk-meydjs-projects.vercel.app',
-      'https://college-of-communication.vercel.app'
-    ];
+const allowedOrigins = ['*']; // This allows ALL frontends to load your data
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -263,6 +260,7 @@ app.get('/api/announcements', async (req, res) => {
     const announcements = await Announcement.find().sort({ date: -1 });
     res.json(announcements);
   } catch (err) {
+    console.error('Error fetching announcements:', err);
     res.status(500).json({ message: 'Failed to fetch announcements.' });
   }
 });
