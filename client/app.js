@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchAndDisplayAnnouncements() {
         try {
-            const response = await fetch(`${CONFIG.API_URL}${CONFIG.ENDPOINTS.ANNOUNCEMENTS}`);
+            const response = await fetch(getApiUrl('ANNOUNCEMENTS'));
             if (!response.ok) throw new Error(`Status: ${response.status}`);
             const announcements = await response.json();
             announcementsContainer.innerHTML = ''; 
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchEventsAndRender() {
         try {
-        const response = await fetch(`${CONFIG.API_URL}${CONFIG.ENDPOINTS.EVENTS}`);
+        const response = await fetch(getApiUrl('EVENTS'));
         allEvents = await response.json();
         renderCalendar();
         } catch (error) {

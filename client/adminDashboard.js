@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Sort by date (newest first) and take top 3
             const sortedAnnouncements = announcements
-                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
                 .slice(0, 3);
             
             announcementList.innerHTML = sortedAnnouncements.map(announcement => {

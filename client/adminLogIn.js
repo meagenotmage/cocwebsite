@@ -11,7 +11,7 @@ if (loginForm) {
 
         try {
             // Using the centralized CONFIG object here
-            const response = await fetch(`${CONFIG.API_URL}${CONFIG.ENDPOINTS.LOGIN}`, {
+            const response = await fetch(getApiUrl('LOGIN'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
