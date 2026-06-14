@@ -54,7 +54,12 @@ const upload = multer({
 
 // --- 2. MIDDLEWARE ---
 // Configure CORS to allow multiple origins
-const allowedOrigins = ['*']; // This allows ALL frontends to load your data
+const allowedOrigins = [
+  'http://localhost:5500',
+  'http://127.0.0.1:5500',
+  'http://localhost:3001',
+  'https://cocwebsiteend.onrender.com'
+];
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -84,9 +89,25 @@ const corsOptions = {
 };
 
 app.use(cors({
-  // REPLACE this with your actual FRONTEND URL (no trailing slash)
-  origin: 'https://cocwebsite.onrender.com', 
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin is in our list OR is a Vercel/Render subdomain
+    const isAllowed = allowedOrigins.includes(origin) || 
+                     origin.includes('vercel.app') || 
+                     origin.includes('onrender.com');
+
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      console.error("Blocked by CORS:", origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // Required for sessions/cookies
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json({ limit: '50mb' })); // Increased limit for base64 images
 app.use(express.urlencoded({ limit: '50mb', extended: true })); // Also increase URL encoded limit
