@@ -99,7 +99,7 @@ app.use(session({
   proxy: true,
   cookie: {
     secure: true,
-    sameSite: none,
+    sameSite: 'none',
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000
   }
