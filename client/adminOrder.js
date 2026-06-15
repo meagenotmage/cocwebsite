@@ -126,6 +126,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // 3. UNIFIED RECEIPT MANAGEMENT (Replaces all previous separate sections)
         let receiptManagementHTML = '';
         const hasReceipt = order.receiptUrl && order.receiptUrl !== '';
+        const receiptClass = hasReceipt ? 'has-receipt' : 'no-receipt';
+        const receiptTitle = hasReceipt ? 'View Receipt' : 'No Receipt Uploaded';
 
         if (hasReceipt) {
             // IF RECEIPT EXISTS: Show View/Replace and Verification buttons
@@ -197,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <td>
                 <div class="actions">
                     <i class="fa-solid fa-chevron-down toggle-details"></i>
-                    ${hasReceipt ? `<i class="fa-solid fa-image view-receipt" data-order-id="${order._id}"></i>` : ''}
+                    ${hasReceipt ? `<i class="fa-solid fa-image view-receipt ${receiptClass}" data-order-id="${order._id}" title="${receiptTitle}"></i>` : ''}
                     <i class="fa-solid fa-trash delete-order" data-order-id="${order._id}"></i>
                 </div>
             </td>
@@ -409,6 +411,10 @@ ordersTbody.addEventListener('click', function(e) {
     ordersTbody.addEventListener('click', function(e) {
         if (e.target.classList.contains('view-receipt') || e.target.closest('.view-receipt')) {
             const target = e.target.classList.contains('view-receipt') ? e.target : e.target.closest('.view-receipt');
+            if (target.classList.contains('no-receipt')) {
+                return; // No receipt to view
+            }
+            
             const orderId = target.dataset.orderId;
             
             // Find the order in the allOrders array

@@ -468,15 +468,25 @@ body {
 }
 
 /* View Receipt Icon */
-.view-receipt {
+.view-receipt.has-receipt {
     color: #2196F3 !important;
     cursor: pointer;
 }
 
-.view-receipt:hover {
+.view-receipt.has-receipt:hover {
     color: #1976D2 !important;
 }
 
+/* No Receipt Icon */
+.view-receipt.no-receipt {
+    color: #BDBDBD !important;
+    cursor: default;
+}
+
+.actions i {
+    font-size: 1.1rem;
+    padding: 4px;
+}
 /* Receipt Modal */
 .receipt-modal {
     position: fixed;
