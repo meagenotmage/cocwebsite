@@ -198,12 +198,15 @@ document.addEventListener('DOMContentLoaded', function () {
             <td class="delivery-status-cell"><span class="${deliveryStatusClass}">${deliveryStatusText}</span></td>
             <td>
                 <div class="actions">
+                ${deletionWarningHTML}
                     <i class="fa-solid fa-chevron-down toggle-details"></i>
-                    ${hasReceipt ? `<i class="fa-solid fa-image view-receipt ${receiptClass}" data-order-id="${order._id}" title="${receiptTitle}"></i>` : ''}
-                    <i class="fa-solid fa-trash delete-order" data-order-id="${order._id}"></i>
-                </div>
-            </td>
-        `;
+                     <i class="fa-solid fa-image view-receipt ${receiptClass}" title="${receiptTitle}" data-order-id="${order._id}"></i>
+            ${order.markedForDeletion ? 
+                `<i class="fa-solid fa-undo cancel-deletion" title="Cancel Deletion" data-order-id="${order._id}"></i>` : 
+                `<i class="fa-solid fa-trash delete-order" title="Mark for Deletion" data-order-id="${order._id}"></i>`}
+        </div>
+    </td>
+`;
 
         const detailsRow = document.createElement('tr');
         detailsRow.className = 'order-details';
@@ -407,75 +410,81 @@ ordersTbody.addEventListener('click', function(e) {
     }
 });// This closes the event listener properly
 
+
     // 4. VIEW RECEIPT
-    ordersTbody.addEventListener('click', function(e) {
-        if (e.target.classList.contains('view-receipt') || e.target.closest('.view-receipt')) {
-            const target = e.target.classList.contains('view-receipt') ? e.target : e.target.closest('.view-receipt');
-            if (target.classList.contains('no-receipt')) {
-                return; // No receipt to view
-            }
-            
-            const orderId = target.dataset.orderId;
-            
-            // Find the order in the allOrders array
-            const order = allOrders.find(o => o._id === orderId);
-            if (!order || !order.receiptUrl) {
-                alert('No receipt available');
-                return;
-            }
-            
-            const receiptUrl = order.receiptUrl;
-            const receiptTitle = isCashPayment(order.paymentMethod)
-                ? 'Cash Payment Receipt'
-                : 'GCash Payment Receipt';
-            
-            // Create modal to view receipt
-            const modal = document.createElement('div');
-            modal.className = 'receipt-modal';
-            modal.innerHTML = `
-                <div class="receipt-modal-content">
-                    <span class="close-modal">&times;</span>
-                    <h3>${receiptTitle}</h3>
-                    <div class="receipt-image-container">
-                        <div style="text-align: center; padding: 20px;">Loading image...</div>
-                    </div>
+ordersTbody.addEventListener('click', function(e) {
+    // 1. Check if the clicked element is the receipt icon
+    const icon = e.target.closest('.view-receipt');
+    if (!icon) return;
+
+    // 2. SAFETY CHECK: If icon is gray (no-receipt), do nothing
+    if (icon.classList.contains('no-receipt')) {
+        console.log("No receipt available for this order.");
+        return; 
+    }
+
+    // 3. Find the specific order data
+    const orderId = icon.dataset.orderId;
+    const order = allOrders.find(o => o._id === orderId);
+    
+    if (!order || !order.receiptUrl) {
+        alert('No receipt available in the system.');
+        return;
+    }
+    
+    const receiptUrl = order.receiptUrl;
+    const receiptTitle = isCashPayment(order.paymentMethod)
+        ? 'Cash Payment Receipt'
+        : 'GCash Payment Receipt';
+    
+    // 4. Create modal to view receipt with a loading state
+    const modal = document.createElement('div');
+    modal.className = 'receipt-modal';
+    modal.innerHTML = `
+        <div class="receipt-modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>${receiptTitle}</h3>
+            <div class="receipt-image-container">
+                <div class="loading-placeholder" style="text-align: center; padding: 20px;">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Loading image...
                 </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            // Load image after modal is in DOM
-            const container = modal.querySelector('.receipt-image-container');
-            const img = document.createElement('img');
-            img.className = 'receipt-image';
-            img.alt = 'Payment Receipt';
-            
-            img.onload = function() {
-                container.innerHTML = '';
-                container.appendChild(img);
-            };
-            
-            img.onerror = function() {
-                container.innerHTML = '<p style="text-align: center; padding: 20px; color: #f44336;">Failed to load receipt image. The image may be corrupted or unavailable.</p>';
-            };
-            
-            // Set image source - handle both base64 and URL formats
-            if (receiptUrl.startsWith('data:image')) {
-                img.src = receiptUrl;
-            } else if (receiptUrl.startsWith('/uploads')) {
-                img.src = `${CONFIG.API_URL}${receiptUrl}`;
-            } else {
-                img.src = receiptUrl;
-            }
-            
-            // Close modal handlers
-            modal.addEventListener('click', (e) => {
-                if (e.target.classList.contains('receipt-modal') || e.target.classList.contains('close-modal')) {
-                    modal.remove();
-                }
-            });
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // 5. Build and Load the Image
+    const container = modal.querySelector('.receipt-image-container');
+    const img = document.createElement('img');
+    img.className = 'receipt-image';
+    img.alt = 'Payment Receipt';
+    
+    img.onload = function() {
+        container.innerHTML = ''; // Clear "Loading..." text
+        container.appendChild(img);
+    };
+    
+    img.onerror = function() {
+        container.innerHTML = '<p style="text-align: center; padding: 20px; color: #f44336;">Failed to load receipt image. It may have been deleted from the server.</p>';
+    };
+    
+    // 6. Set image source based on format
+    if (receiptUrl.startsWith('data:image')) {
+        img.src = receiptUrl; // Handle Base64 strings
+    } else if (receiptUrl.startsWith('/uploads')) {
+        img.src = `${CONFIG.API_URL}${receiptUrl}`; // Handle server paths
+    } else {
+        img.src = receiptUrl; // Handle direct URLs
+    }
+    
+    // 7. Close Modal Logic
+    modal.addEventListener('click', (e) => {
+        if (e.target.classList.contains('receipt-modal') || e.target.classList.contains('close-modal')) {
+            modal.remove();
         }
     });
+});
 
     // 5. VERIFY/REJECT PAYMENT (GCash)
     ordersTbody.addEventListener('click', async function(e) {
