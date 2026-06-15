@@ -94,190 +94,131 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Display orders in the table
     function displayOrders(orders) {
-        if (orders.length === 0) {
-            ordersTbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">No orders yet</td></tr>';
-            return;
+    if (orders.length === 0) {
+        ordersTbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">No orders yet</td></tr>';
+        return;
+    }
+
+    // Sort: Newest first
+    const sortedOrders = [...orders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    ordersTbody.innerHTML = '';
+
+    sortedOrders.forEach((order) => {
+        const orderNumber = String(order.orderNumber).padStart(4, '0');
+
+        // 1. PAYMENT STATUS BADGE (Column 6)
+        let paymentStatusClass, paymentStatusText;
+        if (order.paymentStatus === 'paid') {
+            paymentStatusClass = 'status-paid';
+            paymentStatusText = 'Paid';
+        } else if (order.paymentStatus === 'pending') {
+            paymentStatusClass = 'status-pending';
+            paymentStatusText = 'Pending';
+        } else {
+            paymentStatusClass = 'status-not-paid';
+            paymentStatusText = 'Not Paid';
         }
 
-        // Sort orders by creation date (newest first) for easier viewing
-        const sortedOrders = [...orders].sort((a, b) => 
-            new Date(b.createdAt) - new Date(a.createdAt)
-        );
+        // 2. DELIVERY STATUS BADGE (Column 7)
+        let deliveryStatusText = order.status === 'received' ? 'Received' : 'Not Received';
+        let deliveryStatusClass = order.status === 'received' ? 'status-received' : 'status-not-received';
 
-        ordersTbody.innerHTML = '';
-        sortedOrders.forEach((order, index) => {
-            // Use persistent orderNumber from database
-            const orderNumber = String(order.orderNumber).padStart(4, '0');
+        // 3. UNIFIED RECEIPT MANAGEMENT (Replaces all previous separate sections)
+        let receiptManagementHTML = '';
+        const hasReceipt = order.receiptUrl && order.receiptUrl !== '';
 
-            // Payment status badge
-            let paymentStatusClass, paymentStatusText;
-                if (order.paymentStatus === 'paid') {
-                    paymentStatusClass = 'status-paid';
-                    paymentStatusText = 'Paid';
-                } else if (order.paymentStatus === 'pending') {
-                    paymentStatusClass = 'status-pending';
-                    paymentStatusText = 'Pending';
-                } else {
-                    // This covers 'pending' or any other default state
-                    paymentStatusClass = 'status-not-paid';
-                    paymentStatusText = 'Not Paid';
-                }
-                            
-            // Determine received/delivery status display (Received or Not Received)
-            let deliveryStatusText = 'Not Received';
-            let deliveryStatusClass = 'status-not-received';
-            if (order.status === 'received') {
-                deliveryStatusText = 'Received';
-                deliveryStatusClass = 'status-received';
-            }
-            
-            // Format timestamp
-            let timestamp = 'N/A';
-            if (order.createdAt) {
-                const orderDate = new Date(order.createdAt);
-                timestamp = orderDate.toLocaleString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true
-                });
-            }
-            
-            // Create summary row
-            const summaryRow = document.createElement('tr');
-            summaryRow.className = 'order-summary';
-            if (order.markedForDeletion) {
-                summaryRow.classList.add('marked-for-deletion');
-            }
-            summaryRow.dataset.name = order.fullName;
-            summaryRow.dataset.orderId = order._id;
-            summaryRow.dataset.payment = order.paymentMethod;
-            summaryRow.dataset.section = order.programYear;
-            summaryRow.dataset.items = order.items ? order.items.map(i => i.name).join('|').toLowerCase() : '';
-            
-            // Calculate days until deletion if marked
-            let deletionWarningHTML = '';
-            if (order.markedForDeletion && order.deletionWarningDate) {
-                const deleteDate = new Date(order.deletionWarningDate);
-                deleteDate.setDate(deleteDate.getDate() + 7);
-                const daysUntilDeletion = Math.ceil((deleteDate - new Date()) / (1000 * 60 * 60 * 24));
-                const warningClass = daysUntilDeletion <= 0 ? 'deletion-ready' : 'deletion-warning';
-                deletionWarningHTML = `<span class="deletion-badge ${warningClass}" title="Marked for deletion">🗑️ ${Math.max(0, daysUntilDeletion)}d</span>`;
-            }
-            
-            summaryRow.innerHTML = `
-                <td>${order.fullName}</td>
-                <td>${order.programYear}</td>
-                <td>${order.paymentMethod}</td>
-                <td>P ${order.total.toFixed(2)}</td>
-                <td>${orderNumber}</td>
-                <td class="timestamp">${timestamp}</td>
-                <td class="payment-status-cell"><span class="${paymentStatusClass}">${paymentStatusText}</span></td>
-                <td class="delivery-status-cell"><span class="${deliveryStatusClass}">${deliveryStatusText}</span></td>
-                <td>
-                    <div class="actions">
-                        ${deletionWarningHTML}
-                        <i class="fa-solid fa-chevron-down toggle-details"></i>
-                        ${order.receiptUrl ? '<i class="fa-solid fa-image view-receipt" title="View Receipt" data-order-id="' + order._id + '"></i>' : ''}
-                        ${order.markedForDeletion ? `<i class="fa-solid fa-undo cancel-deletion" title="Cancel Deletion" data-order-id="${order._id}"></i>` : `<i class="fa-solid fa-trash delete-order" title="Mark for Deletion" data-order-id="${order._id}"></i>`}
-                    </div>
-                </td>
-            `;
-
-            // Create details row
-            const detailsRow = document.createElement('tr');
-            detailsRow.className = 'order-details';
-            
-            let itemsHTML = '';
-            if (order.items && order.items.length > 0) {
-                itemsHTML = order.items.map(item => {
-                    // For items with custom names (nameplate and uniforms), show the custom name in the Name column
-                    let customerName = order.fullName;
-                    let productName = item.name;
-                    
-                    if (item.customName) {
-                        customerName = item.customName;
-                        productName = item.name;
-                    }
-                    
-                    const programLabel = item.program ? `<br><span class="item-program">${item.program}</span>` : '';
-
-                    return `
-                        <tr>
-                            <td>${customerName}${programLabel}</td>
-                            <td>${productName}${item.size ? ' - ' + item.size : ''}</td>
-                            <td>${item.quantity}</td>
-                            <td>P ${item.price.toFixed(2)}</td>
-                        </tr>
-                    `;
-                }).join('');
-            } else {
-                itemsHTML = '<tr><td colspan="4">No item details available.</td></tr>';
-            }
-
-            // Receipt / payment proof sections in order details
-            let receiptSection = '';
-            if (isCashPayment(order.paymentMethod) && order.status === 'pending' && !order.receiptUrl) {
-                receiptSection = `
-                    <div class="cash-receipt-upload" data-order-id="${order._id}">
-                        <h4><i class="fa-solid fa-money-bill-wave"></i> Cash Payment — Upload Receipt</h4>
-                        <p class="verification-note">Upload a photo of the cash payment receipt as proof that this order has been paid.</p>
-                        <div class="cash-receipt-controls">
-                            <label class="cash-receipt-file-label">
-                                <i class="fa-solid fa-camera"></i> Choose Receipt Photo
-                                <input type="file" class="cash-receipt-input" accept="image/*" data-order-id="${order._id}">
-                            </label>
-                            <div class="cash-receipt-preview" id="preview-${order._id}"></div>
-                            <button type="button" class="upload-cash-receipt-btn" data-order-id="${order._id}" disabled>
-                                <i class="fa-solid fa-upload"></i> Upload & Mark as Paid
-                            </button>
+        if (hasReceipt) {
+            // IF RECEIPT EXISTS: Show View/Replace and Verification buttons
+            receiptManagementHTML = `
+                <div class="admin-management-box receipt-exists">
+                    <h4><i class="fa-solid fa-circle-check"></i> Payment Proof on File</h4>
+                    <div class="upload-controls">
+                        <button class="view-receipt btn-secondary" data-order-id="${order._id}">
+                            <i class="fa-solid fa-eye"></i> View Current
+                        </button>
+                        <button class="btn-show-replace" onclick="this.nextElementSibling.style.display='flex'; this.style.display='none'">
+                            <i class="fa-solid fa-pen"></i> Replace Image
+                        </button>
+                        <div class="replace-controls" style="display: none; gap: 10px; align-items: center;">
+                            <input type="file" class="admin-manual-upload-input" accept="image/*">
+                            <button class="btn-manual-upload" data-order-id="${order._id}">Confirm</button>
                         </div>
                     </div>
-                `;
-            } else if (order.receiptUrl && order.status === 'pending_payment' && isGcashPayment(order.paymentMethod)) {
-                receiptSection = `
-                    <div class="receipt-verification">
-                        <h4>GCash Receipt Verification</h4>
-                        <div class="receipt-actions">
-                            <button class="verify-btn" data-order-id="${order._id}">
-                                <i class="fa-solid fa-check"></i> Verify & Approve Payment
-                            </button>
-                            <button class="reject-btn" data-order-id="${order._id}">
-                                <i class="fa-solid fa-times"></i> Reject Payment
-                            </button>
+                    ${order.status === 'pending_payment' ? `
+                        <div class="receipt-verification" style="margin-top:15px; padding-top:10px; border-top:1px solid #ddd;">
+                            <p><strong>GCash Verification Needed:</strong></p>
+                            <button class="verify-btn" data-order-id="${order._id}"><i class="fa-solid fa-check"></i> Approve GCash</button>
+                            <button class="reject-btn" data-order-id="${order._id}"><i class="fa-solid fa-xmark"></i> Reject</button>
                         </div>
-                        <p class="verification-note">Please verify the GCash receipt before approving payment.</p>
+                    ` : ''}
+                </div>`;
+        } else {
+            // IF NO RECEIPT: Show simple upload box
+            receiptManagementHTML = `
+                <div class="admin-management-box no-receipt">
+                    <h4><i class="fa-solid fa-circle-exclamation"></i> No Receipt Uploaded</h4>
+                    <p>Select a file to upload proof of payment (Cash receipt or GCash screenshot).</p>
+                    <div class="upload-controls">
+                        <input type="file" class="admin-manual-upload-input" accept="image/*">
+                        <button class="btn-manual-upload" data-order-id="${order._id}">
+                            <i class="fa-solid fa-upload"></i> Upload & Save
+                        </button>
                     </div>
-                `;
-            } else if (order.receiptUrl && isCashPayment(order.paymentMethod)) {
-                receiptSection = `
-                    <div class="cash-receipt-upload cash-receipt-done">
-                        <h4><i class="fa-solid fa-circle-check"></i> Cash Payment Receipt Uploaded</h4>
-                        <p class="verification-note">Payment proof is on file. Use the image icon in Actions to view the receipt.</p>
-                    </div>
-                `;
-            }
-            
-            detailsRow.innerHTML = `
-                <td colspan="9">
-                    ${receiptSection}
-                    <table class="details-table">
-                        <thead>
-                            <tr><th>Name</th><th>Product</th><th>Quantity</th><th>Price</th></tr>
-                        </thead>
-                        <tbody>
-                            ${itemsHTML}
-                        </tbody>
-                    </table>
-                </td>
-            `;
+                </div>`;
+        }
 
-            ordersTbody.appendChild(summaryRow);
-            ordersTbody.appendChild(detailsRow);
-        });
-    }
+        // 4. ITEMS TABLE LOGIC
+        let itemsHTML = (order.items || []).map(item => `
+            <tr>
+                <td>${item.customName || order.fullName}</td>
+                <td>${item.name}${item.size ? ' - ' + item.size : ''}</td>
+                <td>${item.quantity}</td>
+                <td>P ${item.price.toFixed(2)}</td>
+            </tr>
+        `).join('');
+
+        // 5. RENDER ROWS
+        const summaryRow = document.createElement('tr');
+        summaryRow.className = `order-summary ${order.markedForDeletion ? 'marked-for-deletion' : ''}`;
+        summaryRow.dataset.orderId = order._id;
+        summaryRow.dataset.name = order.fullName;
+        summaryRow.dataset.payment = order.paymentMethod;
+        summaryRow.dataset.section = order.programYear;
+
+        summaryRow.innerHTML = `
+            <td>${order.fullName}</td>
+            <td>${order.programYear}</td>
+            <td>${order.paymentMethod}</td>
+            <td>P ${order.total.toFixed(2)}</td>
+            <td>${orderNumber}</td>
+            <td class="timestamp">${new Date(order.createdAt).toLocaleString()}</td>
+            <td class="payment-status-cell"><span class="${paymentStatusClass}">${paymentStatusText}</span></td>
+            <td class="delivery-status-cell"><span class="${deliveryStatusClass}">${deliveryStatusText}</span></td>
+            <td>
+                <div class="actions">
+                    <i class="fa-solid fa-chevron-down toggle-details"></i>
+                    ${hasReceipt ? `<i class="fa-solid fa-image view-receipt" data-order-id="${order._id}"></i>` : ''}
+                    <i class="fa-solid fa-trash delete-order" data-order-id="${order._id}"></i>
+                </div>
+            </td>
+        `;
+
+        const detailsRow = document.createElement('tr');
+        detailsRow.className = 'order-details';
+        detailsRow.innerHTML = `
+            <td colspan="9">
+                ${receiptManagementHTML}
+                <table class="details-table">
+                    <thead><tr><th>Name</th><th>Product</th><th>Quantity</th><th>Price</th></tr></thead>
+                    <tbody>${itemsHTML}</tbody>
+                </table>
+            </td>
+        `;
+
+        ordersTbody.appendChild(summaryRow);
+        ordersTbody.appendChild(detailsRow);
+    });
+}
 
     // Load orders on page load
     loadOrders();
