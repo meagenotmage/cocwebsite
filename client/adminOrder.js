@@ -111,17 +111,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Payment status badge
             let paymentStatusClass, paymentStatusText;
-            if (order.status === 'paid') {
-                paymentStatusClass = 'status-paid';
-                paymentStatusText = 'Paid';
-            } else if (order.status === 'pending_payment') {
-                paymentStatusClass = 'status-pending';
-                paymentStatusText = 'Pending';
-            } else {
-                paymentStatusClass = 'status-not-paid';
-                paymentStatusText = 'Not Paid';
-            }
-            
+                if (order.status === 'paid') {
+                    paymentStatusClass = 'status-paid';
+                    paymentStatusText = 'Paid';
+                } else if (order.status === 'pending_payment') {
+                    paymentStatusClass = 'status-pending';
+                    paymentStatusText = 'Pending';
+                } else {
+                    // This covers 'pending' or any other default state
+                    paymentStatusClass = 'status-not-paid';
+                    paymentStatusText = 'Not Paid';
+                }
+                            
             // Determine received/delivery status display (Received or Not Received)
             let deliveryStatusText = 'Not Received';
             let deliveryStatusClass = 'status-not-received';
@@ -294,43 +295,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 2. FILTER LOGIC - Search and Filters
     function applyFilters() {
-        const searchQuery = searchInput.value.toLowerCase();
-        const paymentFilter = filterPayment.value;
-        const sectionFilter = filterSection.value;
-        const itemFilter = filterItem.value.toLowerCase();
-        const rows = ordersTbody.querySelectorAll('.order-summary');
+    const searchQuery = searchInput.value.toLowerCase().trim();
+    const paymentFilter = filterPayment.value.toLowerCase();
+    const sectionFilter = filterSection.value;
+    const itemFilter = filterItem.value.toLowerCase();
+    const rows = ordersTbody.querySelectorAll('.order-summary');
 
-        rows.forEach(row => {
-            const name = row.dataset.name.toLowerCase();
-            const payment = row.dataset.payment;
-            const section = row.dataset.section;
-            const items = row.dataset.items || '';
-            const detailsRow = row.nextElementSibling;
-            
-            // Check if row matches all filters
-            const matchesSearch = !searchQuery || 
-                name.includes(searchQuery) || 
-                payment.toLowerCase().includes(searchQuery) || 
-                section.toLowerCase().includes(searchQuery);
-            const matchesPayment = !paymentFilter || payment === paymentFilter;
-            const matchesSection = !sectionFilter || section === sectionFilter;
-            const matchesItem = !itemFilter || items.includes(itemFilter);
-            
-            if (matchesSearch && matchesPayment && matchesSection && matchesItem) {
-                row.style.display = '';
-                // Remove inline display style from details row - let CSS class handle visibility
-                if (detailsRow && detailsRow.classList.contains('order-details')) {
-                    detailsRow.style.display = '';
-                }
-            } else {
-                row.style.display = 'none';
-                // Hide details row when summary is hidden
-                if (detailsRow && detailsRow.classList.contains('order-details')) {
-                    detailsRow.style.display = 'none';
-                }
-            }
-        });
-    }
+    rows.forEach(row => {
+        const name = (row.dataset.name || "").toLowerCase();
+        const payment = (row.dataset.payment || "").toLowerCase();
+        const section = (row.dataset.section || "");
+        
+        const matchesSearch = !searchQuery || 
+            name.includes(searchQuery) || 
+            payment.includes(searchQuery) || 
+            section.toLowerCase().includes(searchQuery);
+
+        const matchesPayment = !paymentFilter || payment === paymentFilter;
+        const matchesSection = !sectionFilter || section === sectionFilter;
+        
+        if (matchesSearch && matchesPayment && matchesSection) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+            if (row.nextElementSibling) row.nextElementSibling.style.display = 'none';
+        }
+    });
+}
 
     // Add event listeners for all filters
     searchInput.addEventListener('keyup', applyFilters);
@@ -394,41 +385,81 @@ document.addEventListener('DOMContentLoaded', function () {
     ordersTbody.addEventListener('click', function(e) {
         const target = e.target.closest('td');
         if (!target || !target.closest('.order-summary')) return;
-        // Check if Payment Status (column 6) or Status (column 7) was clicked, but NOT timestamp (column 5)
+
+        // Check if Payment Status (column 6) or Status (column 7) was clicked
         if ((target.cellIndex === 6 || target.cellIndex === 7) && !target.querySelector('select')) {
             const currentStatus = target.querySelector('span')?.textContent.trim() || target.textContent.trim();
             const isPaymentStatus = target.cellIndex === 6;
             const options = isPaymentStatus ? ['Paid', 'Pending', 'Not Paid'] : ['Received', 'Not Received'];
 
-            // Create a select dropdown
             const select = document.createElement('select');
             select.className = 'inline-status-select';
             options.forEach(option => {
                 const opt = document.createElement('option');
                 opt.value = option;
                 opt.textContent = option;
-                if (option === currentStatus) {
-                    opt.selected = true;
-                }
+                if (option === currentStatus) opt.selected = true;
                 select.appendChild(opt);
             });
 
-            // Replace cell content with the dropdown
             target.innerHTML = '';
             target.appendChild(select);
             select.focus();
 
-            // Event listener to handle the change
-            const handleUpdate = () => {
+            // The function that saves to the database
+            const handleUpdate = async () => {
                 const newValue = select.value;
-                const statusClass = `status-${newValue.toLowerCase().replace(/\s+/g, '-')}`;
-                target.innerHTML = `<span class="${statusClass}">${newValue}</span>`;
+                const orderId = target.closest('.order-summary').dataset.orderId;
+                
+                let updateBody = {};
+                if (isPaymentStatus) {
+                    // Map to backend "paymentStatus" field
+                    if (newValue === 'Paid') updateBody.paymentStatus = 'paid';
+                    else if (newValue === 'Pending') updateBody.paymentStatus = 'pending';
+                    else updateBody.paymentStatus = 'pending'; // Default for Not Paid
+                } else {
+                    // Map to backend "status" field
+                    updateBody.status = (newValue === 'Received') ? 'received' : 'pending';
+                }
+
+                try {
+                    const response = await fetch(`${CONFIG.API_URL}/api/orders/${orderId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify(updateBody)
+                    });
+
+                    if (response.ok) {
+                        const statusClass = `status-${newValue.toLowerCase().replace(/\s+/g, '-')}`;
+                        target.innerHTML = `<span class="${statusClass}">${newValue}</span>`;
+                        
+                        // Update local data
+                        const orderIdx = allOrders.findIndex(o => o._id === orderId);
+                        if (orderIdx > -1) {
+                            if (isPaymentStatus) allOrders[orderIdx].paymentStatus = updateBody.paymentStatus;
+                            else allOrders[orderIdx].status = updateBody.status;
+                        }
+                    } else {
+                        alert("Failed to update database.");
+                        loadOrders();
+                    }
+                } catch (err) {
+                    console.error("Update error:", err);
+                    loadOrders();
+                }
             };
-            
+
+            // ATTACH THE EVENTS (This was missing in your code)
             select.addEventListener('change', handleUpdate);
-            select.addEventListener('blur', handleUpdate); // Update when focus is lost
+            select.addEventListener('blur', () => {
+                if (select.parentNode === target) {
+                    const statusClass = `status-${select.value.toLowerCase().replace(/\s+/g, '-')}`;
+                    target.innerHTML = `<span class="${statusClass}">${select.value}</span>`;
+                }
+            });
         }
-    });
+    }); // This closes the event listener properly
 
     // 4. VIEW RECEIPT
     ordersTbody.addEventListener('click', function(e) {

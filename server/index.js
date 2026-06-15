@@ -534,10 +534,6 @@ app.post('/api/orders/:id/receipt', requireAuth, upload.single('receipt'), async
     const updateData = { receiptUrl };
     const method = (order.paymentMethod || '').toUpperCase();
 
-    if (method === 'CASH' && order.status === 'pending') {
-      updateData.status = 'pending';
-    }
-
     const updated = await Order.findByIdAndUpdate(req.params.id, updateData, { new: true });
     res.json({ message: 'Receipt uploaded successfully!', order: updated });
   } catch (err) {
@@ -548,32 +544,57 @@ app.post('/api/orders/:id/receipt', requireAuth, upload.single('receipt'), async
 
 // Update order status (for admin)
 app.put('/api/orders/:id', requireAuth, async (req, res) => {
-  try {
+   try {
     const { id } = req.params;
-    // Extract both status and paymentStatus from the admin request
     const { status, paymentStatus, receiptUrl } = req.body;
-    
+
+    console.log(`--- UPDATE ATTEMPT START ---`);
+    console.log(`Order ID: ${id}`);
+    console.log(`Data Received:`, JSON.stringify(req.body));
+
+    // 1. Check if ID is valid
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      console.error("Invalid MongoDB ID format");
+      return res.status(400).json({ message: 'Invalid Order ID format' });
+    }
+
+    // 2. Build update object - being very explicit
     const updateData = {};
     if (status !== undefined) updateData.status = status;
     if (paymentStatus !== undefined) updateData.paymentStatus = paymentStatus;
     if (receiptUrl !== undefined) updateData.receiptUrl = receiptUrl;
-    
-    console.log(`Updating order ${id} with:`, updateData); // Debug log
-    
-    const order = await Order.findByIdAndUpdate(
+
+    // 3. Perform the update
+    const updatedOrder = await Order.findByIdAndUpdate(
       id,
-      { $set: updateData }, // Use $set to ensure specific fields are updated
-      { new: true, runValidators: true } 
+      { $set: updateData },
+      { 
+        new: true,           // Return the document AFTER update
+        runValidators: true, // Ensure it matches schema
+        upsert: false        // Don't create a new one if it doesn't exist
+      }
     );
-    
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found.' });
+
+    if (!updatedOrder) {
+      console.error(`Order with ID ${id} not found in database.`);
+      return res.status(404).json({ message: 'Order not found in database.' });
     }
-    
-    res.json({ message: 'Order updated successfully!', order });
+
+    console.log(`SUCCESS: Order updated. New status: ${updatedOrder.status}, New paymentStatus: ${updatedOrder.paymentStatus}`);
+    console.log(`--- UPDATE ATTEMPT END ---`);
+
+    res.json({ 
+      message: 'Order updated successfully!', 
+      order: updatedOrder 
+    });
+
   } catch (err) {
-    console.error('Error updating order:', err);
-    res.status(500).json({ message: 'Failed to update order.' });
+    console.error('--- UPDATE ERROR ---');
+    console.error(err);
+    res.status(500).json({ 
+      message: 'Failed to update order.', 
+      error: err.message 
+    });
   }
 });
 
