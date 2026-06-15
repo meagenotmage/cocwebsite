@@ -111,10 +111,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Payment status badge
             let paymentStatusClass, paymentStatusText;
-                if (order.status === 'paid') {
+                if (order.paymentStatus === 'paid') {
                     paymentStatusClass = 'status-paid';
                     paymentStatusText = 'Paid';
-                } else if (order.status === 'pending_payment') {
+                } else if (order.paymentStatus === 'pending') {
                     paymentStatusClass = 'status-pending';
                     paymentStatusText = 'Pending';
                 } else {
@@ -382,84 +382,87 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // 3. INLINE STATUS EDITING LOGIC
-    ordersTbody.addEventListener('click', function(e) {
-        const target = e.target.closest('td');
-        if (!target || !target.closest('.order-summary')) return;
+ordersTbody.addEventListener('click', function(e) {
+    const target = e.target.closest('td');
+    if (!target || !target.closest('.order-summary')) return;
 
-        // Check if Payment Status (column 6) or Status (column 7) was clicked
-        if ((target.cellIndex === 6 || target.cellIndex === 7) && !target.querySelector('select')) {
-            const currentStatus = target.querySelector('span')?.textContent.trim() || target.textContent.trim();
-            const isPaymentStatus = target.cellIndex === 6;
-            const options = isPaymentStatus ? ['Paid', 'Pending', 'Not Paid'] : ['Received', 'Not Received'];
+    // Cell index 6 is "Payment Status", Cell index 7 is "Delivery Status"
+    const isPaymentStatus = target.cellIndex === 6;
+    const isDeliveryStatus = target.cellIndex === 7;
 
-            const select = document.createElement('select');
-            select.className = 'inline-status-select';
-            options.forEach(option => {
-                const opt = document.createElement('option');
-                opt.value = option;
-                opt.textContent = option;
-                if (option === currentStatus) opt.selected = true;
-                select.appendChild(opt);
-            });
+    if ((isPaymentStatus || isDeliveryStatus) && !target.querySelector('select')) {
+        const currentStatus = target.querySelector('span')?.textContent.trim() || target.textContent.trim();
+        const options = isPaymentStatus ? ['Paid', 'Pending', 'Not Paid'] : ['Received', 'Not Received'];
 
-            target.innerHTML = '';
-            target.appendChild(select);
-            select.focus();
+        const select = document.createElement('select');
+        select.className = 'inline-status-select';
+        options.forEach(option => {
+            const opt = document.createElement('option');
+            opt.value = option;
+            opt.textContent = option;
+            if (option === currentStatus) opt.selected = true;
+            select.appendChild(opt);
+        });
 
-            // The function that saves to the database
-            const handleUpdate = async () => {
-                const newValue = select.value;
-                const orderId = target.closest('.order-summary').dataset.orderId;
-                
-                let updateBody = {};
-                if (isPaymentStatus) {
-                    // Map to backend "paymentStatus" field
-                    if (newValue === 'Paid') updateBody.paymentStatus = 'paid';
-                    else if (newValue === 'Pending') updateBody.paymentStatus = 'pending';
-                    else updateBody.paymentStatus = 'pending'; // Default for Not Paid
-                } else {
-                    // Map to backend "status" field
-                    updateBody.status = (newValue === 'Received') ? 'received' : 'pending';
-                }
+        target.innerHTML = '';
+        target.appendChild(select);
+        select.focus();
 
-                try {
-                    const response = await fetch(`${CONFIG.API_URL}/api/orders/${orderId}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        credentials: 'include',
-                        body: JSON.stringify(updateBody)
-                    });
+        const handleUpdate = async () => {
+            const newValue = select.value;
+            const orderId = target.closest('.order-summary').dataset.orderId;
+            
+            let updateBody = {};
 
-                    if (response.ok) {
-                        const statusClass = `status-${newValue.toLowerCase().replace(/\s+/g, '-')}`;
-                        target.innerHTML = `<span class="${statusClass}">${newValue}</span>`;
-                        
-                        // Update local data
-                        const orderIdx = allOrders.findIndex(o => o._id === orderId);
-                        if (orderIdx > -1) {
-                            if (isPaymentStatus) allOrders[orderIdx].paymentStatus = updateBody.paymentStatus;
-                            else allOrders[orderIdx].status = updateBody.status;
-                        }
-                    } else {
-                        alert("Failed to update database.");
-                        loadOrders();
+            if (isPaymentStatus) {
+                // UPDATE THIS FIELD IN DB: paymentStatus
+                if (newValue === 'Paid') updateBody.paymentStatus = 'paid';
+                else if (newValue === 'Pending') updateBody.paymentStatus = 'pending';
+                else updateBody.paymentStatus = 'pending'; // 'Not Paid' maps to pending
+            } else {
+                // UPDATE THIS FIELD IN DB: status
+                updateBody.status = (newValue === 'Received') ? 'received' : 'pending';
+            }
+
+            try {
+                const response = await fetch(`${CONFIG.API_URL}/api/orders/${orderId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(updateBody)
+                });
+
+                if (response.ok) {
+                    const statusClass = `status-${newValue.toLowerCase().replace(/\s+/g, '-')}`;
+                    target.innerHTML = `<span class="${statusClass}">${newValue}</span>`;
+                    
+                    // Update local allOrders array so it stays updated without refresh
+                    const orderIdx = allOrders.findIndex(o => o._id === orderId);
+                    if (orderIdx > -1) {
+                        if (isPaymentStatus) allOrders[orderIdx].paymentStatus = updateBody.paymentStatus;
+                        else allOrders[orderIdx].status = updateBody.status;
                     }
-                } catch (err) {
-                    console.error("Update error:", err);
+                } else {
+                    const errData = await response.json();
+                    alert("Error: " + errData.message);
                     loadOrders();
                 }
-            };
+            } catch (err) {
+                console.error("Update error:", err);
+                loadOrders();
+            }
+        };
 
-            // ATTACH THE EVENTS (This was missing in your code)
-            select.addEventListener('change', handleUpdate);
-            select.addEventListener('blur', () => {
-                if (select.parentNode === target) {
-                    const statusClass = `status-${select.value.toLowerCase().replace(/\s+/g, '-')}`;
-                    target.innerHTML = `<span class="${statusClass}">${select.value}</span>`;
-                }
-            });
-        }
-    }); // This closes the event listener properly
+        select.addEventListener('change', handleUpdate);
+        select.addEventListener('blur', () => {
+            // If the user didn't change anything, just revert back to text
+            if (select.parentNode === target) {
+                const statusClass = `status-${select.value.toLowerCase().replace(/\s+/g, '-')}`;
+                target.innerHTML = `<span class="${statusClass}">${select.value}</span>`;
+            }
+        });
+    }
+});// This closes the event listener properly
 
     // 4. VIEW RECEIPT
     ordersTbody.addEventListener('click', function(e) {
