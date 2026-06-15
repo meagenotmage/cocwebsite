@@ -433,7 +433,22 @@ app.put('/api/events/:id', requireAuth, async (req, res) => {
 // Get all orders (for admin)
 app.get('/api/orders', requireAuth, async (req, res) => {
   try {
-    const orders = await Order.find().sort({ createdAt: -1 });
+    const { paymentMethod, status, paymentStatus } = req.query;
+    let query = {};
+
+    // Filtering logic
+    if (paymentMethod) {
+      // Use regex 'i' for case-insensitive matching (matches "cash" or "Cash")
+      query.paymentMethod = { $regex: new RegExp(`^${paymentMethod}$`, 'i') };
+    }
+    if (status) {
+      query.status = status;
+    }
+    if (paymentStatus) {
+      query.paymentStatus = paymentStatus;
+    }
+
+    const orders = await Order.find(query).sort({ createdAt: -1 });
     res.json(orders);
   } catch (err) {
     console.error('Error fetching orders:', err);
@@ -520,7 +535,7 @@ app.post('/api/orders/:id/receipt', requireAuth, upload.single('receipt'), async
     const method = (order.paymentMethod || '').toUpperCase();
 
     if (method === 'CASH' && order.status === 'pending') {
-      updateData.status = 'paid';
+      updateData.status = 'pending';
     }
 
     const updated = await Order.findByIdAndUpdate(req.params.id, updateData, { new: true });
@@ -539,14 +554,16 @@ app.put('/api/orders/:id', requireAuth, async (req, res) => {
     const { status, paymentStatus, receiptUrl } = req.body;
     
     const updateData = {};
-    if (status) updateData.status = status;
-    if (paymentStatus) updateData.paymentStatus = paymentStatus;
-    if (receiptUrl) updateData.receiptUrl = receiptUrl;
+    if (status !== undefined) updateData.status = status;
+    if (paymentStatus !== undefined) updateData.paymentStatus = paymentStatus;
+    if (receiptUrl !== undefined) updateData.receiptUrl = receiptUrl;
+    
+    console.log(`Updating order ${id} with:`, updateData); // Debug log
     
     const order = await Order.findByIdAndUpdate(
       id,
-      updateData,
-      { new: true } // Returns the updated document
+      { $set: updateData }, // Use $set to ensure specific fields are updated
+      { new: true, runValidators: true } 
     );
     
     if (!order) {
