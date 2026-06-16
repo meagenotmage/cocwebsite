@@ -605,6 +605,30 @@ app.put('/api/orders/:id', requireAuth, async (req, res) => {
   }
 });
 
+// Save or Replace Receipt as Base64 (Persistent Storage)
+app.put('/api/orders/:id/receipt-base64', requireAuth, async (req, res) => {
+  try {
+    const { receiptUrl } = req.body; // This will be the long Base64 string
+
+    if (!receiptUrl) {
+      return res.status(400).json({ message: 'No image data provided.' });
+    }
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.id,
+      { $set: { receiptUrl: receiptUrl } },
+      { new: true }
+    );
+
+    if (!updatedOrder) return res.status(404).json({ message: 'Order not found.' });
+
+    res.json({ message: 'Receipt saved to database!', order: updatedOrder });
+  } catch (err) {
+    console.error('Base64 Save Error:', err);
+    res.status(500).json({ message: 'Server error saving image string.' });
+  }
+});
+
 // Delete order (for admin) - DISABLED. Use mark-for-deletion instead for safety
 // app.delete('/api/orders/:id', async (req, res) => {
 //   try {

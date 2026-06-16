@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const toggleCash = document.getElementById('toggle-cash');
     let allOrders = [];
 
-    // Helper Functions
+    // Helpers
     function isCashPayment(method) { return (method || '').toUpperCase() === 'CASH'; }
     function isGcashPayment(method) { return (method || '').toUpperCase() === 'GCASH'; }
 
@@ -98,21 +98,16 @@ document.addEventListener('DOMContentLoaded', function () {
             const orderNum = String(order.orderNumber).padStart(4, '0');
             const time = order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A';
 
-            // Badges
             let pClass = order.paymentStatus === 'paid' ? 'status-paid' : 'status-not-paid';
             let pText = order.paymentStatus === 'paid' ? 'Paid' : 'Not Paid';
             let dClass = order.status === 'received' ? 'status-received' : 'status-not-received';
             let dText = order.status === 'received' ? 'Received' : 'Not Received';
 
-            // Receipt Icon
             const hasReceipt = order.receiptUrl && order.receiptUrl !== '';
             const receiptClass = hasReceipt ? 'has-receipt' : 'no-receipt';
 
-            // Row HTML
             const summaryRow = document.createElement('tr');
             summaryRow.className = `order-summary ${order.markedForDeletion ? 'marked-for-deletion' : ''}`;
-            
-            // Dataset for filters (Crucial!)
             summaryRow.dataset.orderId = order._id;
             summaryRow.dataset.name = order.fullName;
             summaryRow.dataset.payment = order.paymentMethod;
@@ -135,8 +130,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                 </td>`;
 
-            const detailsRow = document.createElement('tr');
-            detailsRow.className = 'order-details';
             let itemsHTML = (order.items || []).map(i => `
                 <tr>
                     <td>${i.customName || order.fullName}</td>
@@ -145,6 +138,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     <td>P ${i.price.toFixed(2)}</td>
                 </tr>`).join('');
 
+            const detailsRow = document.createElement('tr');
+            detailsRow.className = 'order-details';
             detailsRow.innerHTML = `<td colspan="9">
                 <table class="details-table">
                     <thead><tr><th>Name</th><th>Product</th><th>Qty</th><th>Price</th></tr></thead>
@@ -158,51 +153,83 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ======================= //
-    //    RECEIPT MODAL        //
+    //    ORDER ACTIONS (Main) //
     // ======================= //
-    ordersTbody.addEventListener('click', (e) => {
+    ordersTbody.addEventListener('click', async (e) => {
+        const orderId = e.target.closest('tr')?.dataset.orderId;
+        
+        // 1. Toggle Details
+        if (e.target.classList.contains('toggle-details')) {
+            e.target.classList.toggle('is-open');
+            e.target.closest('tr').nextElementSibling.classList.toggle('is-open');
+        }
+
+        // 2. Receipt Management Modal
         const icon = e.target.closest('.view-receipt');
-        if (!icon) return;
+        if (icon) {
+            const order = allOrders.find(o => o._id === icon.dataset.orderId);
+            if (!order) return;
 
-        const order = allOrders.find(o => o._id === icon.dataset.orderId);
-        if (!order) return;
-
-        const hasReceipt = order.receiptUrl && order.receiptUrl !== '';
-        const modal = document.createElement('div');
-        modal.className = 'receipt-modal management-modal';
-        
-        modal.innerHTML = `
-            <div class="receipt-modal-content">
-                <span class="close-modal">&times;</span>
-                <h3>Receipt Management</h3>
-                <div class="modal-body">
-                    ${hasReceipt ? `<img class="preview-img-small" src="${order.receiptUrl.startsWith('data') ? order.receiptUrl : CONFIG.API_URL + order.receiptUrl}">` : `<p>No receipt on file</p>`}
-                    <div class="modal-actions">
-                        ${hasReceipt ? `<button onclick="window.open('${order.receiptUrl.startsWith('data') ? order.receiptUrl : CONFIG.API_URL + order.receiptUrl}', '_blank')">View Full</button>` : ''}
-                        <hr>
-                        <input type="file" id="modal-file-input" accept="image/*">
-                        <button class="btn-save-receipt" data-id="${order._id}">Save Image</button>
-                        ${order.status === 'pending_payment' ? `<div class="verify-zone"><button class="v-btn" data-id="${order._id}">Approve</button><button class="r-btn" data-id="${order._id}">Reject</button></div>` : ''}
+            const hasReceipt = order.receiptUrl && order.receiptUrl !== '';
+            const modal = document.createElement('div');
+            modal.className = 'receipt-modal management-modal';
+            
+            modal.innerHTML = `
+                <div class="receipt-modal-content">
+                    <span class="close-modal">&times;</span>
+                    <h3>Receipt Management</h3>
+                    <div class="modal-body">
+                        ${hasReceipt ? `<img class="preview-img-small" src="${order.receiptUrl.startsWith('data') ? order.receiptUrl : CONFIG.API_URL + order.receiptUrl}">` : `<p>No receipt on file</p>`}
+                        <div class="modal-actions">
+                            <hr>
+                            <input type="file" id="modal-file-input" accept="image/*">
+                            <button class="btn-save-receipt" style="background:#2196F3; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer; width:100%;">Save to Database</button>
+                            ${order.status === 'pending_payment' ? `<div class="verify-zone" style="display:flex; gap:10px; margin-top:15px;"><button class="v-btn" style="background:#4CAF50; color:white; flex:1; border:none; padding:10px; border-radius:6px;">Approve</button><button class="r-btn" style="background:#f44336; color:white; flex:1; border:none; padding:10px; border-radius:6px;">Reject</button></div>` : ''}
+                        </div>
                     </div>
-                </div>
-            </div>`;
+                </div>`;
 
-        document.body.appendChild(modal);
+            document.body.appendChild(modal);
 
-        modal.querySelector('.close-modal').onclick = () => modal.remove();
-        
-        modal.querySelector('.btn-save-receipt').onclick = async function() {
-            const file = modal.querySelector('#modal-file-input').files[0];
-            if (!file) return alert('Select file');
-            const fd = new FormData(); fd.append('receipt', file);
-            const res = await fetch(`${CONFIG.API_URL}/api/orders/${order._id}/receipt`, { method: 'POST', credentials: 'include', body: fd });
-            if (res.ok) { alert('Saved!'); modal.remove(); loadOrders(); }
-        };
+            modal.querySelector('.close-modal').onclick = () => modal.remove();
+            
+            // THE BASE64 SAVE LOGIC
+            modal.querySelector('.btn-save-receipt').onclick = async function() {
+                const fileInput = modal.querySelector('#modal-file-input');
+                const file = fileInput.files[0];
+                if (!file) return alert('Select file');
 
-        const v = modal.querySelector('.v-btn');
-        if(v) v.onclick = () => updatePayment(order._id, 'paid', 'paid', modal);
-        const r = modal.querySelector('.r-btn');
-        if(r) r.onclick = () => updatePayment(order._id, 'pending_payment', 'pending', modal);
+                this.disabled = true;
+                this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = async () => {
+                    try {
+                        const res = await fetch(`${CONFIG.API_URL}/api/orders/${order._id}/receipt-base64`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include',
+                            body: JSON.stringify({ receiptUrl: reader.result })
+                        });
+                        if (res.ok) { alert('Saved permanently!'); modal.remove(); loadOrders(); }
+                    } catch (err) { console.error(err); this.disabled = false; }
+                };
+            };
+
+            const v = modal.querySelector('.v-btn');
+            if(v) v.onclick = () => updatePayment(order._id, 'paid', 'paid', modal);
+            const r = modal.querySelector('.r-btn');
+            if(r) r.onclick = () => updatePayment(order._id, 'pending_payment', 'pending', modal);
+        }
+
+        // 3. Delete Logic
+        if (e.target.classList.contains('delete-order')) {
+            if (confirm("Mark for deletion?")) {
+                await fetch(`${CONFIG.API_URL}/api/orders/${orderId}/mark-for-deletion`, { method: 'POST', credentials: 'include' });
+                loadOrders();
+            }
+        }
     });
 
     async function updatePayment(id, status, pStatus, modal) {
@@ -216,18 +243,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ======================= //
-    //    RE-ADDED LOGIC       //
+    //    FILTERS & EDITING    //
     // ======================= //
-
-    // 1. Dropdown Toggle
-    ordersTbody.addEventListener('click', (e) => {
-        if (e.target.classList.contains('toggle-details')) {
-            e.target.classList.toggle('is-open');
-            e.target.closest('tr').nextElementSibling.classList.toggle('is-open');
-        }
-    });
-
-    // 2. Filters
     function applyFilters() {
         const search = searchInput.value.toLowerCase().trim();
         const payF = filterPayment.value.toLowerCase();
@@ -248,7 +265,6 @@ document.addEventListener('DOMContentLoaded', function () {
     filterPayment.addEventListener('change', applyFilters);
     filterSection.addEventListener('change', applyFilters);
 
-    // 3. Inline Status Edit
     ordersTbody.addEventListener('click', async (e) => {
         const td = e.target.closest('td');
         if (!td || !td.closest('.order-summary')) return;

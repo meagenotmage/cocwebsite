@@ -567,46 +567,51 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     object-fit: contain;
 }
-/* Management Modal */
+/* Ensure the Modal is centered and looks like a modern popup */
+.management-modal {
+    background: rgba(0, 0, 0, 0.6); /* Darken background */
+    backdrop-filter: blur(2px);     /* Modern blur effect */
+}
+
 .management-modal .receipt-modal-content {
-    max-width: 400px;
-    width: 90%;
-    border-radius: 12px;
-}
-.modal-body { display: flex; flex-direction: column; gap: 15px; padding: 10px; }
-.preview-img-small { 
-    width: 100%; 
-    max-height: 250px; 
-    object-fit: contain; 
-    background: #f4f4f4; 
-    border-radius: 8px; 
-}
-.no-receipt-placeholder {
-    padding: 40px;
-    background: #f9f9f9;
-    border: 2px dashed #ccc;
-    color: #888;
-    text-align: center;
-    border-radius: 8px;
-}
-.modal-actions { display: flex; flex-direction: column; gap: 10px; }
-.btn-action {
-    background: #2196F3;
-    color: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     border: none;
-    padding: 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
 }
-.verify-zone { display: flex; gap: 10px; border-top: 1px solid #eee; padding-top: 15px; }
-.verify-btn { background: #4CAF50; color: white; border: none; flex: 1; padding: 10px; border-radius: 6px; cursor: pointer; }
-.reject-btn { background: #f44336; color: white; border: none; flex: 1; padding: 10px; border-radius: 6px; cursor: pointer; }
 
-/* Status Icon colors */
-.view-receipt.has-receipt { color: #2196F3 !important; }
-.view-receipt.no-receipt { color: #ccc !important; }
+.modal-body img {
+    border-radius: 10px;
+    border: 1px solid #eee;
+    margin-bottom: 15px;
+}
 
+/* Make the Save button look distinct */
+.btn-save-receipt {
+    transition: transform 0.2s, background 0.2s;
+}
+
+.btn-save-receipt:hover {
+    transform: translateY(-2px);
+    background: #1976D2;
+}
+
+/* Ensure badges look consistent */
+.status-paid, .status-received {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.status-not-paid, .status-not-received {
+    background: #ffebee;
+    color: #c62828;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+}
 /* Timestamp Column */
 .timestamp {
     font-size: 0.85rem;
