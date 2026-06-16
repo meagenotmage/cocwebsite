@@ -534,8 +534,15 @@ app.post('/api/orders/:id/receipt', requireAuth, upload.single('receipt'), async
     const updateData = { receiptUrl };
     const method = (order.paymentMethod || '').toUpperCase();
 
-    const updated = await Order.findByIdAndUpdate(req.params.id, updateData, { new: true });
-    res.json({ message: 'Receipt uploaded successfully!', order: updated });
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.id, 
+      { $set: { receiptUrl: receiptUrl } }, 
+      { new: true }
+    );
+
+    if (!updatedOrder) return res.status(404).json({ message: 'Order not found.' });
+
+    res.json({ message: 'Receipt uploaded successfully!', order: updatedOrder });
   } catch (err) {
     console.error('Error uploading order receipt:', err);
     res.status(500).json({ message: 'Failed to upload receipt.', error: err.message });

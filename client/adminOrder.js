@@ -93,276 +93,178 @@ document.addEventListener('DOMContentLoaded', function () {
     // ======================= //
     //    DISPLAY ORDERS       //
     // ======================= //
-    function displayOrders(orders) {
-        if (orders.length === 0) {
-            ordersTbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">No orders yet</td></tr>';
-            return;
-        }
+    // ======================= //
 
-        const sortedOrders = [...orders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        ordersTbody.innerHTML = '';
+function displayOrders(orders) {
+    if (orders.length === 0) {
+        ordersTbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">No orders yet</td></tr>';
+        return;
+    }
 
-        sortedOrders.forEach((order) => {
-            const orderNumber = String(order.orderNumber).padStart(4, '0');
+    const sortedOrders = [...orders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    ordersTbody.innerHTML = '';
 
-            // 1. Timestamp
-            let timestamp = 'N/A';
-            if (order.createdAt) {
-                timestamp = new Date(order.createdAt).toLocaleString('en-US', {
-                    month: 'short', day: 'numeric', year: 'numeric',
-                    hour: '2-digit', minute: '2-digit', hour12: true
-                });
-            }
+    sortedOrders.forEach((order) => {
+        const orderNumber = String(order.orderNumber).padStart(4, '0');
+        const timestamp = order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A';
 
-            // 2. Deletion logic
-            let deletionWarningHTML = ''; 
-            if (order.markedForDeletion && order.deletionWarningDate) {
-                const deleteDate = new Date(order.deletionWarningDate);
-                deleteDate.setDate(deleteDate.getDate() + 7);
-                const daysUntilDeletion = Math.ceil((deleteDate - new Date()) / (1000 * 60 * 60 * 24));
-                const warningClass = daysUntilDeletion <= 0 ? 'deletion-ready' : 'deletion-warning';
-                deletionWarningHTML = `<span class="deletion-badge ${warningClass}" title="Marked for deletion">🗑️ ${Math.max(0, daysUntilDeletion)}d</span>`;
-            }
+        // Payment & Delivery Badges
+        let pClass = order.paymentStatus === 'paid' ? 'status-paid' : 'status-not-paid';
+        let pText = order.paymentStatus === 'paid' ? 'Paid' : 'Not Paid';
+        let dClass = order.status === 'received' ? 'status-received' : 'status-not-received';
+        let dText = order.status === 'received' ? 'Received' : 'Not Received';
 
-            // 3. Payment Status
-            let pClass, pText;
-            if (order.paymentStatus === 'paid') { pClass = 'status-paid'; pText = 'Paid'; }
-            else if (order.paymentStatus === 'pending') { pClass = 'status-pending'; pText = 'Pending'; }
-            else { pClass = 'status-not-paid'; pText = 'Not Paid'; }
+        // Receipt Icon Class
+        const hasReceipt = order.receiptUrl && order.receiptUrl !== '';
+        const receiptClass = hasReceipt ? 'has-receipt' : 'no-receipt';
 
-            // 4. Delivery Status
-            let dText = order.status === 'received' ? 'Received' : 'Not Received';
-            let dClass = order.status === 'received' ? 'status-received' : 'status-not-received';
+        // Items HTML
+        let itemsHTML = (order.items || []).map(item => `
+            <tr>
+                <td>${item.customName || order.fullName}</td>
+                <td>${item.name}${item.size ? ' - ' + item.size : ''}</td>
+                <td>${item.quantity}</td>
+                <td>P ${item.price.toFixed(2)}</td>
+            </tr>`).join('');
 
-            // 5. Receipt Logic
-            const hasReceipt = order.receiptUrl && order.receiptUrl !== '';
-            const receiptClass = hasReceipt ? 'has-receipt' : 'no-receipt';
-            const receiptTitle = hasReceipt ? 'View Receipt' : 'No Receipt Uploaded';
+        const summaryRow = document.createElement('tr');
+        summaryRow.className = `order-summary ${order.markedForDeletion ? 'marked-for-deletion' : ''}`;
+        summaryRow.dataset.orderId = order._id;
 
-            let receiptManagementHTML = '';
-            if (hasReceipt) {
-                receiptManagementHTML = `
-                    <div class="admin-management-box receipt-exists">
-                        <h4><i class="fa-solid fa-circle-check"></i> Payment Proof on File</h4>
-                        <div class="upload-controls">
-                            <button class="view-receipt btn-secondary" data-order-id="${order._id}"><i class="fa-solid fa-eye"></i> View Current</button>
-                            <button class="btn-show-replace" onclick="this.nextElementSibling.style.display='flex'; this.style.display='none'"><i class="fa-solid fa-pen"></i> Replace</button>
-                            <div class="replace-controls" style="display: none; gap: 10px; align-items: center;">
-                                <input type="file" class="admin-manual-upload-input" accept="image/*">
-                                <button class="btn-manual-upload" data-order-id="${order._id}">Confirm</button>
-                            </div>
-                        </div>
-                        ${order.status === 'pending_payment' ? `
-                            <div class="receipt-verification" style="margin-top:10px; border-top:1px solid #ddd; padding-top:10px;">
-                                <button class="verify-btn" data-order-id="${order._id}"><i class="fa-solid fa-check"></i> Approve GCash</button>
-                                <button class="reject-btn" data-order-id="${order._id}"><i class="fa-solid fa-x"></i> Reject</button>
-                            </div>` : ''}
-                    </div>`;
-            } else {
-                receiptManagementHTML = `
-                    <div class="admin-management-box no-receipt">
-                        <h4><i class="fa-solid fa-circle-exclamation"></i> No Receipt Found</h4>
-                        <div class="upload-controls">
-                            <input type="file" class="admin-manual-upload-input" accept="image/*">
-                            <button class="btn-manual-upload" data-order-id="${order._id}"><i class="fa-solid fa-upload"></i> Upload & Save</button>
-                        </div>
-                    </div>`;
-            }
-
-            // 6. Items Table
-            let itemsHTML = (order.items || []).map(item => `
-                <tr>
-                    <td>${item.customName || order.fullName}</td>
-                    <td>${item.name}${item.size ? ' - ' + item.size : ''}</td>
-                    <td>${item.quantity}</td>
-                    <td>P ${item.price.toFixed(2)}</td>
-                </tr>`).join('');
-
-            // 7. Summary Row
-            const summaryRow = document.createElement('tr');
-            summaryRow.className = `order-summary ${order.markedForDeletion ? 'marked-for-deletion' : ''}`;
-            summaryRow.dataset.orderId = order._id;
-            summaryRow.dataset.name = order.fullName;
-            summaryRow.dataset.payment = order.paymentMethod;
-            summaryRow.dataset.section = order.programYear;
-
-            summaryRow.innerHTML = `
-                <td>${order.fullName}</td>
-                <td>${order.programYear}</td>
-                <td>${order.paymentMethod}</td>
-                <td>P ${order.total.toFixed(2)}</td>
-                <td>${orderNumber}</td>
-                <td class="timestamp">${timestamp}</td>
-                <td class="payment-status-cell"><span class="${pClass}">${pText}</span></td>
-                <td class="delivery-status-cell"><span class="${dClass}">${dText}</span></td>
-                <td>
-                    <div class="actions">
-                        ${deletionWarningHTML}
-                        <i class="fa-solid fa-chevron-down toggle-details"></i>
-                        <i class="fa-solid fa-image view-receipt ${receiptClass}" title="${receiptTitle}" data-order-id="${order._id}"></i>
-                        ${order.markedForDeletion ? 
-                            `<i class="fa-solid fa-undo cancel-deletion" data-order-id="${order._id}"></i>` : 
-                            `<i class="fa-solid fa-trash delete-order" data-order-id="${order._id}"></i>`}
-                    </div>
-                </td>`;
-
-            const detailsRow = document.createElement('tr');
-            detailsRow.className = 'order-details';
-            detailsRow.innerHTML = `<td colspan="9">
-                ${receiptManagementHTML}
-                <table class="details-table">
-                    <thead><tr><th>Name</th><th>Product</th><th>Quantity</th><th>Price</th></tr></thead>
-                    <tbody>${itemsHTML}</tbody>
-                </table>
+        summaryRow.innerHTML = `
+            <td>${order.fullName}</td>
+            <td>${order.programYear}</td>
+            <td>${order.paymentMethod}</td>
+            <td>P ${order.total.toFixed(2)}</td>
+            <td>${orderNumber}</td>
+            <td class="timestamp">${timestamp}</td>
+            <td class="payment-status-cell"><span class="${pClass}">${pText}</span></td>
+            <td class="delivery-status-cell"><span class="${dClass}">${dText}</span></td>
+            <td>
+                <div class="actions">
+                    <i class="fa-solid fa-chevron-down toggle-details"></i>
+                    <i class="fa-solid fa-image view-receipt ${receiptClass}" data-order-id="${order._id}"></i>
+                    <i class="fa-solid fa-trash delete-order" data-order-id="${order._id}"></i>
+                </div>
             </td>`;
 
-            ordersTbody.appendChild(summaryRow);
-            ordersTbody.appendChild(detailsRow);
-        });
-    }
+        const detailsRow = document.createElement('tr');
+        detailsRow.className = 'order-details';
+        detailsRow.innerHTML = `<td colspan="9">
+            <table class="details-table">
+                <thead><tr><th>Name</th><th>Product</th><th>Quantity</th><th>Price</th></tr></thead>
+                <tbody>${itemsHTML}</tbody>
+            </table>
+        </td>`;
 
-    loadOrders();
-
-    // ======================= //
-    //    EVENT LISTENERS      //
-    // ======================= //
-
-    // 1. Dropdown Toggle
-    ordersTbody.addEventListener('click', (e) => {
-        if (e.target.classList.contains('toggle-details')) {
-            e.target.classList.toggle('is-open');
-            e.target.closest('tr').nextElementSibling.classList.toggle('is-open');
-        }
+        ordersTbody.appendChild(summaryRow);
+        ordersTbody.appendChild(detailsRow);
     });
+}
 
-    // 2. Filters
-    function applyFilters() {
-        const searchQuery = searchInput.value.toLowerCase().trim();
-        const paymentFilter = filterPayment.value.toLowerCase();
-        const sectionFilter = filterSection.value;
-        const rows = ordersTbody.querySelectorAll('.order-summary');
+// ======================= //
+//    RECEIPT MANAGEMENT   //
+// ======================= //
+ordersTbody.addEventListener('click', (e) => {
+    const icon = e.target.closest('.view-receipt');
+    if (!icon) return;
 
-        rows.forEach(row => {
-            const name = (row.dataset.name || "").toLowerCase();
-            const payment = (row.dataset.payment || "").toLowerCase();
-            const section = (row.dataset.section || "");
-            
-            const matchesSearch = !searchQuery || name.includes(searchQuery) || payment.includes(searchQuery) || section.toLowerCase().includes(searchQuery);
-            const matchesPayment = !paymentFilter || payment === paymentFilter;
-            const matchesSection = !sectionFilter || section === sectionFilter;
-            
-            row.style.display = (matchesSearch && matchesPayment && matchesSection) ? '' : 'none';
-            if (row.nextElementSibling) row.nextElementSibling.style.display = row.style.display;
-        });
-    }
-    searchInput.addEventListener('keyup', applyFilters);
-    filterPayment.addEventListener('change', applyFilters);
-    filterSection.addEventListener('change', applyFilters);
+    const orderId = icon.dataset.orderId;
+    const order = allOrders.find(o => o._id === orderId);
+    if (!order) return;
 
-    // 3. Inline Editing
-    ordersTbody.addEventListener('click', async (e) => {
-        const target = e.target.closest('td');
-        if (!target || !target.closest('.order-summary')) return;
-
-        const isPayment = target.cellIndex === 6;
-        const isDelivery = target.cellIndex === 7;
-
-        if ((isPayment || isDelivery) && !target.querySelector('select')) {
-            const current = target.querySelector('span')?.textContent.trim() || target.textContent.trim();
-            const options = isPayment ? ['Paid', 'Pending', 'Not Paid'] : ['Received', 'Not Received'];
-            
-            const select = document.createElement('select');
-            select.className = 'inline-status-select';
-            options.forEach(opt => {
-                const o = document.createElement('option');
-                o.value = opt; o.textContent = opt; o.selected = (opt === current);
-                select.appendChild(o);
-            });
-
-            target.innerHTML = ''; target.appendChild(select); select.focus();
-
-            const save = async () => {
-                const val = select.value;
-                const id = target.closest('.order-summary').dataset.orderId;
-                let body = {};
-                if (isPayment) body.paymentStatus = (val === 'Paid' ? 'paid' : 'pending');
-                else body.status = (val === 'Received' ? 'received' : 'paid');
-
-                try {
-                    const res = await fetch(`${CONFIG.API_URL}/api/orders/${id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        credentials: 'include',
-                        body: JSON.stringify(body)
-                    });
-                    if (res.ok) loadOrders();
-                } catch (err) { console.error(err); loadOrders(); }
-            };
-            select.addEventListener('change', save);
-            select.addEventListener('blur', save);
-        }
-    });
-
-    // 4. View Receipt
-    ordersTbody.addEventListener('click', (e) => {
-        const icon = e.target.closest('.view-receipt');
-        if (!icon || icon.classList.contains('no-receipt')) return;
-
-        const order = allOrders.find(o => o._id === icon.dataset.orderId);
-        if (!order || !order.receiptUrl) return;
-
-        const modal = document.createElement('div');
-        modal.className = 'receipt-modal';
-        modal.innerHTML = `
-            <div class="receipt-modal-content">
-                <span class="close-modal">&times;</span>
-                <h3>Payment Receipt</h3>
-                <div class="receipt-image-container">
-                    <img class="receipt-image" src="${order.receiptUrl.startsWith('data') ? order.receiptUrl : CONFIG.API_URL + order.receiptUrl}">
+    const hasReceipt = order.receiptUrl && order.receiptUrl !== '';
+    const modal = document.createElement('div');
+    modal.className = 'receipt-modal management-modal';
+    
+    modal.innerHTML = `
+        <div class="receipt-modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Receipt Management</h3>
+            <div class="modal-body">
+                ${hasReceipt ? 
+                    `<img class="preview-img-small" src="${order.receiptUrl.startsWith('data') ? order.receiptUrl : CONFIG.API_URL + order.receiptUrl}">` : 
+                    `<div class="no-receipt-placeholder"><i class="fa-solid fa-image-slash"></i><p>No receipt on file</p></div>`
+                }
+                <div class="modal-actions">
+                    ${hasReceipt ? `<button class="btn-action view-full" data-url="${order.receiptUrl}">View Full Image</button>` : ''}
+                    <hr>
+                    <p style="font-size:0.8rem; color:#666;">${hasReceipt ? 'Replace Receipt:' : 'Upload Receipt:'}</p>
+                    <input type="file" id="modal-file-input" accept="image/*">
+                    <button class="btn-action upload-btn" data-id="${order._id}">Save to Database</button>
+                    
+                    ${order.status === 'pending_payment' ? `
+                        <div class="verify-zone">
+                            <button class="verify-btn" data-id="${order._id}">Approve GCash</button>
+                            <button class="reject-btn" data-id="${order._id}">Reject</button>
+                        </div>` : ''}
                 </div>
-            </div>`;
-        document.body.appendChild(modal);
-        modal.addEventListener('click', (ev) => { if (ev.target.classList.contains('receipt-modal') || ev.target.classList.contains('close-modal')) modal.remove(); });
-    });
+            </div>
+        </div>`;
 
-    // 5. Manual Admin Upload
-    ordersTbody.addEventListener('click', async (e) => {
-        const btn = e.target.closest('.btn-manual-upload');
-        if (!btn) return;
+    document.body.appendChild(modal);
 
-        const container = btn.closest('.admin-management-box');
-        const file = container.querySelector('.admin-manual-upload-input').files[0];
-        if (!file) return alert('Select a file.');
+    // Modal Events
+    modal.querySelector('.close-modal').onclick = () => modal.remove();
+    
+    // Full Image View
+    const vf = modal.querySelector('.view-full');
+    if(vf) vf.onclick = () => window.open(vf.dataset.url.startsWith('data') ? vf.dataset.url : CONFIG.API_URL + vf.dataset.url, '_blank');
+
+    // THE FIX: Manual Admin Upload Logic inside Modal
+    modal.querySelector('.upload-btn').onclick = async function() {
+        const fileInput = modal.querySelector('#modal-file-input');
+        const file = fileInput.files[0];
+
+        if (!file) return alert('Please select an image file first.');
+
+        this.disabled = true;
+        this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
 
         const formData = new FormData();
         formData.append('receipt', file);
 
         try {
-            const res = await fetch(`${CONFIG.API_URL}/api/orders/${btn.dataset.orderId}/receipt`, {
-                method: 'POST', credentials: 'include', body: formData
-            });
-            if (res.ok) loadOrders();
-        } catch (err) { console.error(err); }
-    });
-
-    // 6. GCash Verify/Reject
-    ordersTbody.addEventListener('click', async (e) => {
-        const btn = e.target.closest('.verify-btn') || e.target.closest('.reject-btn');
-        if (!btn) return;
-        const isVerify = btn.classList.contains('verify-btn');
-        if (!confirm(`Are you sure you want to ${isVerify ? 'approve' : 'reject'}?`)) return;
-
-        try {
-            const res = await fetch(`${CONFIG.API_URL}/api/orders/${btn.dataset.orderId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+            const res = await fetch(`${CONFIG.API_URL}/api/orders/${orderId}/receipt`, {
+                method: 'POST',
                 credentials: 'include',
-                body: JSON.stringify({ paymentStatus: isVerify ? 'paid' : 'pending', status: isVerify ? 'paid' : 'pending_payment' })
+                body: formData
             });
-            if (res.ok) loadOrders();
-        } catch (err) { console.error(err); }
-    });
 
+            if (res.ok) {
+                alert('Receipt saved successfully!');
+                modal.remove();
+                loadOrders(); // Refresh the main table
+            } else {
+                alert('Failed to save image. Check server logs.');
+                this.disabled = false;
+                this.innerHTML = 'Save to Database';
+            }
+        } catch (err) {
+            console.error('Upload Error:', err);
+            this.disabled = false;
+        }
+    };
+
+    // GCash Verify/Reject
+    const vBtn = modal.querySelector('.verify-btn');
+    const rBtn = modal.querySelector('.reject-btn');
+    if(vBtn && rBtn) {
+        vBtn.onclick = () => updatePayment(orderId, 'paid', 'paid', modal);
+        rBtn.onclick = () => updatePayment(orderId, 'pending_payment', 'pending', modal);
+    }
+});
+
+async function updatePayment(id, status, pStatus, modal) {
+    const res = await fetch(`${CONFIG.API_URL}/api/orders/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status: status, paymentStatus: pStatus })
+    });
+    if (res.ok) { modal.remove(); loadOrders(); }
+    }
+    
     // 7. Delete/Mark Logic
     ordersTbody.addEventListener('click', async (e) => {
         const btn = e.target.closest('.delete-order') || e.target.closest('.cancel-deletion');
