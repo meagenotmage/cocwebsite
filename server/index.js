@@ -195,8 +195,6 @@ orderSchema.set('skipVersioning', true);
 
 const Announcement = mongoose.model('Announcement', announcementSchema);
 const Event = mongoose.model('Event', eventSchema);
-const Order = mongoose.model('Order', orderSchema);
-const DeletedOrder = mongoose.model('DeletedOrder', orderSchema);
 const OrderCounter = mongoose.model('OrderCounter', orderCounterSchema);
 
 const feedbackSchema = new mongoose.Schema({
