@@ -230,7 +230,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (res.ok) {
                     loadOrders();
                 } else {
-                    alert('Failed to move order to trash.');
+                    const errData = await res.json();
+                    alert('Failed to move order to trash.' + (errData.error || errData.message || 'Unknown error'));
                 }
             }
         }

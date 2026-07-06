@@ -694,7 +694,7 @@ app.post('/api/orders/:id/move-to-trash', requireAuth, async (req, res) => {
     res.json({ message: 'Order moved to trash.', deletedOrder });
   } catch (err) {
     console.error('Error moving order to trash:', err);
-    res.status(500).json({ message: 'Failed to move order to trash.' });
+    res.status(500).json({ message: 'Failed to move order to trash.', error: err.message });
   }
 });
 
