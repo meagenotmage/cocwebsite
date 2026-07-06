@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const receiptClass = hasReceipt ? 'has-receipt' : 'no-receipt';
 
             const summaryRow = document.createElement('tr');
-            summaryRow.className = `order-summary ${order.markedForDeletion ? 'marked-for-deletion' : ''}`;
+            summaryRow.className = 'order-summary';
             summaryRow.dataset.orderId = order._id;
             summaryRow.dataset.name = order.fullName;
             summaryRow.dataset.payment = order.paymentMethod;
@@ -223,11 +223,15 @@ document.addEventListener('DOMContentLoaded', function () {
             if(r) r.onclick = () => updatePayment(order._id, 'pending_payment', 'pending', modal);
         }
 
-        // 3. Delete Logic
+        // 3. Move to Trash
         if (e.target.classList.contains('delete-order')) {
-            if (confirm("Mark for deletion?")) {
-                await fetch(`${CONFIG.API_URL}/api/orders/${orderId}/mark-for-deletion`, { method: 'POST', credentials: 'include' });
-                loadOrders();
+            if (confirm('Move this order to Trash?')) {
+                const res = await fetch(`${CONFIG.API_URL}/api/orders/${orderId}/move-to-trash`, { method: 'POST', credentials: 'include' });
+                if (res.ok) {
+                    loadOrders();
+                } else {
+                    alert('Failed to move order to trash.');
+                }
             }
         }
     });
@@ -316,6 +320,141 @@ document.addEventListener('DOMContentLoaded', function () {
             };
         }
     });
+
+    // ======================= //
+    //    TRASH MODAL LOGIC    //
+    // ======================= //
+    const trashBtn = document.getElementById('open-trash-btn');
+    if (trashBtn) {
+        trashBtn.addEventListener('click', openTrashModal);
+    }
+
+    async function openTrashModal() {
+        // Remove existing modal if any
+        const existing = document.querySelector('.trash-modal');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.className = 'receipt-modal trash-modal';
+        modal.innerHTML = `
+            <div class="trash-modal-content">
+                <span class="close-modal">&times;</span>
+                <div class="trash-header">
+                    <h3><i class="fa-solid fa-trash-can"></i> Trash</h3>
+                    <div class="trash-header-actions">
+                        <button class="cleanup-expired-btn" title="Force delete all expired items">
+                            <i class="fa-solid fa-broom"></i> Clean Up Expired
+                        </button>
+                        <button class="empty-trash-btn" title="Empty Trash">
+                            <i class="fa-solid fa-trash"></i> Empty All
+                        </button>
+                    </div>
+                </div>
+                <p class="trash-note">Orders in trash are automatically deleted after 7 days.</p>
+                <div class="trash-list"><p style="text-align:center; color:#999; padding:20px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</p></div>
+            </div>`;
+        document.body.appendChild(modal);
+        modal.querySelector('.close-modal').onclick = () => modal.remove();
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+
+        // Empty trash button
+        modal.querySelector('.empty-trash-btn').onclick = async () => {
+            if (!confirm('Permanently delete ALL orders in trash? This cannot be undone.')) return;
+            const res = await fetch(`${CONFIG.API_URL}/api/orders/trash/empty`, { method: 'DELETE', credentials: 'include' });
+            if (res.ok) {
+                const data = await res.json();
+                alert(data.message);
+                loadTrashList(modal);
+            }
+        };
+
+        // Clean up expired items only (7+ days old)
+        modal.querySelector('.cleanup-expired-btn').onclick = async () => {
+            const res = await fetch(`${CONFIG.API_URL}/api/orders/trash/expired`, { method: 'DELETE', credentials: 'include' });
+            if (res.ok) {
+                const data = await res.json();
+                alert(data.message);
+                loadTrashList(modal);
+            } else {
+                alert('Failed to clean up expired items.');
+            }
+        };
+
+        loadTrashList(modal);
+    }
+
+    async function loadTrashList(modal) {
+        const listContainer = modal.querySelector('.trash-list');
+        try {
+            const res = await fetch(`${CONFIG.API_URL}/api/orders/trash`, { credentials: 'include' });
+            if (!res.ok) throw new Error('Failed to fetch');
+            const orders = await res.json();
+
+            if (orders.length === 0) {
+                listContainer.innerHTML = '<p class="trash-empty-msg"><i class="fa-solid fa-check-circle"></i> Trash is empty</p>';
+                return;
+            }
+
+            listContainer.innerHTML = orders.map(order => {
+                const orderNum = String(order.orderNumber).padStart(4, '0');
+                const trashedDate = new Date(order.deletionWarningDate).toLocaleDateString();
+                const daysLeft = order.daysUntilAutoDelete;
+                const urgencyClass = daysLeft <= 2 ? 'trash-urgent' : '';
+                const timerText = daysLeft > 0
+                    ? `${daysLeft} day(s) left`
+                    : 'Pending cleanup — overdue';
+                return `
+                    <div class="trash-item ${urgencyClass}" data-id="${order._id}">
+                        <div class="trash-item-info">
+                            <div class="trash-item-name"><strong>#${orderNum}</strong> — ${order.fullName}</div>
+                            <div class="trash-item-meta">
+                                ${order.programYear} · P${order.total.toFixed(2)} · ${order.paymentMethod}
+                            </div>
+                            <div class="trash-item-timer">
+                                <i class="fa-solid fa-clock"></i> ${timerText} · Trashed ${trashedDate}
+                            </div>
+                        </div>
+                        <div class="trash-item-actions">
+                            <button class="trash-restore-btn" data-id="${order._id}" title="Restore">
+                                <i class="fa-solid fa-rotate-left"></i> Restore
+                            </button>
+                            <button class="trash-delete-btn" data-id="${order._id}" title="Delete Permanently">
+                                <i class="fa-solid fa-xmark"></i> Delete
+                            </button>
+                        </div>
+                    </div>`;
+            }).join('');
+
+            // Restore buttons
+            listContainer.querySelectorAll('.trash-restore-btn').forEach(btn => {
+                btn.onclick = async () => {
+                    const res = await fetch(`${CONFIG.API_URL}/api/orders/${btn.dataset.id}/restore`, { method: 'POST', credentials: 'include' });
+                    if (res.ok) {
+                        loadTrashList(modal);
+                        loadOrders();
+                    } else {
+                        alert('Failed to restore order.');
+                    }
+                };
+            });
+
+            // Permanent delete buttons
+            listContainer.querySelectorAll('.trash-delete-btn').forEach(btn => {
+                btn.onclick = async () => {
+                    if (!confirm('Permanently delete this order? This cannot be undone.')) return;
+                    const res = await fetch(`${CONFIG.API_URL}/api/orders/${btn.dataset.id}/permanent-delete`, { method: 'DELETE', credentials: 'include' });
+                    if (res.ok) {
+                        loadTrashList(modal);
+                    } else {
+                        alert('Failed to delete order.');
+                    }
+                };
+            });
+        } catch (err) {
+            console.error('Error loading trash:', err);
+            listContainer.innerHTML = '<p style="text-align:center; color:#c62828;">Failed to load trash.</p>';
+        }
+    }
 
     // Initialize
     loadPaymentSettings();

@@ -196,6 +196,7 @@ orderSchema.set('skipVersioning', true);
 const Announcement = mongoose.model('Announcement', announcementSchema);
 const Event = mongoose.model('Event', eventSchema);
 const Order = mongoose.model('Order', orderSchema);
+const DeletedOrder = mongoose.model('DeletedOrder', orderSchema);
 const OrderCounter = mongoose.model('OrderCounter', orderCounterSchema);
 
 const feedbackSchema = new mongoose.Schema({
@@ -217,6 +218,40 @@ const settingsSchema = new mongoose.Schema({
   cashEnabled: { type: Boolean, default: true }
 });
 const Settings = mongoose.model('Settings', settingsSchema);
+
+// Separate schema — NOT shared with orderSchema, so a TTL index here can't touch live orders
+const deletedOrderSchema = new mongoose.Schema({
+  orderNumber: { type: Number, required: true },
+  fullName: { type: String, required: true },
+  phone: { type: String, required: true },
+  email: { type: String, required: true },
+  programYear: { type: String, required: true },
+  paymentMethod: { type: String, required: true },
+  items: [{
+    name: { type: String, required: true },
+    size: String,
+    quantity: { type: Number, required: true },
+    price: { type: Number, required: true },
+    customName: String,
+    program: String
+  }],
+  total: { type: Number, required: true },
+  status: { type: String, default: 'pending' },
+  paymentStatus: { type: String, default: 'pending' },
+  receiptUrl: { type: String },
+  originalOrderId: { type: String },
+  deletionWarningDate: { type: Date, default: Date.now }
+});
+
+// MongoDB auto-deletes the doc 7 days after deletionWarningDate — runs server-side,
+// independent of Node process uptime, so Render restarts/sleep don't break it.
+deletedOrderSchema.index(
+  { deletionWarningDate: 1 },
+  { expireAfterSeconds: 7 * 24 * 60 * 60 }
+);
+
+const Order = mongoose.model('Order', orderSchema);
+const DeletedOrder = mongoose.model('DeletedOrder', deletedOrderSchema); // now its own schema
 
 
 // --- 4. API ROUTES (WITH CORRECTED PATHS) ---
@@ -434,7 +469,7 @@ app.put('/api/events/:id', requireAuth, async (req, res) => {
 app.get('/api/orders', requireAuth, async (req, res) => {
   try {
     const { paymentMethod, status, paymentStatus } = req.query;
-    let query = {};
+    let query = { markedForDeletion: { $ne: true } };
 
     // Filtering logic
     if (paymentMethod) {
@@ -629,125 +664,12 @@ app.put('/api/orders/:id/receipt-base64', requireAuth, async (req, res) => {
   }
 });
 
-// Delete order (for admin) - DISABLED. Use mark-for-deletion instead for safety
-// app.delete('/api/orders/:id', async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     await Order.findByIdAndDelete(id);
-//     res.json({ message: 'Order deleted successfully!' });
-//   } catch (err) {
-//     console.error('Error deleting order:', err);
-//     res.status(500).json({ message: 'Failed to delete order.' });
-//   }
-// });
+// =============================================
+// TRASH SYSTEM - Soft delete with separate collection
+// =============================================
 
-// Mark order for deletion with 7-day warning (for admin)
-app.post('/api/orders/:id/mark-for-deletion', requireAuth, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const order = await Order.findByIdAndUpdate(
-      id,
-      { 
-        markedForDeletion: true,
-        deletionWarningDate: new Date()
-      },
-      { new: true }
-    );
-    
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found.' });
-    }
-    
-    const deleteDate = new Date(order.deletionWarningDate);
-    deleteDate.setDate(deleteDate.getDate() + 7);
-    
-    res.json({ 
-      message: 'Order marked for deletion with 7-day warning.',
-      order,
-      deleteDate: deleteDate.toISOString(),
-      daysUntilDeletion: 7
-    });
-  } catch (err) {
-    console.error('Error marking order for deletion:', err);
-    res.status(500).json({ message: 'Failed to mark order for deletion.' });
-  }
-});
-
-// Get orders marked for deletion (for admin)
-app.get('/api/orders/marked-for-deletion', requireAuth, async (req, res) => {
-  try {
-    const orders = await Order.find({ markedForDeletion: true }).sort({ deletionWarningDate: -1 });
-    
-    const ordersWithWarningInfo = orders.map(order => {
-      const deleteDate = new Date(order.deletionWarningDate);
-      deleteDate.setDate(deleteDate.getDate() + 7);
-      const daysUntilDeletion = Math.ceil((deleteDate - new Date()) / (1000 * 60 * 60 * 24));
-      
-      return {
-        ...order.toObject(),
-        deleteDate: deleteDate.toISOString(),
-        daysUntilDeletion: Math.max(0, daysUntilDeletion)
-      };
-    });
-    
-    res.json(ordersWithWarningInfo);
-  } catch (err) {
-    console.error('Error fetching marked orders:', err);
-    res.status(500).json({ message: 'Failed to fetch marked orders.' });
-  }
-});
-
-// Cancel deletion warning (for admin)
-app.post('/api/orders/:id/cancel-deletion', requireAuth, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const order = await Order.findByIdAndUpdate(
-      id,
-      { 
-        markedForDeletion: false,
-        deletionWarningDate: null
-      },
-      { new: true }
-    );
-    
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found.' });
-    }
-    
-    res.json({ 
-      message: 'Deletion warning cancelled.',
-      order
-    });
-  } catch (err) {
-    console.error('Error cancelling deletion:', err);
-    res.status(500).json({ message: 'Failed to cancel deletion.' });
-  }
-});
-
-// Get deletion warnings (orders that are 7+ days marked and ready to delete)
-app.get('/api/orders/deletion-warnings', requireAuth, async (req, res) => {
-  try {
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    
-    const ordersReadyForDeletion = await Order.find({
-      markedForDeletion: true,
-      deletionWarningDate: { $lte: sevenDaysAgo }
-    }).sort({ deletionWarningDate: 1 });
-    
-    res.json({
-      warningCount: ordersReadyForDeletion.length,
-      orders: ordersReadyForDeletion,
-      message: `${ordersReadyForDeletion.length} order(s) ready for permanent deletion after 7-day warning period.`
-    });
-  } catch (err) {
-    console.error('Error fetching deletion warnings:', err);
-    res.status(500).json({ message: 'Failed to fetch deletion warnings.' });
-  }
-});
-
-// Permanently delete order after 7-day warning period (for admin only)
-app.delete('/api/orders/:id/permanent-delete', requireAuth, async (req, res) => {
+// Move order to trash (soft delete)
+app.post('/api/orders/:id/move-to-trash', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const order = await Order.findById(id);
@@ -756,30 +678,119 @@ app.delete('/api/orders/:id/permanent-delete', requireAuth, async (req, res) => 
       return res.status(404).json({ message: 'Order not found.' });
     }
     
-    if (!order.markedForDeletion) {
-      return res.status(400).json({ message: 'Order has not been marked for deletion. Use /mark-for-deletion first.' });
-    }
+    // Create a copy in DeletedOrder collection
+    const orderData = order.toObject();
+    delete orderData._id; // Remove _id so MongoDB generates a new one
+    orderData.originalOrderId = id; // Store reference to original
+    orderData.deletionWarningDate = new Date(); // Track when it was trashed
     
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const deletedOrder = new DeletedOrder(orderData);
+    await deletedOrder.save();
     
-    if (order.deletionWarningDate > sevenDaysAgo) {
+    // Remove from main Orders collection
+    await Order.findByIdAndDelete(id);
+    
+    console.log(`Order #${order.orderNumber} moved to trash.`);
+    res.json({ message: 'Order moved to trash.', deletedOrder });
+  } catch (err) {
+    console.error('Error moving order to trash:', err);
+    res.status(500).json({ message: 'Failed to move order to trash.' });
+  }
+});
+
+// Get all trashed orders
+app.get('/api/orders/trash', requireAuth, async (req, res) => {
+  try {
+    const trashedOrders = await DeletedOrder.find().sort({ deletionWarningDate: -1 });
+    
+    const ordersWithInfo = trashedOrders.map(order => {
       const deleteDate = new Date(order.deletionWarningDate);
       deleteDate.setDate(deleteDate.getDate() + 7);
-      return res.status(400).json({ 
-        message: 'Deletion warning period has not expired yet.',
-        deleteDate: deleteDate.toISOString()
-      });
+      const daysLeft = Math.ceil((deleteDate - new Date()) / (1000 * 60 * 60 * 24));
+      
+      return {
+        ...order.toObject(),
+        autoDeleteDate: deleteDate.toISOString(),
+        daysUntilAutoDelete: Math.max(0, daysLeft)
+      };
+    });
+    
+    res.json(ordersWithInfo);
+  } catch (err) {
+    console.error('Error fetching trashed orders:', err);
+    res.status(500).json({ message: 'Failed to fetch trashed orders.' });
+  }
+});
+
+// Restore order from trash
+app.post('/api/orders/:id/restore', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedOrder = await DeletedOrder.findById(id);
+    
+    if (!deletedOrder) {
+      return res.status(404).json({ message: 'Trashed order not found.' });
     }
     
-    await Order.findByIdAndDelete(id);
-    res.json({ message: 'Order permanently deleted after 7-day warning period.' });
+    // Create a copy back in Order collection
+    const orderData = deletedOrder.toObject();
+    delete orderData._id;
+    delete orderData.originalOrderId;
+    orderData.markedForDeletion = false;
+    orderData.deletionWarningDate = null;
+    
+    const restoredOrder = new Order(orderData);
+    await restoredOrder.save();
+    
+    // Remove from DeletedOrder collection
+    await DeletedOrder.findByIdAndDelete(id);
+    
+    console.log(`Order #${deletedOrder.orderNumber} restored from trash.`);
+    res.json({ message: 'Order restored successfully!', order: restoredOrder });
+  } catch (err) {
+    console.error('Error restoring order:', err);
+    res.status(500).json({ message: 'Failed to restore order.' });
+  }
+});
+
+// Permanently delete order from trash
+app.delete('/api/orders/:id/permanent-delete', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await DeletedOrder.findById(id);
+    
+    if (!order) {
+      return res.status(404).json({ message: 'Trashed order not found.' });
+    }
+    
+    await DeletedOrder.findByIdAndDelete(id);
+    
+    console.log(`Order #${order.orderNumber} permanently deleted.`);
+    res.json({ message: 'Order permanently deleted.' });
   } catch (err) {
     console.error('Error permanently deleting order:', err);
     res.status(500).json({ message: 'Failed to permanently delete order.' });
   }
 });
 
+// Empty entire trash
+app.delete('/api/orders/trash/empty', requireAuth, async (req, res) => {
+  try {
+    const result = await DeletedOrder.deleteMany({});
+    console.log(`Trash emptied. ${result.deletedCount} order(s) permanently deleted.`);
+    res.json({ message: `Trash emptied. ${result.deletedCount} order(s) permanently deleted.`, count: result.deletedCount });
+  } catch (err) {
+    console.error('Error emptying trash:', err);
+    res.status(500).json({ message: 'Failed to empty trash.' });
+  }
+});
+
+app.delete('/api/orders/trash/expired', requireAuth, async (req, res) => {
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const result = await DeletedOrder.deleteMany({ deletionWarningDate: { $lte: sevenDaysAgo } });
+  res.json({ message: `Deleted ${result.deletedCount} expired order(s).`, count: result.deletedCount });
+});
 
 // --- FEEDBACK ROUTES ---
 
@@ -905,39 +916,30 @@ async function checkDeletionWarnings() {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     
-    const threeHoursFromNow = new Date();
-    threeHoursFromNow.setHours(threeHoursFromNow.getHours() + 3);
-    
-    // Get orders ready for deletion (7+ days marked)
-    const readyForDeletion = await Order.find({
-      markedForDeletion: true,
+    // Automatically delete orders in DeletedOrder that are older than 7 days
+    const result = await DeletedOrder.deleteMany({
       deletionWarningDate: { $lte: sevenDaysAgo }
     });
     
-    // Get orders with warning expiring soon (3+ days, but less than 7)
+    if (result.deletedCount > 0) {
+      console.log(`[CLEANUP] Automatically permanently deleted ${result.deletedCount} expired order(s) from Trash.`);
+    }
+    
+    // Warn about orders that will be automatically deleted soon (in 1-2 days)
     const sixDaysAgo = new Date();
     sixDaysAgo.setDate(sixDaysAgo.getDate() - 6);
-    const ordersWithWarningExpiringSoon = await Order.find({
-      markedForDeletion: true,
+    const expiringSoon = await DeletedOrder.find({
       deletionWarningDate: { $gt: sevenDaysAgo, $lte: sixDaysAgo }
     });
     
-    if (readyForDeletion.length > 0) {
-      console.warn(`
-⚠️  [DELETION ALERT] ${readyForDeletion.length} order(s) marked for deletion are now ready for permanent deletion!
-Orders: ${readyForDeletion.map(o => `#${o.orderNumber}`).join(', ')}
-Action required: Admin must call DELETE /api/orders/:id/permanent-delete to finalize deletion.
-      `);
-    }
-    
-    if (ordersWithWarningExpiringSoon.length > 0) {
+    if (expiringSoon.length > 0) {
       console.log(`
-⚠️  [DELETION WARNING] ${ordersWithWarningExpiringSoon.length} order(s) will be ready for deletion soon (in 1-3 days).
-Orders: ${ordersWithWarningExpiringSoon.map(o => `#${o.orderNumber}`).join(', ')}
+⚠️  [DELETION WARNING] ${expiringSoon.length} order(s) in Trash will be permanently deleted soon (in 1-2 days).
+Orders: ${expiringSoon.map(o => `#${o.orderNumber}`).join(', ')}
       `);
     }
   } catch (err) {
-    console.error('Error checking deletion warnings:', err);
+    console.error('Error checking/cleaning deletion warnings:', err);
   }
 }
 

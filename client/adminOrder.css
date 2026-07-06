@@ -542,6 +542,23 @@ body {
     color: #999;
     transition: color 0.3s;
 }
+.cleanup-expired-btn {
+    padding: 7px 14px;
+    background: #FFA726;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s, transform 0.2s;
+}
+.cleanup-expired-btn:hover { background: #F57C00; transform: translateY(-1px); }
+
 
 .close-modal:hover {
     color: #333;
@@ -756,50 +773,215 @@ body {
     }
 }
 
-/* Deletion Warning Styles */
-.deletion-badge {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-right: 8px;
+/* Trash Button */
+.trash-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    background-color: #78909C;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
     white-space: nowrap;
 }
-
-.deletion-badge.deletion-warning {
-    background-color: #FFF3CD;
-    color: #856404;
-    border: 1px solid #FFEAA7;
+.trash-btn:hover {
+    background-color: #546E7A;
 }
 
-.deletion-badge.deletion-ready {
-    background-color: #F8D7DA;
-    color: #721C24;
-    border: 1px solid #F5C6CB;
-    animation: pulse-warning 1.5s infinite;
+/* Trash Modal */
+.trash-modal .trash-modal-content {
+    background: #fff;
+    border-radius: 16px;
+    padding: 0;
+    width: 92%;
+    max-width: 600px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
 }
 
-@keyframes pulse-warning {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-}
-
-.order-summary.marked-for-deletion {
-    background-color: #FFF5F5;
-    opacity: 0.95;
-}
-
-.order-summary.marked-for-deletion td {
-    border-left: 3px solid #D32F2F;
-}
-
-.cancel-deletion {
+.trash-modal .close-modal {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    font-size: 1.8rem;
     cursor: pointer;
-    color: #1976D2;
-    transition: color 0.3s;
+    color: #999;
+    z-index: 2;
+    transition: color 0.2s;
+}
+.trash-modal .close-modal:hover { color: #333; }
+
+.trash-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 25px 0 25px;
 }
 
-.cancel-deletion:hover {
-    color: #1565C0;
+.trash-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.trash-header h3 i { color: #78909C; }
+
+.empty-trash-btn {
+    padding: 7px 14px;
+    background: #ef5350;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.empty-trash-btn:hover { background: #c62828; transform: translateY(-1px); }
+
+.trash-note {
+    padding: 8px 25px 0 25px;
+    margin: 0;
+    font-size: 0.78rem;
+    color: #999;
+}
+
+.trash-list {
+    padding: 15px 25px 25px;
+    overflow-y: auto;
+    flex: 1;
+    max-height: calc(85vh - 120px);
+}
+
+.trash-empty-msg {
+    text-align: center;
+    color: #4CAF50;
+    font-size: 0.95rem;
+    padding: 40px 0;
+}
+.trash-empty-msg i { margin-right: 6px; }
+
+/* Individual Trash Item */
+.trash-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border-left: 3px solid #bdbdbd;
+    transition: background 0.2s, border-color 0.2s;
+}
+.trash-item:hover { background: #f3f3f3; }
+
+.trash-item.trash-urgent {
+    border-left-color: #ef5350;
+    background: #fff5f5;
+}
+
+.trash-item-info { flex: 1; min-width: 0; }
+
+.trash-item-name {
+    font-size: 0.88rem;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.trash-item-meta {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 3px;
+}
+
+.trash-item-timer {
+    font-size: 0.72rem;
+    color: #999;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.trash-item.trash-urgent .trash-item-timer {
+    color: #ef5350;
+    font-weight: 600;
+}
+
+.trash-item-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.trash-restore-btn,
+.trash-delete-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.trash-restore-btn {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+.trash-restore-btn:hover {
+    background: #c8e6c9;
+    transform: translateY(-1px);
+}
+
+.trash-delete-btn {
+    background: #ffebee;
+    color: #c62828;
+}
+.trash-delete-btn:hover {
+    background: #ffcdd2;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .trash-modal .trash-modal-content {
+        width: 96%;
+        max-height: 90vh;
+    }
+    .trash-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .trash-item-actions {
+        width: 100%;
+        margin-top: 10px;
+    }
+    .trash-restore-btn,
+    .trash-delete-btn {
+        flex: 1;
+        justify-content: center;
+    }
 }
