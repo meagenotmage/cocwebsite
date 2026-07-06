@@ -270,15 +270,49 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!td || !td.closest('.order-summary')) return;
         const isP = td.cellIndex === 6; const isD = td.cellIndex === 7;
         if ((isP || isD) && !td.querySelector('select')) {
+            const orderId = td.closest('.order-summary').dataset.orderId;
+            const order = allOrders.find(o => o._id === orderId);
+            if (!order) return;
+
             const select = document.createElement('select');
             const opts = isP ? ['Paid', 'Pending'] : ['Received', 'Not Received'];
-            opts.forEach(o => { const op = document.createElement('option'); op.value = o; op.textContent = o; select.appendChild(op); });
-            td.innerHTML = ''; td.appendChild(select); select.focus();
+            opts.forEach(o => { 
+                const op = document.createElement('option'); 
+                op.value = o; 
+                op.textContent = o; 
+                select.appendChild(op); 
+            });
+
+            // Set the correct selected option matching the current database state
+            if (isP) {
+                select.value = order.paymentStatus === 'paid' ? 'Paid' : 'Pending';
+            } else {
+                select.value = order.status === 'received' ? 'Received' : 'Not Received';
+            }
+
+            td.innerHTML = ''; 
+            td.appendChild(select); 
+            select.focus();
+
+            let isSaving = false;
             select.onchange = async () => {
-                const id = td.closest('.order-summary').dataset.orderId;
+                isSaving = true;
                 const body = isP ? { paymentStatus: select.value.toLowerCase() } : { status: select.value.toLowerCase() === 'received' ? 'received' : 'paid' };
-                await fetch(`${CONFIG.API_URL}/api/orders/${id}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, credentials: 'include', body: JSON.stringify(body) });
+                await fetch(`${CONFIG.API_URL}/api/orders/${orderId}`, { 
+                    method: 'PUT', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    credentials: 'include', 
+                    body: JSON.stringify(body) 
+                });
                 loadOrders();
+            };
+
+            select.onblur = () => {
+                setTimeout(() => {
+                    if (!isSaving) {
+                        displayOrders(allOrders);
+                    }
+                }, 150);
             };
         }
     });
