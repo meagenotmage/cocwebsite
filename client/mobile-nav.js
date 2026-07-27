@@ -4,27 +4,77 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileNav = document.getElementById('mobile-nav');
     
     if (!hamburgerBtn || !mobileNav) {
-        console.log('Mobile nav elements not found');
+        console.info('[COC] Mobile navigation elements not found on this page.');
         return;
     }
+
+    // 1. Create mobile overlay dynamically if it doesn't exist
+    let overlay = document.querySelector('.mobile-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'mobile-overlay';
+        document.body.appendChild(overlay);
+    }
+
+    // 2. Create close button dynamically inside the drawer if it doesn't exist
+    let closeBtn = mobileNav.querySelector('.mobile-nav-close');
+    if (!closeBtn) {
+        closeBtn = document.createElement('button');
+        closeBtn.className = 'mobile-nav-close';
+        closeBtn.innerHTML = '&times;'; // Large Close (X) symbol
+        closeBtn.setAttribute('aria-label', 'Close menu');
+        mobileNav.insertBefore(closeBtn, mobileNav.firstChild);
+    }
     
-    // Toggle mobile menu dropdown
+    // Toggle state handlers
+    function openMenu() {
+        mobileNav.classList.add('open');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        hamburgerBtn.setAttribute('aria-expanded', 'true');
+    }
+
+    // Wrap in requestAnimationFrame to ensure smooth layout transitions
+    function closeMenu() {
+        mobileNav.classList.remove('open');
+        overlay.classList.remove('active');
+        document.body.style.overflow = ''; // Re-enable background scrolling
+        hamburgerBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    // Toggle menu on hamburger click
     hamburgerBtn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('Hamburger clicked, toggling menu');
-        mobileNav.classList.toggle('open');
-        console.log('Mobile nav classes:', mobileNav.className);
-    });
-    
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', (e) => {
-        if (mobileNav && !mobileNav.contains(e.target) && !hamburgerBtn.contains(e.target)) {
-            mobileNav.classList.remove('open');
+        if (mobileNav.classList.contains('open')) {
+            closeMenu();
+        } else {
+            openMenu();
         }
     });
     
-    // Mobile dropdown toggle
+    // Close menu when clicking the close button
+    closeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        closeMenu();
+    });
+
+    // Close menu when clicking the overlay backdrop
+    overlay.addEventListener('click', (e) => {
+        closeMenu();
+    });
+    
+    // Close menu when clicking outside the drawer
+    document.addEventListener('click', (e) => {
+        if (mobileNav.classList.contains('open') && 
+            !mobileNav.contains(e.target) && 
+            !hamburgerBtn.contains(e.target)) {
+            closeMenu();
+        }
+    });
+    
+    // Mobile dropdown toggle (if submenus exist)
     const mobileDropdownToggle = document.querySelector('.mobile-dropdown-toggle');
     const mobileDropdown = document.querySelector('.mobile-dropdown');
     
@@ -40,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileNavLinks = mobileNav.querySelectorAll('a:not(.mobile-dropdown-toggle)');
     mobileNavLinks.forEach(link => {
         link.addEventListener('click', () => {
-            mobileNav.classList.remove('open');
+            closeMenu();
         });
     });
 });

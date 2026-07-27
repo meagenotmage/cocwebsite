@@ -54,6 +54,87 @@ document.addEventListener('DOMContentLoaded', function () {
     toggleCash.addEventListener('change', savePaymentSettings);
 
     // ======================= //
+    //    EXPORTS LOGIC        //
+    // ======================= //
+    if (exportExcelBtn) {
+        exportExcelBtn.addEventListener('click', () => {
+            const visibleRows = Array.from(ordersTbody.querySelectorAll('.order-summary')).filter(row => row.style.display !== 'none');
+            
+            if (visibleRows.length === 0) {
+                alert('No orders found to export.');
+                return;
+            }
+            
+            const data = [];
+            data.push([
+                "Order Number",
+                "Order Date",
+                "Customer Name",
+                "Program, Year & Section",
+                "Payment Method",
+                "Payment Status",
+                "Claim Status",
+                "Total Amount (PHP)",
+                "Items Ordered"
+            ]);
+            
+            visibleRows.forEach(row => {
+                const orderId = row.dataset.orderId;
+                const order = allOrders.find(o => o._id === orderId);
+                if (!order) return;
+                
+                const orderNum = String(order.orderNumber).padStart(4, '0');
+                const date = order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A';
+                const itemsStr = (order.items || []).map(i => {
+                    let parts = [];
+                    if (i.size) parts.push(`Size: ${i.size}`);
+                    if (i.customName) parts.push(`Custom Name: ${i.customName}`);
+                    if (i.program) parts.push(`Program: ${i.program}`);
+                    const details = parts.length > 0 ? ` (${parts.join(', ')})` : '';
+                    return `${i.quantity}x ${i.name}${details}`;
+                }).join('; ');
+                
+                data.push([
+                    `#${orderNum}`,
+                    date,
+                    order.fullName,
+                    order.programYear,
+                    order.paymentMethod,
+                    order.paymentStatus === 'paid' ? 'Paid' : (order.paymentStatus === 'pending' ? 'Pending' : 'Not Paid'),
+                    order.status === 'received' ? 'Received' : 'Not Received',
+                    order.total,
+                    itemsStr
+                ]);
+            });
+            
+            try {
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                
+                // Auto-fit column widths
+                const wscols = [
+                    {wch: 15}, // Order Number
+                    {wch: 25}, // Order Date
+                    {wch: 25}, // Customer Name
+                    {wch: 25}, // Section
+                    {wch: 18}, // Payment Method
+                    {wch: 18}, // Payment Status
+                    {wch: 18}, // Claim Status
+                    {wch: 18}, // Total
+                    {wch: 50}  // Items Ordered
+                ];
+                ws['!cols'] = wscols;
+                
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Orders");
+                XLSX.writeFile(wb, `COC_Orders_${new Date().toISOString().slice(0,10)}.xlsx`);
+            } catch (err) {
+                console.error('Error generating Excel file:', err);
+                alert('Failed to generate Excel file. Make sure XLSX library is loaded correctly.');
+            }
+        });
+    }
+
+    // ======================= //
     //    DATA LOADING         //
     // ======================= //
     async function loadOrders() {
