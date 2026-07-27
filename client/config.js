@@ -16,7 +16,7 @@ const CONFIG = {
   // FIXED LOGIC: If override exists, use it. Otherwise, check if local.
   API_URL: urlApiOverride || (isLocalDev()
       ? 'http://localhost:3001'
-      : 'https://cocwebsiteend.onrender.com'),
+      : 'https://cocsc-website.onrender.com'),
 
   ENDPOINTS: {
     ANNOUNCEMENTS: '/api/announcements',
