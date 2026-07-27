@@ -98,8 +98,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const orderNum = String(order.orderNumber).padStart(4, '0');
             const time = order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A';
 
-            let pClass = order.paymentStatus === 'paid' ? 'status-paid' : 'status-not-paid';
-            let pText = order.paymentStatus === 'paid' ? 'Paid' : 'Not Paid';
+            let pClass = order.paymentStatus === 'paid' ? 'status-paid' : (order.paymentStatus === 'pending' ? 'status-pending' : 'status-not-paid');
+            let pText = order.paymentStatus === 'paid' ? 'Paid' : (order.paymentStatus === 'pending' ? 'Pending' : 'Not Paid');
             let dClass = order.status === 'received' ? 'status-received' : 'status-not-received';
             let dText = order.status === 'received' ? 'Received' : 'Not Received';
 
@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!order) return;
 
             const select = document.createElement('select');
-            const opts = isP ? ['Paid', 'Pending'] : ['Received', 'Not Received'];
+            const opts = isP ? ['Paid', 'Pending', 'Not Paid'] : ['Received', 'Not Received'];
             opts.forEach(o => { 
                 const op = document.createElement('option'); 
                 op.value = o; 
@@ -290,7 +290,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Set the correct selected option matching the current database state
             if (isP) {
-                select.value = order.paymentStatus === 'paid' ? 'Paid' : 'Pending';
+                if (order.paymentStatus === 'paid') {
+                    select.value = 'Paid';
+                } else if (order.paymentStatus === 'pending') {
+                    select.value = 'Pending';
+                } else {
+                    select.value = 'Not Paid';
+                }
             } else {
                 select.value = order.status === 'received' ? 'Received' : 'Not Received';
             }

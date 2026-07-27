@@ -517,7 +517,7 @@ app.post('/api/orders', async (req, res) => {
       items,
       total,
       status: 'pending',
-      paymentStatus: 'pending',
+      paymentStatus: (paymentMethod || '').toUpperCase() === 'GCASH' ? 'pending' : 'not paid',
       receiptUrl: receiptUrl || undefined
     });
     

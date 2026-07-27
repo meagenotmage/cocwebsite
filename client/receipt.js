@@ -30,18 +30,27 @@ function populateReceipt(order) {
 
     // Payment status
     const paymentStatusElement = document.getElementById('payment-status');
-    if (order.status === 'paid') {
+    if (order.paymentStatus === 'paid') {
         paymentStatusElement.textContent = 'Paid';
         paymentStatusElement.style.background = '#00A36C';
-    } else if (order.status === 'pending_payment' || (order.paymentMethod === 'GCASH' && order.receiptUrl)) {
+    } else if (order.paymentStatus === 'pending') {
         paymentStatusElement.textContent = 'Pending for Verification';
         paymentStatusElement.style.background = '#FFA500';
-    } else if (order.paymentMethod === 'CASH') {
-        paymentStatusElement.textContent = 'Pending';
-        paymentStatusElement.style.background = '#FFA500';
+    } else if (order.paymentStatus === 'not paid') {
+        paymentStatusElement.textContent = 'Not Paid';
+        paymentStatusElement.style.background = '#D32F2F';
     } else {
-        paymentStatusElement.textContent = 'Pending';
-        paymentStatusElement.style.background = '#FFA500';
+        // Fallback for older orders
+        if (order.status === 'paid') {
+            paymentStatusElement.textContent = 'Paid';
+            paymentStatusElement.style.background = '#00A36C';
+        } else if (order.paymentMethod === 'GCASH') {
+            paymentStatusElement.textContent = 'Pending for Verification';
+            paymentStatusElement.style.background = '#FFA500';
+        } else {
+            paymentStatusElement.textContent = 'Not Paid';
+            paymentStatusElement.style.background = '#D32F2F';
+        }
     }
 
     // Customer details
