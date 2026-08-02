@@ -249,9 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <i class="fa-solid fa-calendar-days"></i> ${timeText}
                     </p>
                     ${locationHtml}
-                    <p style="color: var(--text-color); line-height: 1.7; font-size: 1rem; margin-top: 12px; white-space: pre-wrap;">
-                        ${event.description || ''}
-                    </p>
+                    <p style="color: var(--text-color); line-height: 1.7; font-size: 1rem; margin-top: 12px; white-space: pre-wrap;">${event.description || ''}</p>
                 </div>
             `;
         });
