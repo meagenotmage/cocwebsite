@@ -118,8 +118,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 dayDiv.classList.add('today');
             }
 
-            // Check if any event falls on this day (check date, startDate, or endDate)
-            const eventForDay = allEvents.find(e => {
+            // Check if any events fall on this day (check date, startDate, or endDate)
+            const eventsForDay = allEvents.filter(e => {
                 // Check if the date matches the main date field or startDate
                 if (e.date === dateStr || e.startDate === dateStr) return true;
                 
@@ -128,15 +128,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     const eventStart = new Date(e.startDate);
                     const eventEnd = new Date(e.endDate);
                     const currentDay = new Date(dateStr);
+                    // Clear times to compare dates accurately in local timezone
+                    eventStart.setHours(0,0,0,0);
+                    eventEnd.setHours(0,0,0,0);
+                    currentDay.setHours(0,0,0,0);
                     return currentDay >= eventStart && currentDay <= eventEnd;
                 }
                 
                 return false;
             });
             
-            if (eventForDay) {
+            if (eventsForDay.length > 0) {
                 dayDiv.classList.add('event-day');
-                dayDiv.addEventListener('click', () => showEventModal(eventForDay, dateStr));
+                dayDiv.addEventListener('click', () => showEventModal(eventsForDay, dateStr));
             }
 
             calendarGrid.appendChild(dayDiv);
@@ -155,80 +159,108 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- Event Modal Logic ---
-    function showEventModal(event, clickedDate) {
-        eventModalTitle.textContent = event.title;
+    function showEventModal(events, clickedDate) {
+        const eventList = Array.isArray(events) ? events : [events];
+        const modalContent = eventModal.querySelector('.modal-content');
         
-        // Format time and duration
-        let timeText = '';
+        let html = `<button id="event-modal-close-btn" class="modal-close-btn" aria-label="Close modal">×</button>`;
         
-        // Display date range if both start and end dates exist
-        if (event.startDate && event.endDate && event.startDate !== event.endDate) {
-            const startDate = new Date(event.startDate);
-            const endDate = new Date(event.endDate);
+        eventList.forEach((event, index) => {
+            // Format time and duration
+            let timeText = '';
             
-            const startFormatted = startDate.toLocaleDateString('en-US', {
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric'
-            });
-            
-            const endFormatted = endDate.toLocaleDateString('en-US', {
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric'
-            });
-            
-            timeText = `${startFormatted} - ${endFormatted}`;
-        } else {
-            // Single date event
-            const dateToDisplay = event.startDate || event.date;
-            if (dateToDisplay) {
-                const eventDate = new Date(dateToDisplay);
-                timeText = eventDate.toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
+            // Display date range if both start and end dates exist
+            if (event.startDate && event.endDate && event.startDate !== event.endDate) {
+                const startDate = new Date(event.startDate);
+                const endDate = new Date(event.endDate);
+                
+                const startFormatted = startDate.toLocaleDateString('en-US', {
                     month: 'long',
-                    day: 'numeric'
+                    day: 'numeric',
+                    year: 'numeric'
                 });
-            }
-        }
-        
-        if (event.startTime && event.endTime) {
-            // Convert 24-hour time to 12-hour format with AM/PM
-            const formatTime = (timeStr) => {
-                const [hours, minutes] = timeStr.split(':');
-                const hour = parseInt(hours);
-                const ampm = hour >= 12 ? 'PM' : 'AM';
-                const hour12 = hour % 12 || 12;
-                return `${hour12}:${minutes} ${ampm}`;
-            };
-            
-            const startTimeFormatted = formatTime(event.startTime);
-            const endTimeFormatted = formatTime(event.endTime);
-            
-            // Calculate duration
-            const [startHours, startMinutes] = event.startTime.split(':').map(Number);
-            const [endHours, endMinutes] = event.endTime.split(':').map(Number);
-            const startTotalMinutes = startHours * 60 + startMinutes;
-            const endTotalMinutes = endHours * 60 + endMinutes;
-            const durationMinutes = endTotalMinutes - startTotalMinutes;
-            const durationHours = Math.floor(durationMinutes / 60);
-            const durationMins = durationMinutes % 60;
-            
-            let durationText = '';
-            if (durationHours > 0 && durationMins > 0) {
-                durationText = `${durationHours} hour${durationHours > 1 ? 's' : ''} ${durationMins} minute${durationMins > 1 ? 's' : ''}`;
-            } else if (durationHours > 0) {
-                durationText = `${durationHours} hour${durationHours > 1 ? 's' : ''}`;
+                
+                const endFormatted = endDate.toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+                
+                timeText = `${startFormatted} - ${endFormatted}`;
             } else {
-                durationText = `${durationMins} minute${durationMins > 1 ? 's' : ''}`;
+                // Single date event
+                const dateToDisplay = event.startDate || event.date;
+                if (dateToDisplay) {
+                    const eventDate = new Date(dateToDisplay);
+                    timeText = eventDate.toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                }
             }
             
-            timeText += ` • ${startTimeFormatted} - ${endTimeFormatted} (${durationText})`;
-        }
+            if (event.startTime && event.endTime) {
+                // Convert 24-hour time to 12-hour format with AM/PM
+                const formatTime = (timeStr) => {
+                    const [hours, minutes] = timeStr.split(':');
+                    const hour = parseInt(hours);
+                    const ampm = hour >= 12 ? 'PM' : 'AM';
+                    const hour12 = hour % 12 || 12;
+                    return `${hour12}:${minutes} ${ampm}`;
+                };
+                
+                const startTimeFormatted = formatTime(event.startTime);
+                const endTimeFormatted = formatTime(event.endTime);
+                
+                // Calculate duration
+                const [startHours, startMinutes] = event.startTime.split(':').map(Number);
+                const [endHours, endMinutes] = event.endTime.split(':').map(Number);
+                const startTotalMinutes = startHours * 60 + startMinutes;
+                const endTotalMinutes = endHours * 60 + endMinutes;
+                const durationMinutes = endTotalMinutes - startTotalMinutes;
+                const durationHours = Math.floor(durationMinutes / 60);
+                const durationMins = durationMinutes % 60;
+                
+                let durationText = '';
+                if (durationHours > 0 && durationMins > 0) {
+                    durationText = `${durationHours} hour${durationHours > 1 ? 's' : ''} ${durationMins} minute${durationMins > 1 ? 's' : ''}`;
+                } else if (durationHours > 0) {
+                    durationText = `${durationHours} hour${durationHours > 1 ? 's' : ''}`;
+                } else {
+                    durationText = `${durationMins} minute${durationMins > 1 ? 's' : ''}`;
+                }
+                
+                timeText += ` • ${startTimeFormatted} - ${endTimeFormatted} (${durationText})`;
+            }
+
+            // Location
+            const locationHtml = event.location 
+                ? `<p class="modal-location" style="margin-bottom: 8px; font-size: 0.95rem; color: #555;"><i class="fa-solid fa-location-dot"></i> <strong>Location:</strong> ${event.location}</p>`
+                : '';
+            
+            html += `
+                <div class="modal-event-item" style="${index > 0 ? 'border-top: 1px solid #ddd; padding-top: 24px; margin-top: 24px;' : ''}">
+                    <h2 style="margin-top: 0; color: var(--primary-red); margin-bottom: 12px; font-size: 1.6rem; font-weight: 600; display: flex; align-items: center; gap: 10px;">
+                        ${event.title}
+                    </h2>
+                    <p class="modal-datetime" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px; font-weight: 500;">
+                        <i class="fa-solid fa-calendar-days"></i> ${timeText}
+                    </p>
+                    ${locationHtml}
+                    <p style="color: var(--text-color); line-height: 1.7; font-size: 1rem; margin-top: 12px; white-space: pre-wrap;">
+                        ${event.description || ''}
+                    </p>
+                </div>
+            `;
+        });
         
-        eventModalDatetime.textContent = timeText;
-        eventModalDescription.textContent = event.description;
+        modalContent.innerHTML = html;
+        
+        // Re-attach close button listener
+        document.getElementById('event-modal-close-btn').addEventListener('click', hideEventModal);
+        
         eventModal.classList.remove('hidden');
     }
 
@@ -264,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     eventModal.addEventListener('click', (e) => {
-        if (e.target === eventModal || e.target === eventModalCloseBtn) {
+        if (e.target === eventModal || e.target.id === 'event-modal-close-btn' || e.target.closest('#event-modal-close-btn')) {
             hideEventModal();
         }
     });

@@ -944,6 +944,7 @@ footer {
     width: 90%;              /* Adjust width */
     max-width: 600px;        /* Maximum width */
     max-height: 80vh;        /* Maximum height */
+    overflow-y: auto;        /* Scroll if too many events */
     padding: 2rem;           /* Internal spacing */
     border-radius: 12px;     /* Rounded corners */
     position: relative;
