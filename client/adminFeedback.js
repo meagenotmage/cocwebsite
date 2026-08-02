@@ -11,6 +11,7 @@ const TYPE_BADGE_CLASS = {
 
 let allFeedback = [];
 let currentId = null;
+let viewingDeleted = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
     // Mobile sidebar toggle
@@ -18,6 +19,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     const sidebarNav = document.querySelector('.sidebar-nav');
     if (hamburgerBtn && sidebarNav) {
         hamburgerBtn.addEventListener('click', () => sidebarNav.classList.toggle('active'));
+    }
+
+    // Tab switcher
+    const tabInbox = document.getElementById('tab-inbox');
+    const tabBin = document.getElementById('tab-bin');
+
+    if (tabInbox && tabBin) {
+        tabInbox.addEventListener('click', async () => {
+            if (!viewingDeleted) return;
+            viewingDeleted = false;
+            tabInbox.classList.add('active');
+            tabBin.classList.remove('active');
+            await loadFeedback();
+        });
+
+        tabBin.addEventListener('click', async () => {
+            if (viewingDeleted) return;
+            viewingDeleted = true;
+            tabBin.classList.add('active');
+            tabInbox.classList.remove('active');
+            await loadFeedback();
+        });
     }
 
     await loadFeedback();
@@ -38,7 +61,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadFeedback() {
     try {
-        const res = await fetch(`${CONFIG.API_URL}/api/feedback`, { credentials: 'include' });
+        const url = viewingDeleted 
+            ? `${CONFIG.API_URL}/api/feedback?deleted=true` 
+            : `${CONFIG.API_URL}/api/feedback`;
+        const res = await fetch(url, { credentials: 'include' });
         if (!res.ok) throw new Error('Failed to fetch');
         allFeedback = await res.json();
         applyFilters();
@@ -74,7 +100,7 @@ function displayFeedback(items) {
 
     items.forEach(fb => {
         const tr = document.createElement('tr');
-        if (fb.status === 'unread') tr.classList.add('is-unread');
+        if (fb.status === 'unread' && !viewingDeleted) tr.classList.add('is-unread');
 
         const date = new Date(fb.createdAt).toLocaleDateString('en-PH', {
             year: 'numeric', month: 'short', day: 'numeric'
@@ -88,11 +114,22 @@ function displayFeedback(items) {
         const statusClass = fb.status === 'unread' ? 'status-label--unread' : 'status-label--read';
         const statusLabel = fb.status === 'unread' ? 'Unread' : 'Read';
 
-        const toggleTitle = fb.status === 'unread' ? 'Mark as read' : 'Mark as unread';
-        const toggleIcon  = fb.status === 'unread'
-            ? '<i class="fa-solid fa-envelope-open"></i>'
-            : '<i class="fa-solid fa-envelope"></i>';
-        const toggleClass = fb.status === 'unread' ? 'action-btn--read' : 'action-btn--unread';
+        let toggleTitle, toggleIcon, toggleClass, toggleAction;
+        if (viewingDeleted) {
+            toggleTitle = 'Restore to Inbox';
+            toggleIcon = '<i class="fa-solid fa-rotate-left"></i>';
+            toggleClass = 'action-btn--restore';
+            toggleAction = 'restore';
+        } else {
+            toggleTitle = fb.status === 'unread' ? 'Mark as read' : 'Mark as unread';
+            toggleIcon  = fb.status === 'unread'
+                ? '<i class="fa-solid fa-envelope-open"></i>'
+                : '<i class="fa-solid fa-envelope"></i>';
+            toggleClass = fb.status === 'unread' ? 'action-btn--read' : 'action-btn--unread';
+            toggleAction = 'toggle-status';
+        }
+
+        const deleteTitle = viewingDeleted ? 'Delete permanently' : 'Move to trash bin';
 
         tr.innerHTML = `
             <td>${date}</td>
@@ -103,8 +140,8 @@ function displayFeedback(items) {
             <td>
                 <div class="row-actions">
                     <button class="action-btn action-btn--view" data-id="${fb._id}" title="View details"><i class="fa-solid fa-eye"></i></button>
-                    <button class="action-btn ${toggleClass}" data-id="${fb._id}" data-action="toggle-status" title="${toggleTitle}">${toggleIcon}</button>
-                    <button class="action-btn action-btn--delete" data-id="${fb._id}" data-action="delete" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                    <button class="action-btn ${toggleClass}" data-id="${fb._id}" data-action="${toggleAction}" title="${toggleTitle}">${toggleIcon}</button>
+                    <button class="action-btn action-btn--delete" data-id="${fb._id}" data-action="delete" title="${deleteTitle}"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </td>
         `;
@@ -112,11 +149,15 @@ function displayFeedback(items) {
         // View
         tr.querySelector('.action-btn--view').addEventListener('click', () => openModal(fb._id));
 
-        // Toggle read/unread
-        tr.querySelector('[data-action="toggle-status"]').addEventListener('click', () => {
-            const newStatus = fb.status === 'unread' ? 'read' : 'unread';
-            updateFeedback(fb._id, { status: newStatus });
-        });
+        // Restore / Toggle
+        if (viewingDeleted) {
+            tr.querySelector('[data-action="restore"]').addEventListener('click', () => restoreFeedback(fb._id));
+        } else {
+            tr.querySelector('[data-action="toggle-status"]').addEventListener('click', () => {
+                const newStatus = fb.status === 'unread' ? 'read' : 'unread';
+                updateFeedback(fb._id, { status: newStatus });
+            });
+        }
 
         // Delete
         tr.querySelector('[data-action="delete"]').addEventListener('click', () => deleteFeedback(fb._id));
@@ -128,7 +169,7 @@ function displayFeedback(items) {
 function updateUnreadBadge() {
     const badge = document.getElementById('unread-badge');
     const count = allFeedback.filter(fb => fb.status === 'unread').length;
-    if (count > 0) {
+    if (count > 0 && !viewingDeleted) {
         badge.textContent = count;
         badge.style.display = 'inline-block';
     } else {
@@ -158,7 +199,10 @@ async function updateFeedback(id, data) {
 }
 
 async function deleteFeedback(id) {
-    if (!confirm('Delete this submission? This cannot be undone.')) return;
+    const confirmMsg = viewingDeleted 
+        ? 'Are you sure you want to permanently delete this feedback? This cannot be undone.'
+        : 'Move this feedback to the trash bin? It will be automatically deleted after 7 days.';
+    if (!confirm(confirmMsg)) return;
     try {
         const res = await fetch(`${CONFIG.API_URL}/api/feedback/${id}`, {
             method: 'DELETE',
@@ -169,9 +213,31 @@ async function deleteFeedback(id) {
         applyFilters();
         updateUnreadBadge();
         if (currentId === id) closeModal();
+        
+        const successMsg = viewingDeleted ? 'Feedback permanently deleted!' : 'Feedback moved to trash bin!';
+        alert(successMsg);
     } catch (err) {
         console.error('Error deleting feedback:', err);
         alert('Failed to delete. Please try again.');
+    }
+}
+
+async function restoreFeedback(id) {
+    try {
+        const res = await fetch(`${CONFIG.API_URL}/api/feedback/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ deleted: false })
+        });
+        if (!res.ok) throw new Error('Restore failed');
+        allFeedback = allFeedback.filter(fb => fb._id !== id);
+        applyFilters();
+        updateUnreadBadge();
+        alert('Feedback restored to Inbox!');
+    } catch (err) {
+        console.error('Error restoring feedback:', err);
+        alert('Failed to restore. Please try again.');
     }
 }
 
@@ -206,8 +272,8 @@ function openModal(id) {
 
     document.getElementById('feedback-modal').style.display = 'flex';
 
-    // Mark as read automatically when opened (if unread)
-    if (fb.status === 'unread') {
+    // Mark as read automatically when opened (if unread and not in Trash Bin)
+    if (fb.status === 'unread' && !viewingDeleted) {
         updateFeedback(id, { status: 'read' });
     }
 }

@@ -153,13 +153,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     ? `${formatTime(event.startTime)} - ${formatTime(event.endTime)}`
                     : 'TBD';
 
+                const status = getEventStatus(event);
+
                 const newRow = document.createElement('tr');
                 newRow.dataset.id = event._id;
                 newRow.innerHTML = `
                     <td>${event.title}</td>
                     <td>${displayDates}</td>
                     <td>${displayTimes}</td>
-                    <td class="status-upcoming">Upcoming</td>
+                    <td class="${status.className}">${status.text}</td>
                     <td>${dateCreated}</td>
                     <td class="actions">
                         <i class="fa-solid fa-pencil" title="Edit"></i>
@@ -268,5 +270,53 @@ document.addEventListener('DOMContentLoaded', function() {
         const ampm = h >= 12 ? 'PM' : 'AM';
         const formattedHour = h % 12 === 0 ? 12 : h % 12;
         return `${String(formattedHour).padStart(2, '0')}:${minutes} ${ampm}`;
+    }
+
+    // Helper function to dynamically calculate event status
+    function getEventStatus(event) {
+        try {
+            const now = new Date();
+            const startD = event.startDate || event.date;
+            const endD = event.endDate || event.date || startD;
+            
+            if (!startD) {
+                return { text: 'Upcoming', className: 'status-upcoming' };
+            }
+            
+            const startTimeStr = event.startTime || '00:00';
+            const endTimeStr = event.endTime || '23:59';
+            
+            const startParts = startD.split('-');
+            if (startParts.length !== 3) {
+                return { text: 'Upcoming', className: 'status-upcoming' };
+            }
+            const [startYear, startMonth, startDay] = startParts.map(Number);
+            const [startHour, startMin] = startTimeStr.split(':').map(Number);
+            
+            const endParts = endD.split('-');
+            const [endYear, endMonth, endDay] = endParts.length === 3 
+                ? endParts.map(Number) 
+                : startParts.map(Number);
+            const [endHour, endMin] = endTimeStr.split(':').map(Number);
+            
+            // Build dates in local time
+            const startDateTime = new Date(startYear, startMonth - 1, startDay, startHour, startMin);
+            const endDateTime = new Date(endYear, endMonth - 1, endDay, endHour, endMin);
+            
+            if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
+                return { text: 'Upcoming', className: 'status-upcoming' };
+            }
+            
+            if (now < startDateTime) {
+                return { text: 'Upcoming', className: 'status-upcoming' };
+            } else if (now >= startDateTime && now <= endDateTime) {
+                return { text: 'Ongoing', className: 'status-ongoing' };
+            } else {
+                return { text: 'Ended', className: 'status-ended' };
+            }
+        } catch (e) {
+            console.error('Error calculating event status:', e);
+            return { text: 'Upcoming', className: 'status-upcoming' };
+        }
     }
 });

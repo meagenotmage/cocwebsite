@@ -83,6 +83,51 @@ body {
 }
 
 /* ================================ */
+/*       FEEDBACK TABS              */
+/* ================================ */
+.feedback-tabs {
+    display: flex;
+    gap: 10px;
+    border-bottom: 2px solid #E0E0E0;
+    margin-bottom: 24px;
+    padding-bottom: 2px;
+}
+.tab-btn {
+    background: none;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #666;
+    padding: 10px 16px;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+.tab-btn:hover {
+    color: #D32F2F;
+    background-color: #FAF5F5;
+}
+.tab-btn.active {
+    color: #D32F2F;
+}
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background-color: #D32F2F;
+    border-radius: 2px;
+}
+
+/* ================================ */
 /*       FEEDBACK TOOLBAR           */
 /* ================================ */
 .feedback-toolbar {
@@ -247,6 +292,8 @@ body {
 .action-btn--unread:hover { background: #f0f0f0; }
 .action-btn--delete { color: #c62828; }
 .action-btn--delete:hover { background: #fdecea; }
+.action-btn--restore { color: #1565c0; }
+.action-btn--restore:hover { background: #e3f0ff; }
 
 .empty-msg {
     text-align: center;

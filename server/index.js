@@ -205,8 +205,12 @@ const feedbackSchema = new mongoose.Schema({
   senderEmail: { type: String },
   status: { type: String, enum: ['unread', 'read'], default: 'unread' },
   adminNotes: { type: String },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  deleted: { type: Boolean, default: false },
+  deletedAt: { type: Date }
 });
+
+feedbackSchema.index({ deletedAt: 1 }, { expireAfterSeconds: 604800 });
 
 const Feedback = mongoose.model('Feedback', feedbackSchema);
 
@@ -827,6 +831,11 @@ app.get('/api/feedback', requireAuth, async (req, res) => {
     if (req.query.type && ['feedback', 'suggestion', 'partnership'].includes(req.query.type)) {
       query.type = req.query.type;
     }
+    if (req.query.deleted === 'true') {
+      query.deleted = true;
+    } else {
+      query.deleted = { $ne: true };
+    }
     const feedbacks = await Feedback.find(query).sort({ createdAt: -1 });
     res.json(feedbacks);
   } catch (err) {
@@ -839,13 +848,29 @@ app.get('/api/feedback', requireAuth, async (req, res) => {
 app.put('/api/feedback/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, adminNotes } = req.body;
+    const { status, adminNotes, deleted } = req.body;
 
     const updateData = {};
+    const unsetData = {};
     if (status && ['unread', 'read'].includes(status)) updateData.status = status;
     if (adminNotes !== undefined) updateData.adminNotes = adminNotes;
+    if (deleted !== undefined) {
+      updateData.deleted = deleted;
+      if (deleted === false) {
+        unsetData.deletedAt = 1;
+      } else {
+        updateData.deletedAt = new Date();
+      }
+    }
 
-    const feedback = await Feedback.findByIdAndUpdate(id, updateData, { new: true });
+    const feedback = await Feedback.findByIdAndUpdate(
+      id,
+      {
+        ...(Object.keys(updateData).length > 0 ? { $set: updateData } : {}),
+        ...(Object.keys(unsetData).length > 0 ? { $unset: unsetData } : {})
+      },
+      { new: true }
+    );
     if (!feedback) return res.status(404).json({ message: 'Feedback not found.' });
 
     res.json({ message: 'Feedback updated successfully!', feedback });
@@ -859,8 +884,20 @@ app.put('/api/feedback/:id', requireAuth, async (req, res) => {
 app.delete('/api/feedback/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
-    await Feedback.findByIdAndDelete(id);
-    res.json({ message: 'Feedback deleted successfully!' });
+    const feedback = await Feedback.findById(id);
+    if (!feedback) return res.status(404).json({ message: 'Feedback not found.' });
+
+    if (feedback.deleted) {
+      // Already in the bin, delete completely/permanently
+      await Feedback.findByIdAndDelete(id);
+      res.json({ message: 'Feedback permanently deleted successfully!' });
+    } else {
+      // Move to bin
+      feedback.deleted = true;
+      feedback.deletedAt = new Date();
+      await feedback.save();
+      res.json({ message: 'Feedback moved to trash bin!' });
+    }
   } catch (err) {
     console.error('Error deleting feedback:', err);
     res.status(500).json({ message: 'Failed to delete feedback.' });
