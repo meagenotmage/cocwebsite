@@ -5,9 +5,26 @@
   "installCommand": "npm install",
   "framework": null,
   "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/html/index.html"
-    }
+    { "source": "/",                    "destination": "/html/index.html" },
+    { "source": "/order",               "destination": "/html/order.html" },
+    { "source": "/order.html",          "destination": "/html/order.html" },
+    { "source": "/feedback",            "destination": "/html/feedback.html" },
+    { "source": "/feedback.html",       "destination": "/html/feedback.html" },
+    { "source": "/aboutUs",             "destination": "/html/aboutUs.html" },
+    { "source": "/aboutUs.html",        "destination": "/html/aboutUs.html" },
+    { "source": "/checkout",            "destination": "/html/checkout.html" },
+    { "source": "/checkout.html",       "destination": "/html/checkout.html" },
+    { "source": "/gcash-payment",       "destination": "/html/gcash-payment.html" },
+    { "source": "/gcash-payment.html",  "destination": "/html/gcash-payment.html" },
+    { "source": "/receipt",             "destination": "/html/receipt.html" },
+    { "source": "/receipt.html",        "destination": "/html/receipt.html" },
+    { "source": "/admin",               "destination": "/html/admin/adminLogIn.html" },
+    { "source": "/admin/login",         "destination": "/html/admin/adminLogIn.html" },
+    { "source": "/admin/dashboard",     "destination": "/html/admin/admin.html" },
+    { "source": "/admin/feedback",      "destination": "/html/admin/adminFeedback.html" },
+    { "source": "/admin/orders",        "destination": "/html/admin/adminOrder.html" },
+    { "source": "/admin/announcement",  "destination": "/html/admin/createAnnouncement.html" },
+    { "source": "/admin/events",        "destination": "/html/admin/setUpEvent.html" },
+    { "source": "/admin/logs",          "destination": "/html/admin/processingLogs.html" }
   ]
 }

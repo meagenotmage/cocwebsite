@@ -1,14 +1,81 @@
-[[redirects]]
-  from = "/"
-  to = "/html/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/*"
-  to = "/html/index.html"
-  status = 200
-
 [build]
-  base = "client"
+  base    = "client"
   publish = "client"
   command = "npm install"
+
+# ── User pages ───────────────────────────────────────────────
+[[redirects]]
+  from   = "/"
+  to     = "/html/index.html"
+  status = 200
+
+[[redirects]]
+  from   = "/order"
+  to     = "/html/order.html"
+  status = 200
+
+[[redirects]]
+  from   = "/feedback"
+  to     = "/html/feedback.html"
+  status = 200
+
+[[redirects]]
+  from   = "/aboutUs"
+  to     = "/html/aboutUs.html"
+  status = 200
+
+[[redirects]]
+  from   = "/checkout"
+  to     = "/html/checkout.html"
+  status = 200
+
+[[redirects]]
+  from   = "/gcash-payment"
+  to     = "/html/gcash-payment.html"
+  status = 200
+
+[[redirects]]
+  from   = "/receipt"
+  to     = "/html/receipt.html"
+  status = 200
+
+# ── Admin pages ──────────────────────────────────────────────
+[[redirects]]
+  from   = "/admin"
+  to     = "/html/admin/adminLogIn.html"
+  status = 200
+
+[[redirects]]
+  from   = "/admin/login"
+  to     = "/html/admin/adminLogIn.html"
+  status = 200
+
+[[redirects]]
+  from   = "/admin/dashboard"
+  to     = "/html/admin/admin.html"
+  status = 200
+
+[[redirects]]
+  from   = "/admin/feedback"
+  to     = "/html/admin/adminFeedback.html"
+  status = 200
+
+[[redirects]]
+  from   = "/admin/orders"
+  to     = "/html/admin/adminOrder.html"
+  status = 200
+
+[[redirects]]
+  from   = "/admin/announcement"
+  to     = "/html/admin/createAnnouncement.html"
+  status = 200
+
+[[redirects]]
+  from   = "/admin/events"
+  to     = "/html/admin/setUpEvent.html"
+  status = 200
+
+[[redirects]]
+  from   = "/admin/logs"
+  to     = "/html/admin/processingLogs.html"
+  status = 200
