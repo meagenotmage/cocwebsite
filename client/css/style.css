@@ -184,7 +184,7 @@ header nav.desktop-nav ul li a.active::after {
 /*       HERO BANNER       */
 /* ======================= */
 .hero {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6)), url('assets/hero.jpg'); 
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6)), url('../assets/images/general/hero.jpg'); 
     background-size: cover;
     background-position: center;
     background-attachment: fixed;

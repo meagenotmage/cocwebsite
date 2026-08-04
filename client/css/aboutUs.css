@@ -11,7 +11,7 @@
 /* Header styles inherited from style.css */
 
 .hero-about {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6)), url('assets/aboutUs.jpg');
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6)), url('../assets/images/general/aboutUs.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
