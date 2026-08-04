@@ -1,0 +1,132 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../assets/images/general/COCSC.png" />
+    <title>Orders - Admin</title>
+    <link rel="stylesheet" href="../../css/admin/adminOrder.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- ======================= -->
+        <!--        SIDEBAR          -->
+        <!-- ======================= -->
+       <aside class="sidebar">
+            <button class="hamburger-btn" aria-label="Toggle menu">☰</button>
+            <h1 class="sidebar-title">Hi, Admin!</h1>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="admin.html"><i class="fa-solid fa-tachograph-digital"></i> Dashboard</a></li>
+                    <li><a href="adminFeedback.html"><i class="fa-solid fa-users"></i> Feedbacks</a></li>
+                    <li class="active"><a href="adminOrder.html"><i class="fa-solid fa-box-archive"></i> Orders</a></li>
+                    <li><a href="setUpEvent.html"><i class="fa-solid fa-calendar-plus"></i> Set-Up Event</a></li>
+                    <li><a href="createAnnouncement.html"><i class="fa-solid fa-bullhorn"></i> Announcements</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="adminLogIn.html"><i class="fa-solid fa-question-circle"></i> Log out</a>
+            </div>
+        </aside>
+
+        <!-- ======================= -->
+        <!--       MAIN CONTENT      -->
+        <!-- ======================= -->
+        <main class="main-content">
+            <div class="card">
+                <h2 class="list-title">Order Tracking List</h2>
+
+                <!-- Payment Method Settings -->
+                <div class="payment-settings-bar">
+                    <span class="payment-settings-label"><i class="fa-solid fa-sliders"></i> Payment Methods:</span>
+                    <label class="toggle-label">
+                        <span>GCash</span>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="toggle-gcash" checked>
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </label>
+                    <label class="toggle-label">
+                        <span>Cash</span>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="toggle-cash" checked>
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="search-container">
+                    <div class="search-group">
+                        <label for="search-name">Search</label>
+                        <div class="search-bar">
+                            <i class="fa-solid fa-search"></i>
+                            <input type="text" id="search-name" placeholder="Search name, payment, section...">
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-payment">Payment Method</label>
+                        <select id="filter-payment" class="filter-select">
+                            <option value="">All Payment Methods</option>
+                            <option value="Cash">Cash</option>
+                            <option value="GCASH">GCash</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-section">Section</label>
+                        <select id="filter-section" class="filter-select">
+                            <option value="">All Sections</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-item">Item Type</label>
+                        <select id="filter-item" class="filter-select">
+                            <option value="">All Items</option>
+                            <option value="type b">Type B</option>
+                            <option value="type c">Type C</option>
+                            <option value="nameplate">Nameplate</option>
+                            <option value="lanyard">Lanyard</option>
+                        </select>
+                    </div>
+                    <div class="filter-group export-group">
+                        <label>&nbsp;</label>
+                        <div style="display: flex; gap: 8px;">
+                            <button id="export-excel-btn" class="export-btn">
+                                <i class="fa-solid fa-file-excel"></i> Export to Excel
+                            </button>
+                            <button id="open-trash-btn" class="trash-btn">
+                                <i class="fa-solid fa-trash-can"></i> Trash
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Program, Year & Section</th>
+                                <th>Payment Method</th>
+                                <th>Total Amount</th>
+                                <th>Order Number</th>
+                                <th>Order Time</th>
+                                <th class="editable">Payment Status</th>
+                                <th class="editable">Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-tbody">
+                            <!-- Orders will be loaded dynamically from the API -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="../../js/config.js"></script>
+    <script src="../../js/auth-guard.js"></script>
+    <script src="../../js/admin/adminOrder.js"></script>
+</body>
+</html>

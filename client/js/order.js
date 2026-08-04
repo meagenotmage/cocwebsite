@@ -1,0 +1,491 @@
+﻿document.addEventListener('DOMContentLoaded', () => {
+    const productModal = document.getElementById('product-modal');
+    const cartModal = document.getElementById('cart-modal');
+    const confirmationModal = document.getElementById('confirmation-modal');
+    const sizeGuideModal = document.getElementById('size-guide-modal');
+    const closeButtons = document.querySelectorAll('.close-button');
+    const productItems = document.querySelectorAll('.product-item');
+    const modalSizeGuideLink = document.getElementById('modal-size-guide-link');
+    const cartLink = document.getElementById('cart-link');
+    const cartCountSpan = document.getElementById('cart-count');
+    const cartItemsContainer = document.getElementById('cart-items-container');
+    const cartTotalPriceSpan = document.getElementById('cart-total-price');
+    const addToCartBtn = productModal.querySelector('.add-to-cart-btn');
+    const productModalCheckoutBtn = productModal.querySelector('.checkout-btn');
+    const cartModalCheckoutBtn = cartModal.querySelector('.checkout-btn');
+    const confirmationOkBtn = document.getElementById('confirmation-ok-btn');
+    const confirmationTitle = document.getElementById('confirmation-title');
+    const confirmationMessage = document.getElementById('confirmation-message');
+    const sizeButtons = productModal.querySelectorAll('.sizes button');
+    const quantityInput = document.getElementById('quantity');
+    const minusBtn = productModal.querySelector('.quantity-btn.minus');
+    const plusBtn = productModal.querySelector('.quantity-btn.plus');
+    const nameTemplateInputContainer = productModal.querySelector('.name-template-input');
+    const nameTemplateInput = document.getElementById('template-name');
+    const nameInputFieldContainer = productModal.querySelector('.name-input-field');
+    const uniformNameInput = document.getElementById('uniform-name');
+    const programInputFieldContainer = document.getElementById('program-input-field');
+    const programNameInput = document.getElementById('program-name');
+    const sizesContainer = productModal.querySelector('.sizes');
+    
+    // Load cart from localStorage
+    let cart = [];
+    try {
+        const savedCart = localStorage.getItem('cocCart');
+        if (savedCart) {
+            cart = JSON.parse(savedCart);
+        }
+    } catch (error) {
+        console.error('Error loading cart:', error);
+        cart = [];
+    }
+    
+    let selectedSize = '';
+    const scrollLeftBtn = document.getElementById('scroll-left-btn');
+    const scrollRightBtn = document.getElementById('scroll-right-btn');
+    const merchandiseGrid = document.querySelector('.merchandise-grid');
+
+    // Initialize cart display on page load
+    updateCart();
+    updateCartDisplay();
+
+    if (scrollLeftBtn && scrollRightBtn && merchandiseGrid) {
+        const scrollAmount = 330;
+        scrollRightBtn.addEventListener('click', () => {
+            merchandiseGrid.scrollBy({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
+        });
+
+        scrollLeftBtn.addEventListener('click', () => {
+            merchandiseGrid.scrollBy({
+                left: -scrollAmount,
+                behavior: 'smooth'
+            });
+        });
+    }
+
+    const sliderDots   = document.getElementById('slider-dots');
+    const sliderLabel  = document.getElementById('slider-label');
+
+    // Build image slider
+    function buildImageViewer(images) {
+        const mainImg = productModal.querySelector('#modal-img');
+        sliderDots.innerHTML = '';
+        let currentIndex = 0;
+
+        if (!images || images.length === 0) return;
+
+        // Always query fresh arrow nodes (they get replaced each call)
+        function getPrev() { return document.getElementById('slider-prev'); }
+        function getNext() { return document.getElementById('slider-next'); }
+
+        function goTo(index) {
+            currentIndex = (index + images.length) % images.length;
+            mainImg.style.opacity = '0';
+            setTimeout(() => {
+                mainImg.src = images[currentIndex].src;
+                sliderLabel.textContent = images[currentIndex].label;
+                mainImg.style.opacity = '1';
+            }, 160);
+            sliderDots.querySelectorAll('.dot').forEach((d, i) => {
+                d.classList.toggle('active', i === currentIndex);
+            });
+        }
+
+        // Set initial
+        mainImg.src = images[0].src;
+        sliderLabel.textContent = images[0].label;
+
+        const multi = images.length > 1;
+        sliderDots.style.display = multi ? 'flex' : 'none';
+        getPrev().style.display  = multi ? 'flex' : 'none';
+        getNext().style.display  = multi ? 'flex' : 'none';
+
+        if (multi) {
+            // Build dots
+            images.forEach((_, i) => {
+                const dot = document.createElement('span');
+                dot.className = 'dot' + (i === 0 ? ' active' : '');
+                dot.addEventListener('click', () => goTo(i));
+                sliderDots.appendChild(dot);
+            });
+
+            // Replace arrow nodes to clear stale listeners, then re-attach
+            ['slider-prev', 'slider-next'].forEach(id => {
+                const old = document.getElementById(id);
+                const clone = old.cloneNode(true);
+                old.parentNode.replaceChild(clone, old);
+            });
+            document.getElementById('slider-prev').addEventListener('click', () => goTo(currentIndex - 1));
+            document.getElementById('slider-next').addEventListener('click', () => goTo(currentIndex + 1));
+        }
+    }
+
+    productItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const name = item.dataset.name;
+            const price = item.dataset.price;
+            const imgSrc = item.dataset.imgSrc;
+            const id = item.dataset.id;
+            const requiresName = item.dataset.requiresName === 'true';
+            const imagesRaw = item.dataset.images;
+
+            productModal.querySelector('#modal-name').textContent = name;
+            productModal.querySelector('#modal-price').textContent = `₱ ${price}`;
+            addToCartBtn.dataset.id = id;
+            addToCartBtn.dataset.name = name;
+            addToCartBtn.dataset.price = price;
+            addToCartBtn.dataset.img = imagesRaw ? JSON.parse(imagesRaw)[0].src : imgSrc;
+            addToCartBtn.dataset.requiresName = requiresName;
+            quantityInput.value = '1';
+
+            // Build image viewer
+            let images = [];
+            try { images = imagesRaw ? JSON.parse(imagesRaw) : [{src: imgSrc, label: 'View'}]; } catch(e) { images = [{src: imgSrc, label: 'View'}]; }
+            buildImageViewer(images);
+            
+            if (name === 'COC Nameplate') {
+                sizesContainer.style.display = 'none';
+                if (modalSizeGuideLink) modalSizeGuideLink.style.display = 'none';
+                if (nameTemplateInputContainer) {
+                    nameTemplateInputContainer.style.display = 'block';
+                    if (nameTemplateInput) nameTemplateInput.value = '';
+                }
+                if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'none';
+                if (programInputFieldContainer) programInputFieldContainer.style.display = 'none';
+            } else if (name === 'COC Lanyard') {
+                // Lanyard doesn't need a size - it's one size fits all
+                sizesContainer.style.display = 'none';
+                if (modalSizeGuideLink) modalSizeGuideLink.style.display = 'none';
+                if (nameTemplateInputContainer) nameTemplateInputContainer.style.display = 'none';
+                if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'none';
+                if (programInputFieldContainer) programInputFieldContainer.style.display = 'none';
+                setActiveSize('One Size');
+            } else if (requiresName) {
+                sizesContainer.style.display = 'block';
+                if (modalSizeGuideLink) modalSizeGuideLink.style.display = 'block';
+                if (nameTemplateInputContainer) nameTemplateInputContainer.style.display = 'none';
+                if (nameInputFieldContainer) {
+                    nameInputFieldContainer.style.display = 'block';
+                    if (uniformNameInput) uniformNameInput.value = '';
+                }
+                if (programInputFieldContainer) {
+                    programInputFieldContainer.style.display = 'block';
+                    if (programNameInput) programNameInput.value = '';
+                }
+                setActiveSize('');
+            } else if (name.includes('Uniform')) {
+                // All uniforms should have size guide
+                sizesContainer.style.display = 'block';
+                if (modalSizeGuideLink) modalSizeGuideLink.style.display = 'block';
+                if (nameTemplateInputContainer) nameTemplateInputContainer.style.display = 'none';
+                if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'none';
+                if (programInputFieldContainer) programInputFieldContainer.style.display = 'none';
+                setActiveSize('');
+            } else {
+                sizesContainer.style.display = 'block';
+                if (modalSizeGuideLink) modalSizeGuideLink.style.display = 'none';
+                if (nameTemplateInputContainer) nameTemplateInputContainer.style.display = 'none';
+                if (nameInputFieldContainer) nameInputFieldContainer.style.display = 'none';
+                if (programInputFieldContainer) programInputFieldContainer.style.display = 'none';
+                setActiveSize('');
+            }
+            productModal.style.display = 'flex';
+        });
+    });
+
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Find the parent modal and close only that one
+            const parentModal = button.closest('.modal');
+            if (parentModal) {
+                parentModal.style.display = 'none';
+                // If closing the size guide, reopen the product modal
+                if (parentModal.id === 'size-guide-modal') {
+                    productModal.style.display = 'flex';
+                }
+            } else {
+                // Fallback: close all
+                productModal.style.display = 'none';
+                cartModal.style.display = 'none';
+                sizeGuideModal.style.display = 'none';
+            }
+        });
+    });
+
+    confirmationOkBtn.addEventListener('click', () => {
+        confirmationModal.style.display = 'none';
+    });
+
+    // Size Guide Link in Modal
+    if (modalSizeGuideLink) {
+        modalSizeGuideLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            sizeGuideModal.style.display = 'flex';
+        });
+    }
+
+    window.addEventListener('click', (event) => {
+        if (event.target == productModal || event.target == cartModal) {
+            productModal.style.display = 'none';
+            cartModal.style.display = 'none';
+        }
+        if (event.target == confirmationModal) {
+            confirmationModal.style.display = 'none';
+        }
+        if (event.target == sizeGuideModal) {
+            sizeGuideModal.style.display = 'none';
+        }
+    });
+
+    sizeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            setActiveSize(button.textContent);
+        });
+    });
+
+    minusBtn.addEventListener('click', () => {
+        let currentValue = parseInt(quantityInput.value);
+        if (currentValue > 1) {
+            quantityInput.value = currentValue - 1;
+        }
+    });
+
+    plusBtn.addEventListener('click', () => {
+        let currentValue = parseInt(quantityInput.value);
+        quantityInput.value = currentValue + 1;
+    });
+
+    addToCartBtn.addEventListener('click', (e) => {
+        let customDetail = selectedSize;
+        let customName = null;
+        let customProgram = null;
+        const requiresName = e.target.dataset.requiresName === 'true';
+        const productName = e.target.dataset.name;
+        
+        if (productName === 'COC Nameplate') {
+            if(!nameTemplateInput || nameTemplateInput.value.trim() === '') {
+                showConfirmation('Error', '<p>Please enter a name for the nameplate.</p>', false);
+                return;
+            }
+            customDetail = nameTemplateInput.value.trim();
+            customName = nameTemplateInput.value.trim();
+        } else if (productName === 'COC Lanyard') {
+            // Lanyard doesn't require size selection
+            customDetail = 'One Size';
+        } else if (requiresName) {
+            if (!selectedSize) {
+                showConfirmation('Error', '<p>Please select a size.</p>', false);
+                return;
+            }
+            if (!uniformNameInput || uniformNameInput.value.trim() === '') {
+                showConfirmation('Error', '<p>Please enter a name for the uniform.</p>', false);
+                return;
+            }
+            customName = uniformNameInput.value.trim();
+            customProgram = programNameInput ? programNameInput.value.trim() : '';
+        } else if (!selectedSize) {
+            showConfirmation('Error', '<p>Please select a size.</p>', false);
+            return;
+        }
+
+        const item = {
+            id: e.target.dataset.id,
+            name: e.target.dataset.name,
+            price: parseFloat(e.target.dataset.price),
+            quantity: parseInt(quantityInput.value),
+            detail: customDetail,
+            img: e.target.dataset.img,
+            customName: customName,
+            program: customProgram || null,
+            size: !customName || e.target.dataset.name === 'COC Nameplate' ? null : customDetail
+        };
+
+        const existingItemIndex = cart.findIndex(cartItem => 
+            cartItem.id === item.id && 
+            cartItem.detail === item.detail && 
+            cartItem.customName === item.customName &&
+            cartItem.program === item.program
+        );
+
+        if (existingItemIndex > -1) {
+            cart[existingItemIndex].quantity += item.quantity;
+        } else {
+            cart.push(item);
+        }
+        updateCart();
+        productModal.style.display = 'none';
+        
+        const detailLabel = item.name === 'COC Nameplate' ? 'Name' : 'Size';
+        const nameInfo = customName && item.name !== 'COC Nameplate' ? `<p>Name: ${customName}</p>` : '';
+        const programInfo = customProgram ? `<p>Program: ${customProgram}</p>` : '';
+        showConfirmation(
+            'Added to Cart!',
+            `<p><strong>${item.quantity} x ${item.name}</strong></p>
+             <p>${detailLabel}: ${item.detail}</p>
+             ${nameInfo}
+             ${programInfo}
+             <p>Price: ₱${(item.price * item.quantity).toFixed(2)}</p>`
+        );
+    });
+
+    cartLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        updateCartDisplay();
+        cartModal.style.display = 'flex';
+    });
+
+    // Direct checkout from product modal
+    productModalCheckoutBtn.addEventListener('click', () => {
+        let customDetail = selectedSize;
+        let customName = null;
+        let customProgram = null;
+        const productName = addToCartBtn.dataset.name;
+        const requiresName = addToCartBtn.dataset.requiresName === 'true';
+        
+        if (productName === 'COC Nameplate') {
+            if(!nameTemplateInput || nameTemplateInput.value.trim() === '') {
+                showConfirmation('Error', '<p>Please enter a name for the nameplate.</p>', false);
+                return;
+            }
+            customDetail = nameTemplateInput.value.trim();
+            customName = nameTemplateInput.value.trim();
+        } else if (productName === 'COC Lanyard') {
+            // Lanyard doesn't require size selection
+            customDetail = 'One Size';
+        } else if (requiresName) {
+            if (!selectedSize) {
+                showConfirmation('Error', '<p>Please select a size.</p>', false);
+                return;
+            }
+            if (!uniformNameInput || uniformNameInput.value.trim() === '') {
+                showConfirmation('Error', '<p>Please enter a name for the uniform.</p>', false);
+                return;
+            }
+            customName = uniformNameInput.value.trim();
+            customProgram = programNameInput ? programNameInput.value.trim() : '';
+        } else if (!selectedSize) {
+            showConfirmation('Error', '<p>Please select a size.</p>', false);
+            return;
+        }
+
+        const item = {
+            id: addToCartBtn.dataset.id,
+            name: productName,
+            price: parseFloat(addToCartBtn.dataset.price),
+            quantity: parseInt(quantityInput.value),
+            detail: customDetail,
+            img: addToCartBtn.dataset.img,
+            customName: customName,
+            program: customProgram || null,
+            size: !customName || productName === 'COC Nameplate' ? null : customDetail
+        };
+
+        // Store in session and redirect to checkout
+        sessionStorage.setItem('checkoutData', JSON.stringify([item]));
+        window.location.href = '../html/checkout.html';
+    });
+
+    // Checkout from cart
+    cartModalCheckoutBtn.addEventListener('click', () => {
+        if (cart.length === 0) {
+            showConfirmation('Cart Empty', '<p>Please add items to your cart before checking out.</p>', false);
+            return;
+        }
+        
+        // Store cart in session and redirect to checkout
+        sessionStorage.setItem('checkoutData', JSON.stringify(cart));
+        window.location.href = '../html/checkout.html';
+    });
+
+    function setActiveSize(size) {
+        selectedSize = size;
+        sizeButtons.forEach(btn => {
+            if (btn.textContent === size) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
+    function updateCart() {
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        cartCountSpan.textContent = totalItems;
+        
+        // Save cart to localStorage
+        try {
+            localStorage.setItem('cocCart', JSON.stringify(cart));
+        } catch (error) {
+            console.error('Error saving cart:', error);
+        }
+    }
+
+    function removeItemFromCart(index) {
+        cart.splice(index, 1);
+        updateCart();
+        updateCartDisplay();
+    }
+    
+    function addDeleteEventListeners() {
+        const deleteButtons = document.querySelectorAll('.cart-item-delete-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const itemIndex = parseInt(e.target.dataset.index, 10);
+                removeItemFromCart(itemIndex);
+            });
+        });
+    }
+
+    function updateCartDisplay() {
+        cartItemsContainer.innerHTML = '';
+        if (cart.length === 0) {
+            cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
+            cartTotalPriceSpan.textContent = '₱0.00';
+            return;
+        }
+        let totalPrice = 0;
+        cart.forEach((item, index) => {
+            const itemTotal = item.price * item.quantity;
+            totalPrice += itemTotal;
+            const detailLabel = item.name === 'COC Nameplate' ? 'Name' : 'Size';
+            const nameInfo = item.customName && item.name !== 'COC Nameplate' ? `<p>Name: ${item.customName}</p>` : '';
+            const programInfo = item.program ? `<p>Program: ${item.program}</p>` : '';
+            const cartItemDiv = document.createElement('div');
+            cartItemDiv.classList.add('cart-item');
+            cartItemDiv.innerHTML = `
+                <img src="${item.img}" alt="${item.name}" class="cart-item-img">
+                <div class="cart-item-details">
+                    <p>${item.name}</p>
+                    <p>${detailLabel}: ${item.detail}</p>
+                    ${nameInfo}
+                    ${programInfo}
+                    <p>Qty: ${item.quantity}</p>
+                </div>
+                <div class="cart-item-price">₱${itemTotal.toFixed(2)}</div>
+                <button class="cart-item-delete-btn" data-index="${index}">×</button>
+            `;
+            cartItemsContainer.appendChild(cartItemDiv);
+        });
+        cartTotalPriceSpan.textContent = `₱${totalPrice.toFixed(2)}`;
+        addDeleteEventListeners();
+    }
+
+    function showConfirmation(title, message, isSuccess = true) {
+        confirmationTitle.textContent = title;
+        confirmationMessage.innerHTML = message;
+        
+        const icon = confirmationModal.querySelector('.confirmation-icon i');
+        if (isSuccess) {
+            icon.className = 'fa-solid fa-check-circle';
+            icon.style.color = '#28a745';
+        } else {
+            icon.className = 'fa-solid fa-exclamation-circle';
+            icon.style.color = '#E53935';
+        }
+        
+        confirmationModal.style.display = 'flex';
+    }
+});

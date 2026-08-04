@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../assets/images/general/COCSC.png" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="../../css/admin/adminDashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- ======================= -->
+        <!--        SIDEBAR          -->
+        <!-- ======================= -->
+        <aside class="sidebar">
+            <button class="hamburger-btn" aria-label="Toggle menu">☰</button>
+            <h1 class="sidebar-title">Hi, Admin!</h1>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active"><a href="admin.html"><i class="fa-solid fa-tachograph-digital"></i> Dashboard</a></li>
+                    <li><a href="adminFeedback.html"><i class="fa-solid fa-users"></i> Feedbacks</a></li>
+                    <li><a href="adminOrder.html"><i class="fa-solid fa-box-archive"></i> Orders</a></li>
+                    <li><a href="setUpEvent.html"><i class="fa-solid fa-calendar-days"></i> Set-up Event</a></li>
+                    <li><a href="createAnnouncement.html"><i class="fa-solid fa-bullhorn"></i> Announcements</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="adminLogIn.html"><i class="fa-solid fa-right-from-bracket"></i> Log out</a>
+            </div>
+        </aside>
+
+        <!-- ======================= -->
+        <!--       MAIN CONTENT      -->
+        <!-- ======================= -->
+        <main class="main-content">
+            <div class="card orders-card clickable-card" data-href="adminOrder.html">
+                <h2>Orders <span class="card-nav-arrow">View All →</span></h2>
+                <p class="subtitle">Orders per Merch</p>
+                <div class="chart-container">
+                    <canvas id="ordersChart"></canvas>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #8B0000;"></span> ID Lanyard
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #B22222;"></span> COC Type B Uniform
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #CD5C5C;"></span> COC Type C Uniform
+                    </div>
+                     <div class="legend-item">
+                        <span class="legend-color" style="background-color: #E9967A;"></span> COC Nameplate
+                    </div>
+                </div>
+            </div>
+
+            <div class="card events-card clickable-card" data-href="setUpEvent.html">
+                <h2>Upcoming Events <span class="card-nav-arrow">View All →</span></h2>
+                <div class="events-list">
+                    <!-- JS will populate this -->
+                </div>
+            </div>
+
+            <div class="card feedbacks-card clickable-card" data-href="adminFeedback.html">
+                <h2>Feedbacks <span class="card-nav-arrow">View All →</span></h2>
+                <div class="feedback-list">
+                    <!-- JS will populate this -->
+                </div>
+            </div>
+
+            <div class="card announcements-card clickable-card" data-href="createAnnouncement.html">
+                <h2>Announcements <span class="card-nav-arrow">View All →</span></h2>
+                <div class="announcement-list">
+                    <!-- Will be populated by JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../../js/config.js"></script>
+    <script src="../../js/auth-guard.js"></script>
+    <script src="../../js/admin/adminDashboard.js"></script>
+</body>
+</html>

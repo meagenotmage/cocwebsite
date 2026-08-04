@@ -1,0 +1,242 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../assets/images/general/coc.png" />
+    <title>Order</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="../css/order.css">
+</head>
+<body>
+    <!-- ======================= -->
+    <!--          HEADER         -->
+    <!-- ======================= -->
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="../assets/images/general/COCSC.png" alt="College Logo"> 
+            </a>
+            <nav class="desktop-nav">
+                <ul>
+                    <li><a href="index.html">HOME</a></li>
+                    <li><a href="order.html" class="active">ORDER</a></li>
+                    <li><a href="feedback.html">FEEDBACK</a></li>
+                    <li><a href="aboutUs.html">ABOUT US</a></li>
+                </ul>
+            </nav>
+            <!-- ADDED: Hamburger Menu Button -->
+            <button class="hamburger" id="hamburger-btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- ADDED: Mobile Navigation Menu -->
+    <div class="mobile-nav" id="mobile-nav">
+        <ul>
+            <li><a href="index.html">HOME</a></li>
+            <li><a href="order.html" class="active">ORDER</a></li>
+            <li><a href="feedback.html">FEEDBACK</a></li>
+            <li><a href="aboutUs.html">ABOUT US</a></li>
+        </ul>
+    </div>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1><strong>ORDER</strong></h1>
+                    <p class="hero-description">College of Communications Merchandise! Wear your college with pride.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="merchandise">
+            <div class="container">
+                <div class="merchandise-header">
+                    <h2>College of Communication Merchandise</h2>
+                    <div class="cart-summary">
+                        <a href="#" id="cart-link">CART (<span id="cart-count">0</span>)</a>
+                    </div>
+                </div>
+                <div class="merchandise-grid">
+                    <div class="product-item" data-id="1" data-name="COC Type B Uniform" data-price="550" data-img-src="../assets/images/products/TYPE B UNIFORM (FRONT VIEW).png" data-requires-name="true" data-images='[{"src":"assets/TYPE B UNIFORM (FRONT VIEW).png","label":"Front"},{"src":"assets/TYPE B UNIFORM (BACK VIEW).png","label":"Back"}]'>
+                        <img src="../assets/images/products/TYPE B UNIFORM.png" alt="COC Type B Uniform" onerror="this.style.display='none'; this.parentElement.classList.add('image-error');">
+                        <div class="product-info-text">
+                            <h3>COC Type B Uniform</h3>
+                            <p>₱ 550</p>
+                        </div>
+                    </div>
+                    <div class="product-item" data-id="2" data-name="COC Type C Uniform" data-price="200" data-img-src="../assets/images/products/TYPE C UNIFORM (FRONT VIEW).png" data-images='[{"src":"assets/TYPE C UNIFORM (FRONT VIEW).png","label":"Front"},{"src":"assets/TYPE C UNIFORM (BACK VIEW).png","label":"Back"}]'>
+                        <img src="../assets/images/products/TYPE C UNIFORM.png" alt="COC Type C Uniform" onerror="this.style.display='none'; this.parentElement.classList.add('image-error');">
+                        <div class="product-info-text">
+                            <h3>COC Type C Uniform</h3>
+                            <p>₱ 200</p>
+                        </div>
+                    </div>
+                    <div class="product-item" data-id="3" data-name="COC Nameplate" data-price="260" data-img-src="../assets/images/products/NAMEPLATE.png" data-images='[{"src":"assets/NAMEPLATE (2).png","label":"View 1"},{"src":"assets/NAMEPLATE (3).png","label":"View 2"}]'>
+                        <img src="../assets/images/products/NAMEPLATE.png" alt="COC Nameplate" onerror="this.src='https://i.imgur.com/1RO9505.png'; this.onerror=null;">
+                        <div class="product-info-text">
+                            <h3>COC Nameplate</h3>
+                            <p>₱ 260</p>
+                        </div>
+                    </div>
+                    <div class="product-item" data-id="4" data-name="COC Lanyard" data-price="120" data-img-src="assets/LANYARD.png?v=2" data-images='[{"src":"assets/LANYARD (2).png?v=2","label":"View 1"},{"src":"assets/LANYARD (3).png?v=2","label":"View 2"}]'>
+                        <img src="assets/LANYARD.png?v=2" alt="COC Lanyard" onerror="this.src='assets/LANYARD (2).png?v=2'; this.onerror=null;">
+                        <div class="product-info-text">
+                            <h3>COC Lanyard</h3>
+                            <p>₱ 120</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="pagination" style="display: none;">
+                    <button id="scroll-left-btn"><</button>
+                    <button id="scroll-right-btn">></button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">×</span>
+            <div class="modal-body">
+                <div class="modal-image">
+                    <div class="modal-img-slider" id="modal-img-slider">
+                        <img id="modal-img" src="" alt="Product Image">
+                        <span class="slider-label" id="slider-label"></span>
+                        <button class="slider-arrow slider-prev" id="slider-prev" aria-label="Previous"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button class="slider-arrow slider-next" id="slider-next" aria-label="Next"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                    <div class="slider-dots" id="slider-dots"></div>
+                </div>
+                <div class="modal-details">
+                    <h2 id="modal-name">Product Name</h2>
+                    <p id="modal-price">P 0</p>
+                    <div id="modal-options">
+                        <div class="sizes">
+                            <button>S</button>
+                            <button>M</button>
+                            <button>L</button>
+                            <button>XL</button>
+                            <button>2XL</button>
+                        </div>
+                        <a href="#" class="size-guide-link" id="modal-size-guide-link" style="display: none;"><i class="fa-solid fa-ruler"></i> View Size Guide</a>
+                        <div class="name-template-input" id="name-template-input" style="display: none;">
+                            <label for="template-name">Name for Nameplate</label>
+                            <input type="text" id="template-name" placeholder="e.g., CHRISTINE ELIJAH F. PORRAS">
+                        </div>
+                        <div class="name-input-field" id="name-input-field" style="display: none;">
+                            <label for="uniform-name">Name for Type B</label>
+                            <input type="text" id="uniform-name" placeholder="e.g., PORRAS, C.E. F.">
+                        </div>
+                        <div class="name-input-field" id="program-input-field" style="display: none;">
+                            <label for="program-name">Program</label>
+                            <input type="text" id="program-name" placeholder="e.g., BA Broadcasting">
+                        </div>
+                    </div>
+                    <div class="quantity">
+                        <label for="quantity">Quantity:</label>
+                        <button class="quantity-btn minus">-</button>
+                        <input type="text" id="quantity" value="1" readonly>
+                        <button class="quantity-btn plus">+</button>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="add-to-cart-btn">Add to cart</button>
+                        <button class="checkout-btn">Checkout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="cart-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">×</span>
+            <h2>CART</h2>
+            <div id="cart-items-container">
+            </div>
+            <div class="cart-total">
+                <p>Total: <span id="cart-total-price">₱0.00</span></p>
+            </div>
+            <button class="checkout-btn">Checkout</button>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="modal confirmation-modal">
+        <div class="modal-content confirmation-content">
+            <div class="confirmation-icon">
+                <i class="fa-solid fa-check-circle"></i>
+            </div>
+            <h2 id="confirmation-title">Success!</h2>
+            <div id="confirmation-message"></div>
+            <button class="confirmation-btn" id="confirmation-ok-btn">OK</button>
+        </div>
+    </div>
+
+    <!-- Size Guide Modal -->
+    <div id="size-guide-modal" class="modal">
+        <div class="modal-content size-guide-content">
+            <span class="close-button">×</span>
+            <h2>Size Guide</h2>
+            <div class="size-guide-image">
+                <img src="../assets/images/products/size-guide.jpg" alt="Size Guide Chart" onerror="this.src='https://via.placeholder.com/600x400?text=Size+Guide+Chart';">
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================= -->
+    <!--          FOOTER         -->
+    <!-- ======================= -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-main">
+                <a href="admin/adminLogIn.html" style="display: inline-block;">
+                    <img src="../assets/images/general/COCSC.png" alt="College Logo" class="footer-logo">
+                </a>
+                <p>WVSU College of Communication, Luna St. La Paz</p>
+                <p>Iloilo City, Philippines 5000</p>
+                <p>coc.sec@wvsu.edu.ph</p>
+                <p>admission.coc@wvsu.edu.ph</p>
+            </div>
+            
+            <div class="footer-menu">
+                <h3>Menu</h3>
+                <ul>
+                    <li><a href="order.html">Orders</a></li>
+                    <li><a href="aboutUs.html">About Us</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-social">
+                <h3>Social Media</h3>
+                <div class="social-icons">
+                    <a href="https://www.facebook.com/wvsucocsc" target="_blank" rel="noopener noreferrer" aria-label="Visit COCSC Facebook page"><i class="fa-brands fa-facebook" aria-hidden="true"></i></a>
+                    <a href="https://www.facebook.com/wvsucoc" target="_blank" rel="noopener noreferrer" aria-label="Visit COC Facebook page"><i class="fa-brands fa-facebook" aria-hidden="true"></i></a>
+                    <a href="https://www.instagram.com/wvsucocsc/" target="_blank" rel="noopener noreferrer" aria-label="Visit COCSC Instagram page"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-logos">
+                <img src="../assets/images/general/wvsu.png" alt="WVSU Seal">
+                <a href="admin/adminLogIn.html">
+                    <img src="../assets/images/general/coc.png" alt="COC Seal">
+                </a>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>Copyright © COCSC 2025. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../js/mobile-nav.js"></script>
+    <script src="../js/order.js"></script>
+</body>
+</html>

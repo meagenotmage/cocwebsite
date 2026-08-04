@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../assets/images/general/coc.png" />
+    <title>GCash Payment - College of Communications</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="../css/gcash-payment.css">
+</head>
+<body>
+    <!-- ======================= -->
+    <!--          HEADER         -->
+    <!-- ======================= -->
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="../assets/images/general/COCSC.png" alt="College Logo"> 
+            </a>
+            <nav class="desktop-nav">
+                <ul>
+                    <li><a href="index.html">HOME</a></li>
+                    <li><a href="order.html">ORDER</a></li>
+                    <li><a href="aboutUs.html">ABOUT US</a></li>
+                </ul>
+            </nav>
+            <button class="hamburger" id="hamburger-btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="mobile-nav" id="mobile-nav">
+        <ul>
+            <li><a href="index.html">HOME</a></li>
+            <li class="mobile-dropdown">
+                <a href="#" class="mobile-dropdown-toggle">SERVICES <i class="fa-solid fa-chevron-down"></i></a>
+                <ul class="mobile-dropdown-menu">
+                    <li><a href="order.html">ORDER</a></li>
+                </ul>
+            </li>
+            <li><a href="aboutUs.html">ABOUT US</a></li>
+        </ul>
+    </div>
+
+    <main class="gcash-payment-main">
+        <div class="container">
+            <div class="payment-container">
+                <div class="payment-header">
+                    <img src="../assets/images/general/COCSC.png" alt="COC Logo" class="payment-logo">
+                    <h1>GCash Payment</h1>
+                    <p>Scan the QR code or send payment to the account below</p>
+                    <div class="session-timer" id="session-timer">
+                        <i class="fa-solid fa-clock"></i>
+                        <span>Session expires in: <strong id="timer-display">20:00</strong></span>
+                    </div>
+                </div>
+
+                <div class="payment-content">
+                    <div class="payment-left">
+                        <div class="qr-section">
+                            <h3>Scan QR Code</h3>
+                            <div class="qr-code">
+                                <img src="../assets/images/general/qr gcash.jpg" alt="GCash QR Code" id="gcash-qr">
+                            </div>
+                        </div>
+                        
+                        <div class="account-details">
+                            <h3>Or send to:</h3>
+                            <div class="detail-item">
+                                <span class="label">Account Name:</span>
+                                <span class="value">Elmer Marie Sable</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">GCash Number:</span>
+                                <span class="value gcash-number-row">
+                                    <span id="gcash-number">0945 455 2491</span>
+                                    <button class="copy-btn" id="copy-gcash-btn" title="Copy GCash number" aria-label="Copy GCash number">
+                                        <i class="fa-regular fa-copy" id="copy-icon"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="payment-right">
+                        <div class="order-summary-box">
+                            <h3>Order Summary</h3>
+                            <div id="payment-order-items"></div>
+                            <div class="summary-total">
+                                <p><strong>Total Amount:</strong></p>
+                                <p class="amount" id="payment-total">₱0.00</p>
+                            </div>
+                        </div>
+
+                        <div class="payment-confirmation">
+                            <h3>Upload Payment Proof</h3>
+                            <p>Please upload a screenshot of your GCash payment receipt for verification.</p>
+                            
+                            <div class="upload-section">
+                                <input type="file" id="receipt-upload" accept="image/*" style="display: none;">
+                                <button type="button" class="upload-btn" id="upload-btn">
+                                    <i class="fa-solid fa-upload"></i> Choose Receipt Image
+                                </button>
+                                <div class="upload-preview" id="upload-preview" style="display: none;">
+                                    <img id="preview-image" src="" alt="Receipt preview">
+                                    <button type="button" class="remove-image-btn" id="remove-image-btn">
+                                        <i class="fa-solid fa-times"></i> Remove
+                                    </button>
+                                </div>
+                                <p class="upload-status" id="upload-status"></p>
+                            </div>
+
+                            <div class="confirmation-section">
+                                <h3>Confirm Payment</h3>
+                                <p>After uploading your receipt, click the button below to confirm payment.</p>
+                                <button type="button" class="confirm-payment-btn" id="confirm-payment-btn" disabled>
+                                    I have sent the payment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ======================= -->
+    <!--          FOOTER         -->
+    <!-- ======================= -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-main">
+                <a href="admin/adminLogIn.html" style="display: inline-block;">
+                    <img src="../assets/images/general/COCSC.png" alt="College Logo" class="footer-logo">
+                </a>
+                <p>WVSU College of Communication, Luna St. La Paz</p>
+                <p>Iloilo City, Philippines 5000</p>
+                <p>coc.sec@wvsu.edu.ph</p>
+                <p>admission.coc@wvsu.edu.ph</p>
+            </div>
+            
+            <div class="footer-menu">
+                <h3>Menu</h3>
+                <ul>
+                    <li><a href="order.html">Orders</a></li>
+                    <li><a href="feedback.html">Feedback</a></li>
+                    <li><a href="processingLogs.html">Processing Logs</a></li>
+                    <li><a href="aboutUs.html">About Us</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-social">
+                <h3>Social Media</h3>
+                <div class="social-icons">
+                    <a href="https://www.facebook.com/wvsucocsc" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="https://www.facebook.com/wvsucoc" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="https://www.instagram.com/wvsucocsc/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-logos">
+                <img src="../assets/images/general/wvsu.png" alt="WVSU Seal">
+                <a href="admin/adminLogIn.html">
+                    <img src="../assets/images/general/coc.png" alt="COC Seal">
+                </a>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>Copyright © COCSC 2025. All rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/mobile-nav.js"></script>
+    <script src="../js/gcash-payment.js"></script>
+</body>
+</html>
