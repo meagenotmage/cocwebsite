@@ -85,7 +85,7 @@
                 credentials: 'include'
             });
             if (response.status === 401) {
-                window.location.href = 'adminLogIn.html';
+                window.location.href = '/admin/login';
                 return;
             }
             if (!response.ok) throw new Error('Failed to fetch orders');
@@ -302,7 +302,7 @@
                 credentials: 'include'
             });
             if (response.status === 401) {
-                window.location.href = 'adminLogIn.html';
+                window.location.href = '/admin/login';
                 return;
             }
             if (!response.ok) throw new Error('Failed to fetch feedbacks');

@@ -14,13 +14,13 @@ export async function requireAuth() {
         const data = await response.json();
         
         if (!data.authenticated) {
-            window.location.href = '../html/admin/adminLogIn.html';
+            window.location.href = '/admin/login';
             return false;
         }
         return true;
     } catch (error) {
         console.error('Auth check error:', error);
-        window.location.href = '../html/admin/adminLogIn.html';
+        window.location.href = '/admin/login';
         return false;
     }
 }
@@ -36,7 +36,7 @@ export async function logout() {
         });
         
         if (response.ok) {
-            window.location.href = '../html/admin/adminLogIn.html';
+            window.location.href = '/admin/login';
         } else {
             console.error('Logout failed');
             alert('Logout failed. Please try again.');

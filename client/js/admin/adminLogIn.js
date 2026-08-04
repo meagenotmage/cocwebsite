@@ -21,7 +21,7 @@ if (loginForm) {
             const data = await response.json().catch(function () { return {}; });
 
             if (response.ok && data.success) {
-                window.location.href = 'admin.html';
+                window.location.href = '/admin/dashboard';
             } else if (response.status === 404) {
                 alert('Login endpoint not found on the server. Make sure the backend is running locally (npm start in server/) or deploy the latest server code to Render.');
             } else if (response.status === 503) {

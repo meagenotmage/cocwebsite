@@ -385,7 +385,7 @@
 
         // Store in session and redirect to checkout
         sessionStorage.setItem('checkoutData', JSON.stringify([item]));
-        window.location.href = '../html/checkout.html';
+        window.location.href = '/checkout';
     });
 
     // Checkout from cart
@@ -397,7 +397,7 @@
         
         // Store cart in session and redirect to checkout
         sessionStorage.setItem('checkoutData', JSON.stringify(cart));
-        window.location.href = '../html/checkout.html';
+        window.location.href = '/checkout';
     });
 
     function setActiveSize(size) {

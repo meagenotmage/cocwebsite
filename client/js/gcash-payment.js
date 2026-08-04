@@ -3,7 +3,7 @@
 
     if (!orderData) {
         alert('No order data found. Redirecting to order page.');
-        window.location.href = '../html/order.html';
+        window.location.href = '/order';
         return;
     }
 
@@ -27,7 +27,7 @@
             sessionStorage.removeItem(TIMER_KEY);
             sessionStorage.removeItem('pendingOrderData');
             alert('Your payment session has expired. Please start your order again.');
-            window.location.href = '../html/checkout.html';
+            window.location.href = '/checkout';
             return;
         }
 
@@ -164,7 +164,7 @@
                     sessionStorage.removeItem('gcashSessionExpiry');
                     
                     // Redirect to receipt
-                    window.location.href = '../html/receipt.html';
+                    window.location.href = '/receipt';
                 } else {
                     alert('Failed to confirm payment. Please try again.');
                     confirmBtn.disabled = false;

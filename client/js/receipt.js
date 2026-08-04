@@ -3,7 +3,7 @@
 
     if (!orderData) {
         alert('No order data found. Redirecting to order page.');
-        window.location.href = '../html/order.html';
+        window.location.href = '/order';
         return;
     }
 

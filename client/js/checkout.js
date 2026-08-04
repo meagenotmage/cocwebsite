@@ -206,7 +206,7 @@
             sessionStorage.removeItem('checkoutData');
             try { localStorage.removeItem('cocCart'); } catch (e) {}
             sessionStorage.setItem('pendingOrderData', JSON.stringify(formData));
-            window.location.href = '../html/gcash-payment.html';
+            window.location.href = '/gcash-payment';
             return;
         }
 
@@ -238,7 +238,7 @@
                 }
 
                 sessionStorage.setItem('orderData', JSON.stringify(result.order));
-                window.location.href = '../html/receipt.html';
+                window.location.href = '/receipt';
             } else {
                 alert('Error placing order: ' + (result.message || 'Please try again'));
             }

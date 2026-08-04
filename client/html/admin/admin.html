@@ -19,15 +19,15 @@
             <h1 class="sidebar-title">Hi, Admin!</h1>
             <nav class="sidebar-nav">
                 <ul>
-                    <li class="active"><a href="admin.html"><i class="fa-solid fa-tachograph-digital"></i> Dashboard</a></li>
-                    <li><a href="adminFeedback.html"><i class="fa-solid fa-users"></i> Feedbacks</a></li>
-                    <li><a href="adminOrder.html"><i class="fa-solid fa-box-archive"></i> Orders</a></li>
-                    <li><a href="setUpEvent.html"><i class="fa-solid fa-calendar-days"></i> Set-up Event</a></li>
-                    <li><a href="createAnnouncement.html"><i class="fa-solid fa-bullhorn"></i> Announcements</a></li>
+                    <li class="active"><a href="/admin/dashboard"><i class="fa-solid fa-tachograph-digital"></i> Dashboard</a></li>
+                    <li><a href="/admin/feedback"><i class="fa-solid fa-users"></i> Feedbacks</a></li>
+                    <li><a href="/admin/orders"><i class="fa-solid fa-box-archive"></i> Orders</a></li>
+                    <li><a href="/admin/events"><i class="fa-solid fa-calendar-days"></i> Set-up Event</a></li>
+                    <li><a href="/admin/announcement"><i class="fa-solid fa-bullhorn"></i> Announcements</a></li>
                 </ul>
             </nav>
             <div class="sidebar-footer">
-                <a href="adminLogIn.html"><i class="fa-solid fa-right-from-bracket"></i> Log out</a>
+                <a href="/admin/login"><i class="fa-solid fa-right-from-bracket"></i> Log out</a>
             </div>
         </aside>
 
@@ -35,7 +35,7 @@
         <!--       MAIN CONTENT      -->
         <!-- ======================= -->
         <main class="main-content">
-            <div class="card orders-card clickable-card" data-href="adminOrder.html">
+            <div class="card orders-card clickable-card" data-href="/admin/orders">
                 <h2>Orders <span class="card-nav-arrow">View All →</span></h2>
                 <p class="subtitle">Orders per Merch</p>
                 <div class="chart-container">
@@ -57,21 +57,21 @@
                 </div>
             </div>
 
-            <div class="card events-card clickable-card" data-href="setUpEvent.html">
+            <div class="card events-card clickable-card" data-href="/admin/events">
                 <h2>Upcoming Events <span class="card-nav-arrow">View All →</span></h2>
                 <div class="events-list">
                     <!-- JS will populate this -->
                 </div>
             </div>
 
-            <div class="card feedbacks-card clickable-card" data-href="adminFeedback.html">
+            <div class="card feedbacks-card clickable-card" data-href="/admin/feedback">
                 <h2>Feedbacks <span class="card-nav-arrow">View All →</span></h2>
                 <div class="feedback-list">
                     <!-- JS will populate this -->
                 </div>
             </div>
 
-            <div class="card announcements-card clickable-card" data-href="createAnnouncement.html">
+            <div class="card announcements-card clickable-card" data-href="/admin/announcement">
                 <h2>Announcements <span class="card-nav-arrow">View All →</span></h2>
                 <div class="announcement-list">
                     <!-- Will be populated by JS -->

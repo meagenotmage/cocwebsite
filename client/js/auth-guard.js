@@ -7,7 +7,7 @@
     .then(function (res) { return res.json(); })
     .then(function (data) {
       if (!data.authenticated) {
-        window.location.href = '../html/admin/adminLogIn.html';
+        window.location.href = '/admin/login';
       }
     })
     .catch(function (err) {
