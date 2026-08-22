@@ -126,20 +126,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch product availability (sold out status)
     async function loadProductAvailability() {
         try {
-            const res = await fetch(`${CONFIG.API_URL}/api/products`);
+            const apiUrl = (typeof CONFIG !== 'undefined' && CONFIG.API_URL) ? CONFIG.API_URL : '';
+            const res = await fetch(`${apiUrl}/api/products`);
             if (res.ok) {
                 const products = await res.json();
                 products.forEach(p => {
-                    const item = document.querySelector(`.product-item[data-id="${p.productId}"]`);
+                    const item = document.querySelector(`.product-item[data-id="${p.productId}"], .product-item[data-name="${p.name}"]`);
                     if (item) {
                         item.dataset.soldOut = p.soldOut ? 'true' : 'false';
                         let badge = item.querySelector('.sold-out-badge');
                         if (p.soldOut) {
                             item.classList.add('is-sold-out');
                             if (!badge) {
-                                badge = document.createElement('span');
+                                badge = document.createElement('div');
                                 badge.className = 'sold-out-badge';
-                                badge.textContent = 'Sold Out';
+                                badge.innerHTML = 'SOLD<br>OUT';
                                 item.appendChild(badge);
                             }
                         } else {
@@ -158,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
     productItems.forEach(item => {
         item.addEventListener('click', () => {
             if (item.dataset.soldOut === 'true') {
-                showConfirmation('Item Sold Out', 'Sorry, this merchandise is currently sold out and unavailable for order.');
+                showConfirmation('Item Sold Out', '<p>Sorry, this merchandise is currently sold out and unavailable for order.</p>', false);
                 return;
             }
 
