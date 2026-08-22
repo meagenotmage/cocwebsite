@@ -194,6 +194,33 @@ h1, h2, h3, h4, h5, h6 {
     min-width: 320px;
     max-width: 320px;
     flex-shrink: 0;
+    position: relative;
+}
+
+.product-item.is-sold-out {
+    opacity: 0.75;
+    cursor: not-allowed;
+}
+
+.product-item.is-sold-out:hover {
+    transform: none;
+    box-shadow: var(--shadow-md, 0 4px 16px rgba(0, 0, 0, 0.12));
+}
+
+.sold-out-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #d32f2f;
+    color: white;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 6px 14px;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(211, 47, 47, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 2;
 }
 
 .product-item.image-error img {

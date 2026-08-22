@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -39,7 +39,7 @@
             <div class="card">
                 <h2 class="list-title">Order Tracking List</h2>
 
-                <!-- Payment Method Settings -->
+                <!-- Payment Method & Merch Stock Settings -->
                 <div class="payment-settings-bar">
                     <span class="payment-settings-label"><i class="fa-solid fa-sliders"></i> Payment Methods:</span>
                     <label class="toggle-label">
@@ -56,6 +56,13 @@
                             <span class="toggle-slider"></span>
                         </div>
                     </label>
+                </div>
+
+                <div class="payment-settings-bar merch-settings-bar">
+                    <span class="payment-settings-label"><i class="fa-solid fa-store"></i> Merch Availability:</span>
+                    <div id="merch-toggles-container" class="merch-toggles-container">
+                        <!-- Dynamically populated merch sold-out toggles -->
+                    </div>
                 </div>
 
                 <div class="search-container">

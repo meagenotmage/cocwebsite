@@ -147,7 +147,42 @@ body {
     border: 1px solid #f0e0b0;
     border-radius: 10px;
     padding: 12px 18px;
+    margin-bottom: 12px;
+}
+.merch-settings-bar {
+    background: #f4f6fb;
+    border-color: #d0d7de;
     margin-bottom: 20px;
+}
+.merch-toggles-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+}
+.merch-toggle-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffffff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+.merch-status-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+.merch-status-badge.in-stock {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+.merch-status-badge.sold-out {
+    background-color: #ffebee;
+    color: #c62828;
 }
 .payment-settings-label {
     font-weight: 600;

@@ -221,6 +221,36 @@ const settingsSchema = new mongoose.Schema({
 });
 const Settings = mongoose.model('Settings', settingsSchema);
 
+const productSchema = new mongoose.Schema({
+  productId: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  soldOut: { type: Boolean, default: false },
+  updatedAt: { type: Date, default: Date.now }
+});
+const Product = mongoose.model('Product', productSchema);
+
+const DEFAULT_PRODUCTS = [
+  { productId: '1', name: 'COC Type B Uniform' },
+  { productId: '2', name: 'COC Type C Uniform' },
+  { productId: '3', name: 'COC Nameplate' },
+  { productId: '4', name: 'COC Lanyard' }
+];
+
+async function ensureDefaultProducts() {
+  try {
+    for (const p of DEFAULT_PRODUCTS) {
+      await Product.updateOne(
+        { productId: p.productId },
+        { $setOnInsert: { productId: p.productId, name: p.name, soldOut: false } },
+        { upsert: true }
+      );
+    }
+  } catch (err) {
+    console.error('Error ensuring default products:', err);
+  }
+}
+ensureDefaultProducts();
+
 // Separate schema — NOT shared with orderSchema, so a TTL index here can't touch live orders
 const deletedOrderSchema = new mongoose.Schema({
   orderNumber: { type: Number, required: true },
@@ -933,6 +963,39 @@ app.put('/api/settings/payment', requireAuth, async (req, res) => {
   } catch (err) {
     console.error('Error updating payment settings:', err);
     res.status(500).json({ message: 'Failed to update payment settings.' });
+  }
+});
+
+// --- MERCHANDISE / PRODUCT SOLD OUT ROUTES ---
+
+// Get all products status (public/admin)
+app.get('/api/products', async (req, res) => {
+  try {
+    await ensureDefaultProducts();
+    const products = await Product.find().sort({ productId: 1 });
+    res.json(products);
+  } catch (err) {
+    console.error('Error fetching products:', err);
+    res.status(500).json({ message: 'Failed to fetch products.' });
+  }
+});
+
+// Update product sold-out status (admin)
+app.put('/api/products/:id/sold-out', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { soldOut } = req.body;
+
+    const product = await Product.findOneAndUpdate(
+      { $or: [{ productId: id }, { _id: mongoose.Types.ObjectId.isValid(id) ? id : null }] },
+      { soldOut: Boolean(soldOut), updatedAt: new Date() },
+      { new: true, upsert: true }
+    );
+
+    res.json({ message: 'Product availability updated successfully!', product });
+  } catch (err) {
+    console.error('Error updating product sold-out status:', err);
+    res.status(500).json({ message: 'Failed to update product availability.', error: err.message });
   }
 });
 

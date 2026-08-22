@@ -1,4 +1,4 @@
-﻿document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     const productModal = document.getElementById('product-modal');
     const cartModal = document.getElementById('cart-modal');
     const confirmationModal = document.getElementById('confirmation-modal');
@@ -123,8 +123,45 @@
         }
     }
 
+    // Fetch product availability (sold out status)
+    async function loadProductAvailability() {
+        try {
+            const res = await fetch(`${CONFIG.API_URL}/api/products`);
+            if (res.ok) {
+                const products = await res.json();
+                products.forEach(p => {
+                    const item = document.querySelector(`.product-item[data-id="${p.productId}"]`);
+                    if (item) {
+                        item.dataset.soldOut = p.soldOut ? 'true' : 'false';
+                        let badge = item.querySelector('.sold-out-badge');
+                        if (p.soldOut) {
+                            item.classList.add('is-sold-out');
+                            if (!badge) {
+                                badge = document.createElement('span');
+                                badge.className = 'sold-out-badge';
+                                badge.textContent = 'Sold Out';
+                                item.appendChild(badge);
+                            }
+                        } else {
+                            item.classList.remove('is-sold-out');
+                            if (badge) badge.remove();
+                        }
+                    }
+                });
+            }
+        } catch (err) {
+            console.error('Error fetching product status:', err);
+        }
+    }
+    loadProductAvailability();
+
     productItems.forEach(item => {
         item.addEventListener('click', () => {
+            if (item.dataset.soldOut === 'true') {
+                showConfirmation('Item Sold Out', 'Sorry, this merchandise is currently sold out and unavailable for order.');
+                return;
+            }
+
             const name = item.dataset.name;
             const price = item.dataset.price;
             const imgSrc = item.dataset.imgSrc;

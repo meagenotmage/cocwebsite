@@ -1,4 +1,4 @@
-﻿document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     // ======================= //
     //   MOBILE NAV TOGGLE     //
     // ======================= //
@@ -52,6 +52,75 @@
 
     toggleGcash.addEventListener('change', savePaymentSettings);
     toggleCash.addEventListener('change', savePaymentSettings);
+
+    // ======================= //
+    // MERCH AVAILABILITY LOGIC//
+    // ======================= //
+    const merchTogglesContainer = document.getElementById('merch-toggles-container');
+
+    async function loadMerchSettings() {
+        if (!merchTogglesContainer) return;
+        try {
+            const res = await fetch(`${CONFIG.API_URL}/api/products`);
+            if (res.ok) {
+                const products = await res.json();
+                renderMerchToggles(products);
+            }
+        } catch (e) {
+            console.error('Merch settings load error', e);
+        }
+    }
+
+    function renderMerchToggles(products) {
+        if (!merchTogglesContainer) return;
+        merchTogglesContainer.innerHTML = '';
+        products.forEach(p => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'merch-toggle-item';
+            
+            const isSoldOut = p.soldOut === true;
+            const badgeClass = isSoldOut ? 'sold-out' : 'in-stock';
+            const badgeText = isSoldOut ? 'Sold Out' : 'Available';
+
+            itemDiv.innerHTML = `
+                <span class="merch-name"><strong>${p.name}</strong></span>
+                <span class="merch-status-badge ${badgeClass}">${badgeText}</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" class="merch-soldout-toggle" data-product-id="${p.productId}" ${isSoldOut ? 'checked' : ''}>
+                    <span class="toggle-slider"></span>
+                </label>
+            `;
+
+            const checkbox = itemDiv.querySelector('.merch-soldout-toggle');
+            checkbox.addEventListener('change', async (e) => {
+                const soldOut = e.target.checked;
+                await updateMerchSoldOut(p.productId, soldOut);
+            });
+
+            merchTogglesContainer.appendChild(itemDiv);
+        });
+    }
+
+    async function updateMerchSoldOut(productId, soldOut) {
+        try {
+            const res = await fetch(`${CONFIG.API_URL}/api/products/${productId}/sold-out`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ soldOut })
+            });
+            if (res.ok) {
+                loadMerchSettings();
+            } else {
+                alert('Failed to update product availability status.');
+                loadMerchSettings();
+            }
+        } catch (e) {
+            console.error('Merch status update error', e);
+            alert('Error updating merch availability.');
+            loadMerchSettings();
+        }
+    }
 
     // ======================= //
     //    EXPORTS LOGIC        //
@@ -546,5 +615,6 @@
 
     // Initialize
     loadPaymentSettings();
+    loadMerchSettings();
     loadOrders();
 });
