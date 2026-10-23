@@ -59,9 +59,9 @@
                 </div>
 
                 <div class="payment-settings-bar merch-settings-bar">
-                    <span class="payment-settings-label"><i class="fa-solid fa-store"></i> Merch Availability:</span>
+                    <span class="payment-settings-label"><i class="fa-solid fa-store"></i> Merchandise & Pricing:</span>
                     <div id="merch-toggles-container" class="merch-toggles-container">
-                        <!-- Dynamically populated merch sold-out toggles -->
+                        <!-- Dynamically populated merch toggles & edit buttons -->
                     </div>
                 </div>
 
@@ -132,6 +132,56 @@
             </div>
         </main>
     </div>
+    <!-- Merchandise Edit Modal -->
+    <div id="merch-edit-modal" class="merch-modal management-modal" style="display: none;">
+        <div class="merch-modal-content">
+            <span class="close-merch-modal" id="close-merch-modal-btn">&times;</span>
+            <div class="merch-modal-header">
+                <h3><i class="fa-solid fa-pen-to-square"></i> Edit Merchandise</h3>
+                <p class="merch-modal-subtitle">Update price and image for this item</p>
+            </div>
+            <form id="merch-edit-form">
+                <input type="hidden" id="edit-merch-id">
+                
+                <div class="merch-form-group">
+                    <label for="edit-merch-name">Product Name</label>
+                    <input type="text" id="edit-merch-name" readonly class="merch-input-readonly">
+                </div>
+
+                <div class="merch-form-group">
+                    <label for="edit-merch-price">Price (₱)</label>
+                    <div class="price-input-wrapper">
+                        <span class="currency-symbol">₱</span>
+                        <input type="number" id="edit-merch-price" step="0.01" min="0" required placeholder="0.00" class="merch-input">
+                    </div>
+                </div>
+
+                <div class="merch-form-group">
+                    <label>Product Image</label>
+                    <div class="merch-preview-box">
+                        <img id="edit-merch-preview" src="" alt="Product Preview" onerror="this.src='../../assets/images/general/COCSC.png';">
+                    </div>
+                    <div class="merch-image-actions">
+                        <label class="btn-merch-upload" for="edit-merch-file">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Choose New Image File
+                            <input type="file" id="edit-merch-file" accept="image/*" style="display: none;">
+                        </label>
+                        <span class="or-separator">or enter image URL / path:</span>
+                        <input type="text" id="edit-merch-url" placeholder="https://... or ../assets/images/products/..." class="merch-input">
+                    </div>
+                    <small class="merch-hint">Changes will reflect immediately on the customer order page.</small>
+                </div>
+
+                <div class="merch-modal-buttons">
+                    <button type="button" class="btn-cancel-merch" id="cancel-merch-btn">Cancel</button>
+                    <button type="submit" class="btn-save-merch" id="save-merch-btn">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="../../js/config.js"></script>
     <script src="../../js/auth-guard.js"></script>
     <script src="../../js/admin/adminOrder.js"></script>

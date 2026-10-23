@@ -53,10 +53,31 @@ document.addEventListener('DOMContentLoaded', function () {
     toggleGcash.addEventListener('change', savePaymentSettings);
     toggleCash.addEventListener('change', savePaymentSettings);
 
-    // ======================= //
-    // MERCH AVAILABILITY LOGIC//
-    // ======================= //
+    // ========================================== //
+    // MERCHANDISE AVAILABILITY & PRICING LOGIC   //
+    // ========================================== //
     const merchTogglesContainer = document.getElementById('merch-toggles-container');
+    const merchEditModal = document.getElementById('merch-edit-modal');
+    const merchEditForm = document.getElementById('merch-edit-form');
+    const editMerchId = document.getElementById('edit-merch-id');
+    const editMerchName = document.getElementById('edit-merch-name');
+    const editMerchPrice = document.getElementById('edit-merch-price');
+    const editMerchPreview = document.getElementById('edit-merch-preview');
+    const editMerchFile = document.getElementById('edit-merch-file');
+    const editMerchUrl = document.getElementById('edit-merch-url');
+    const closeMerchModalBtn = document.getElementById('close-merch-modal-btn');
+    const cancelMerchBtn = document.getElementById('cancel-merch-btn');
+    const saveMerchBtn = document.getElementById('save-merch-btn');
+
+    let selectedBase64Image = null;
+
+    function resolveImgUrl(url) {
+        if (!url) return '../../assets/images/general/COCSC.png';
+        if (url.startsWith('data:') || url.startsWith('http://') || url.startsWith('https://') || url.startsWith('../') || url.startsWith('./')) {
+            return url;
+        }
+        return CONFIG.API_URL + url;
+    }
 
     async function loadMerchSettings() {
         if (!merchTogglesContainer) return;
@@ -81,14 +102,23 @@ document.addEventListener('DOMContentLoaded', function () {
             const isSoldOut = p.soldOut === true;
             const badgeClass = isSoldOut ? 'sold-out' : 'in-stock';
             const badgeText = isSoldOut ? 'Sold Out' : 'Available';
+            const formattedPrice = (p.price !== undefined && p.price !== null) ? Number(p.price).toFixed(2) : '0.00';
+            const imgSrc = resolveImgUrl(p.imageUrl);
 
             itemDiv.innerHTML = `
-                <span class="merch-name"><strong>${p.name}</strong></span>
+                <img src="${imgSrc}" alt="${p.name}" class="merch-thumb" onerror="this.src='../../assets/images/general/COCSC.png';">
+                <div class="merch-info">
+                    <span class="merch-name" title="${p.name}"><strong>${p.name}</strong></span>
+                    <span class="merch-price">₱ ${formattedPrice}</span>
+                </div>
                 <span class="merch-status-badge ${badgeClass}">${badgeText}</span>
-                <label class="toggle-switch">
+                <label class="toggle-switch" title="Toggle Sold Out">
                     <input type="checkbox" class="merch-soldout-toggle" data-product-id="${p.productId}" ${isSoldOut ? 'checked' : ''}>
                     <span class="toggle-slider"></span>
                 </label>
+                <button type="button" class="btn-edit-merch" data-product-id="${p.productId}" title="Edit price and image">
+                    <i class="fa-solid fa-pen-to-square"></i> Edit
+                </button>
             `;
 
             const checkbox = itemDiv.querySelector('.merch-soldout-toggle');
@@ -97,7 +127,123 @@ document.addEventListener('DOMContentLoaded', function () {
                 await updateMerchSoldOut(p.productId, soldOut);
             });
 
+            const editBtn = itemDiv.querySelector('.btn-edit-merch');
+            editBtn.addEventListener('click', () => {
+                openMerchEditModal(p);
+            });
+
             merchTogglesContainer.appendChild(itemDiv);
+        });
+    }
+
+    function openMerchEditModal(product) {
+        if (!merchEditModal) return;
+        editMerchId.value = product.productId;
+        editMerchName.value = product.name;
+        editMerchPrice.value = (product.price !== undefined && product.price !== null) ? product.price : '';
+        const resolvedImg = resolveImgUrl(product.imageUrl);
+        editMerchPreview.src = resolvedImg;
+        editMerchUrl.value = (product.imageUrl && !product.imageUrl.startsWith('data:')) ? product.imageUrl : '';
+        if (editMerchFile) editMerchFile.value = '';
+        selectedBase64Image = null;
+        merchEditModal.style.display = 'flex';
+    }
+
+    function closeMerchEditModal() {
+        if (merchEditModal) {
+            merchEditModal.style.display = 'none';
+        }
+        selectedBase64Image = null;
+    }
+
+    if (closeMerchModalBtn) closeMerchModalBtn.onclick = closeMerchEditModal;
+    if (cancelMerchBtn) cancelMerchBtn.onclick = closeMerchEditModal;
+    if (merchEditModal) {
+        merchEditModal.addEventListener('click', (e) => {
+            if (e.target === merchEditModal) closeMerchEditModal();
+        });
+    }
+
+    if (editMerchFile) {
+        editMerchFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file (PNG, JPG, WEBP, etc.)');
+                return;
+            }
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Image file size must be less than 10MB.');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => {
+                selectedBase64Image = reader.result;
+                editMerchPreview.src = selectedBase64Image;
+                if (editMerchUrl) editMerchUrl.value = '';
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    if (editMerchUrl) {
+        editMerchUrl.addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            if (val) {
+                selectedBase64Image = null;
+                editMerchPreview.src = resolveImgUrl(val);
+            }
+        });
+    }
+
+    if (merchEditForm) {
+        merchEditForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const productId = editMerchId.value;
+            const priceVal = parseFloat(editMerchPrice.value);
+
+            if (isNaN(priceVal) || priceVal < 0) {
+                alert('Please enter a valid price (0 or higher).');
+                return;
+            }
+
+            let finalImageUrl = undefined;
+            if (selectedBase64Image) {
+                finalImageUrl = selectedBase64Image;
+            } else if (editMerchUrl && editMerchUrl.value.trim()) {
+                finalImageUrl = editMerchUrl.value.trim();
+            }
+
+            saveMerchBtn.disabled = true;
+            saveMerchBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+            try {
+                const bodyPayload = { price: priceVal };
+                if (finalImageUrl !== undefined) {
+                    bodyPayload.imageUrl = finalImageUrl;
+                }
+
+                const res = await fetch(`${CONFIG.API_URL}/api/products/${productId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(bodyPayload)
+                });
+
+                if (res.ok) {
+                    closeMerchEditModal();
+                    loadMerchSettings();
+                } else {
+                    const data = await res.json().catch(() => ({}));
+                    alert(data.message || 'Failed to update merchandise details.');
+                }
+            } catch (err) {
+                console.error('Error saving merchandise changes:', err);
+                alert('Network error while saving changes.');
+            } finally {
+                saveMerchBtn.disabled = false;
+                saveMerchBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
+            }
         });
     }
 
@@ -122,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // ======================= //
+    // ========================================== //
     //    EXPORTS LOGIC        //
     // ======================= //
     if (exportExcelBtn) {

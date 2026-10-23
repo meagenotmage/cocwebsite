@@ -225,25 +225,39 @@ const productSchema = new mongoose.Schema({
   productId: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   soldOut: { type: Boolean, default: false },
+  price: { type: Number, default: 0 },
+  imageUrl: { type: String, default: '' },
   updatedAt: { type: Date, default: Date.now }
 });
 const Product = mongoose.model('Product', productSchema);
 
 const DEFAULT_PRODUCTS = [
-  { productId: '1', name: 'COC Type B Uniform' },
-  { productId: '2', name: 'COC Type C Uniform' },
-  { productId: '3', name: 'COC Nameplate' },
-  { productId: '4', name: 'COC Lanyard' }
+  { productId: '1', name: 'COC Type B Uniform', price: 680, imageUrl: '../assets/images/products/TYPE B UNIFORM (FRONT VIEW).png' },
+  { productId: '2', name: 'COC Type C Uniform', price: 220, imageUrl: '../assets/images/products/TYPE C UNIFORM (FRONT VIEW).png' },
+  { productId: '3', name: 'COC Nameplate', price: 260, imageUrl: '../assets/images/products/NAMEPLATE.png' },
+  { productId: '4', name: 'COC Lanyard', price: 120, imageUrl: '../assets/images/products/LANYARD.png' }
 ];
 
 async function ensureDefaultProducts() {
   try {
     for (const p of DEFAULT_PRODUCTS) {
-      await Product.updateOne(
-        { productId: p.productId },
-        { $setOnInsert: { productId: p.productId, name: p.name, soldOut: false } },
-        { upsert: true }
-      );
+      const existing = await Product.findOne({ productId: p.productId });
+      if (!existing) {
+        await Product.create({
+          productId: p.productId,
+          name: p.name,
+          price: p.price,
+          imageUrl: p.imageUrl,
+          soldOut: false
+        });
+      } else {
+        const updates = {};
+        if (existing.price === undefined || existing.price === null) updates.price = p.price;
+        if (!existing.imageUrl) updates.imageUrl = p.imageUrl;
+        if (Object.keys(updates).length > 0) {
+          await Product.updateOne({ productId: p.productId }, { $set: updates });
+        }
+      }
     }
   } catch (err) {
     console.error('Error ensuring default products:', err);
@@ -966,7 +980,7 @@ app.put('/api/settings/payment', requireAuth, async (req, res) => {
   }
 });
 
-// --- MERCHANDISE / PRODUCT SOLD OUT ROUTES ---
+// --- MERCHANDISE / PRODUCT ROUTES ---
 
 // Get all products status (public/admin)
 app.get('/api/products', async (req, res) => {
@@ -996,6 +1010,65 @@ app.put('/api/products/:id/sold-out', requireAuth, async (req, res) => {
   } catch (err) {
     console.error('Error updating product sold-out status:', err);
     res.status(500).json({ message: 'Failed to update product availability.', error: err.message });
+  }
+});
+
+// Update product details (price, image, name) - admin
+app.put('/api/products/:id', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { price, imageUrl, name } = req.body;
+
+    const updateFields = { updatedAt: new Date() };
+
+    if (price !== undefined && price !== null && price !== '') {
+      const numPrice = Number(price);
+      if (isNaN(numPrice) || numPrice < 0) {
+        return res.status(400).json({ message: 'Price must be a valid non-negative number.' });
+      }
+      updateFields.price = numPrice;
+    }
+
+    if (imageUrl !== undefined && typeof imageUrl === 'string') {
+      updateFields.imageUrl = imageUrl.trim();
+    }
+
+    if (name && typeof name === 'string') {
+      updateFields.name = name.trim();
+    }
+
+    const product = await Product.findOneAndUpdate(
+      { $or: [{ productId: id }, { _id: mongoose.Types.ObjectId.isValid(id) ? id : null }] },
+      { $set: updateFields },
+      { new: true, upsert: true }
+    );
+
+    res.json({ message: 'Product updated successfully!', product });
+  } catch (err) {
+    console.error('Error updating product:', err);
+    res.status(500).json({ message: 'Failed to update product.', error: err.message });
+  }
+});
+
+// Upload product image file (admin)
+app.post('/api/products/:id/image', requireAuth, upload.single('image'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!req.file) {
+      return res.status(400).json({ message: 'No image file uploaded.' });
+    }
+
+    const imageUrl = `/uploads/${req.file.filename}`;
+    const product = await Product.findOneAndUpdate(
+      { $or: [{ productId: id }, { _id: mongoose.Types.ObjectId.isValid(id) ? id : null }] },
+      { $set: { imageUrl, updatedAt: new Date() } },
+      { new: true, upsert: true }
+    );
+
+    res.json({ message: 'Product image uploaded successfully!', imageUrl, product });
+  } catch (err) {
+    console.error('Error uploading product image:', err);
+    res.status(500).json({ message: 'Failed to upload product image.', error: err.message });
   }
 });
 
