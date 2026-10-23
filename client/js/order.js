@@ -68,58 +68,73 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const sliderDots   = document.getElementById('slider-dots');
     const sliderLabel  = document.getElementById('slider-label');
+    const sliderTabs   = document.getElementById('slider-tabs');
 
-    // Build image slider
+    // Build image slider with Front & Back views
     function buildImageViewer(images) {
         const mainImg = productModal.querySelector('#modal-img');
-        sliderDots.innerHTML = '';
+        const sliderTabsEl = document.getElementById('slider-tabs');
+        if (sliderDots) sliderDots.innerHTML = '';
+        if (sliderTabsEl) sliderTabsEl.innerHTML = '';
         let currentIndex = 0;
 
         if (!images || images.length === 0) return;
-
-        // Always query fresh arrow nodes (they get replaced each call)
-        function getPrev() { return document.getElementById('slider-prev'); }
-        function getNext() { return document.getElementById('slider-next'); }
 
         function goTo(index) {
             currentIndex = (index + images.length) % images.length;
             mainImg.style.opacity = '0';
             setTimeout(() => {
                 mainImg.src = images[currentIndex].src;
-                sliderLabel.textContent = images[currentIndex].label;
+                if (sliderLabel) sliderLabel.textContent = images[currentIndex].label;
                 mainImg.style.opacity = '1';
             }, 160);
-            sliderDots.querySelectorAll('.dot').forEach((d, i) => {
-                d.classList.toggle('active', i === currentIndex);
+            if (sliderTabsEl) {
+                sliderTabsEl.querySelectorAll('.view-tab-btn').forEach((btn, i) => {
+                    btn.classList.toggle('active', i === currentIndex);
+                });
+            }
+        }
+
+        // Set initial (Front View)
+        mainImg.src = images[0].src;
+        if (sliderLabel) sliderLabel.textContent = images[0].label;
+
+        const multi = images.length > 1;
+        if (sliderDots) sliderDots.style.display = 'none';
+        if (sliderTabsEl) sliderTabsEl.style.display = multi ? 'flex' : 'none';
+
+        const prevArrow = document.getElementById('slider-prev');
+        const nextArrow = document.getElementById('slider-next');
+        if (prevArrow) prevArrow.style.display = multi ? 'flex' : 'none';
+        if (nextArrow) nextArrow.style.display = multi ? 'flex' : 'none';
+
+        if (multi && sliderTabsEl) {
+            images.forEach((imgObj, i) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'view-tab-btn' + (i === 0 ? ' active' : '');
+                const icon = (imgObj.label && imgObj.label.toLowerCase().includes('back')) ? 'fa-rotate' : 'fa-eye';
+                btn.innerHTML = `<i class="fa-solid ${icon}"></i> ${imgObj.label}`;
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    goTo(i);
+                });
+                sliderTabsEl.appendChild(btn);
             });
         }
 
-        // Set initial
-        mainImg.src = images[0].src;
-        sliderLabel.textContent = images[0].label;
-
-        const multi = images.length > 1;
-        sliderDots.style.display = multi ? 'flex' : 'none';
-        getPrev().style.display  = multi ? 'flex' : 'none';
-        getNext().style.display  = multi ? 'flex' : 'none';
-
         if (multi) {
-            // Build dots
-            images.forEach((_, i) => {
-                const dot = document.createElement('span');
-                dot.className = 'dot' + (i === 0 ? ' active' : '');
-                dot.addEventListener('click', () => goTo(i));
-                sliderDots.appendChild(dot);
-            });
-
-            // Replace arrow nodes to clear stale listeners, then re-attach
             ['slider-prev', 'slider-next'].forEach(id => {
                 const old = document.getElementById(id);
-                const clone = old.cloneNode(true);
-                old.parentNode.replaceChild(clone, old);
+                if (old) {
+                    const clone = old.cloneNode(true);
+                    old.parentNode.replaceChild(clone, old);
+                }
             });
-            document.getElementById('slider-prev').addEventListener('click', () => goTo(currentIndex - 1));
-            document.getElementById('slider-next').addEventListener('click', () => goTo(currentIndex + 1));
+            const freshPrev = document.getElementById('slider-prev');
+            const freshNext = document.getElementById('slider-next');
+            if (freshPrev) freshPrev.addEventListener('click', (e) => { e.preventDefault(); goTo(currentIndex - 1); });
+            if (freshNext) freshNext.addEventListener('click', (e) => { e.preventDefault(); goTo(currentIndex + 1); });
         }
     }
 
@@ -166,24 +181,22 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }
 
-                        // Update image dynamically
+                        // Update catalog card image (image showing in the order catalog that has the price)
                         if (p.imageUrl && p.imageUrl.trim() !== '') {
                             const resolvedImg = resolveImgUrl(p.imageUrl);
-                            item.dataset.imgSrc = resolvedImg;
                             const cardImg = item.querySelector('img');
                             if (cardImg) {
                                 cardImg.src = resolvedImg;
                             }
-                            const rawImages = item.dataset.images;
-                            if (rawImages) {
-                                try {
-                                    const parsed = JSON.parse(rawImages);
-                                    if (Array.isArray(parsed) && parsed.length > 0) {
-                                        parsed[0].src = resolvedImg;
-                                        item.dataset.images = JSON.stringify(parsed);
-                                    }
-                                } catch (e) {}
-                            }
+                        }
+
+                        // Update modal product views (Front and Back view)
+                        if (p.views && Array.isArray(p.views) && p.views.length > 0) {
+                            const resolvedViews = p.views.map(v => ({
+                                src: resolveImgUrl(v.src),
+                                label: v.label || 'View'
+                            }));
+                            item.dataset.images = JSON.stringify(resolvedViews);
                         }
                     }
                 });

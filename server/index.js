@@ -227,15 +227,55 @@ const productSchema = new mongoose.Schema({
   soldOut: { type: Boolean, default: false },
   price: { type: Number, default: 0 },
   imageUrl: { type: String, default: '' },
+  views: [{
+    src: String,
+    label: String
+  }],
   updatedAt: { type: Date, default: Date.now }
 });
 const Product = mongoose.model('Product', productSchema);
 
 const DEFAULT_PRODUCTS = [
-  { productId: '1', name: 'COC Type B Uniform', price: 680, imageUrl: '../assets/images/products/TYPE B UNIFORM (FRONT VIEW).png' },
-  { productId: '2', name: 'COC Type C Uniform', price: 220, imageUrl: '../assets/images/products/TYPE C UNIFORM (FRONT VIEW).png' },
-  { productId: '3', name: 'COC Nameplate', price: 260, imageUrl: '../assets/images/products/NAMEPLATE.png' },
-  { productId: '4', name: 'COC Lanyard', price: 120, imageUrl: '../assets/images/products/LANYARD.png' }
+  {
+    productId: '1',
+    name: 'COC Type B Uniform',
+    price: 680,
+    imageUrl: '../assets/images/products/TYPE B UNIFORM.png',
+    views: [
+      { src: '../assets/images/products/TYPE B UNIFORM (FRONT VIEW).png', label: 'Front View' },
+      { src: '../assets/images/products/TYPE B UNIFORM (BACK VIEW).png', label: 'Back View' }
+    ]
+  },
+  {
+    productId: '2',
+    name: 'COC Type C Uniform',
+    price: 220,
+    imageUrl: '../assets/images/products/TYPE C UNIFORM.jpg',
+    views: [
+      { src: '../assets/images/products/TYPE C UNIFORM (FRONT VIEW).png', label: 'Front View' },
+      { src: '../assets/images/products/TYPE C UNIFORM (BACK VIEW).png', label: 'Back View' }
+    ]
+  },
+  {
+    productId: '3',
+    name: 'COC Nameplate',
+    price: 260,
+    imageUrl: '../assets/images/products/NAMEPLATE.png',
+    views: [
+      { src: '../assets/images/products/NAMEPLATE (2).png', label: 'Front View' },
+      { src: '../assets/images/products/NAMEPLATE (3).png', label: 'Back View' }
+    ]
+  },
+  {
+    productId: '4',
+    name: 'COC Lanyard',
+    price: 120,
+    imageUrl: '../assets/images/products/LANYARD.png',
+    views: [
+      { src: '../assets/images/products/LANYARD (2).png?v=2', label: 'Front View' },
+      { src: '../assets/images/products/LANYARD (3).png?v=2', label: 'Back View' }
+    ]
+  }
 ];
 
 async function ensureDefaultProducts() {
@@ -248,12 +288,19 @@ async function ensureDefaultProducts() {
           name: p.name,
           price: p.price,
           imageUrl: p.imageUrl,
+          views: p.views,
           soldOut: false
         });
       } else {
         const updates = {};
         if (existing.price === undefined || existing.price === null) updates.price = p.price;
-        if (!existing.imageUrl) updates.imageUrl = p.imageUrl;
+        // Ensure catalog image with price is used if it was set to front view
+        if (!existing.imageUrl || existing.imageUrl.includes('FRONT VIEW')) {
+          updates.imageUrl = p.imageUrl;
+        }
+        if (!existing.views || existing.views.length === 0) {
+          updates.views = p.views;
+        }
         if (Object.keys(updates).length > 0) {
           await Product.updateOne({ productId: p.productId }, { $set: updates });
         }
