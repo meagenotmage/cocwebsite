@@ -123,7 +123,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Fetch product availability (sold out status)
+    function resolveImgUrl(url) {
+        if (!url) return '';
+        if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:') || url.startsWith('../') || url.startsWith('./')) {
+            return url;
+        }
+        const apiUrl = (typeof CONFIG !== 'undefined' && CONFIG.API_URL) ? CONFIG.API_URL : '';
+        return apiUrl + url;
+    }
+
+    // Fetch product availability, prices, and images
     async function loadProductAvailability() {
         try {
             const apiUrl = (typeof CONFIG !== 'undefined' && CONFIG.API_URL) ? CONFIG.API_URL : '';
@@ -146,6 +155,35 @@ document.addEventListener('DOMContentLoaded', () => {
                         } else {
                             item.classList.remove('is-sold-out');
                             if (badge) badge.remove();
+                        }
+
+                        // Update price dynamically
+                        if (p.price !== undefined && p.price !== null && p.price !== '') {
+                            item.dataset.price = p.price;
+                            const priceP = item.querySelector('.product-info-text p');
+                            if (priceP) {
+                                priceP.textContent = `₱ ${p.price}`;
+                            }
+                        }
+
+                        // Update image dynamically
+                        if (p.imageUrl && p.imageUrl.trim() !== '') {
+                            const resolvedImg = resolveImgUrl(p.imageUrl);
+                            item.dataset.imgSrc = resolvedImg;
+                            const cardImg = item.querySelector('img');
+                            if (cardImg) {
+                                cardImg.src = resolvedImg;
+                            }
+                            const rawImages = item.dataset.images;
+                            if (rawImages) {
+                                try {
+                                    const parsed = JSON.parse(rawImages);
+                                    if (Array.isArray(parsed) && parsed.length > 0) {
+                                        parsed[0].src = resolvedImg;
+                                        item.dataset.images = JSON.stringify(parsed);
+                                    }
+                                } catch (e) {}
+                            }
                         }
                     }
                 });
