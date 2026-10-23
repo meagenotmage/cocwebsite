@@ -190,6 +190,10 @@ const orderSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+// Index for efficient sorting and filtering — prevents in-memory sort limit errors on Atlas M0
+orderSchema.index({ createdAt: -1 });
+orderSchema.index({ markedForDeletion: 1, createdAt: -1 });
+
 // Prevent TTL indexes from accidentally deleting orders
 orderSchema.set('skipVersioning', true);
 
@@ -576,7 +580,7 @@ app.get('/api/orders', requireAuth, async (req, res) => {
       query.paymentStatus = paymentStatus;
     }
 
-    const orders = await Order.find(query).sort({ createdAt: -1 });
+    const orders = await Order.find(query).sort({ createdAt: -1 }).allowDiskUse(true);
     res.json(orders);
   } catch (err) {
     console.error('Error fetching orders:', err);
